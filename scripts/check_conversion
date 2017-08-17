@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+
+import ROOT as r
+r.PyConfig.IgnoreCommandLineOptions = True
+import h5py
+from optparse import OptionParser
+import glob
+
+class Counts :
+    def __init__(self, name="") :
+        self.name = name
+        self.rcounts = 0
+        self.hcounts = 0
+
+    def Print(self) :
+        print "%s %2s r %10d %2s h %10d - %d"%(self.name, '', self.rcounts, '', self.hcounts, self.ok())
+
+    def ok(self) :
+        return self.rcounts == self.hcounts
+
+def get_name(filename) :
+    return filename.split("/")[-1].replace(".root","").replace(".h5","")
+
+def get_file(filelist, name) :
+    for f in filelist :
+        if name in f :
+            return f
+    return None
+
+def get_rcounts(filename) :
+    rfile = r.TFile.Open(filename)
+    tree = rfile.Get("superNt")
+    entries = tree.GetEntries()
+    tree.Delete()
+    rfile.Delete()
+    return entries
+
+def get_hcounts(filename) :
+    hfile = h5py.File(filename, 'r')
+    keys = hfile.keys()
+    if "superNt" not in keys :
+        print "WARNING Did not find 'superNt' key in h5 file %s"%filename
+        return 0
+    return hfile['superNt'].size
+
+def get_counts(root_files, h5_files, verbose) :
+
+    counts = []
+    bad = []
+    for rf in root_files :
+        name = get_name(rf)
+        c = Counts(name)
+        hf = get_file(h5_files, name)
+        if not hf :
+            print "WARNING Did not find h5 output for input ROOT file %s"%rf
+            continue
+        c.rcounts = get_rcounts(rf)
+        c.hcounts = get_hcounts(hf)
+        if not c.ok() :
+            bad.append(c)
+        counts.append(c)
+
+    if not len(bad) == 0 :
+        print 45 * "-"
+        print "There were bad conversions!"
+        print ""
+        for bc in bad :
+            bc.Print()
+    else :
+        print "All OK"
+
+    if len(counts) and verbose :
+        print 45 * '-'
+        print "Counts summary:"
+        print ""
+        for cc in counts :
+            cc.Print()
+        
+
+def main() :
+    parser = OptionParser()
+    parser.add_option("-i", "--init-dir", help="Directory containing ROOT files that were converted", default="")
+    parser.add_option("-o", "--out-dir", help="Directory containing *.h5 files", default="")
+    parser.add_option("-v", "--verbose", help="Print out  more stuff", action="store_true", default=False)
+    (options, args) = parser.parse_args()
+    root_dir = options.init_dir
+    h5_dir = options.out_dir
+    verbose = options.verbose
+
+    if not root_dir.endswith("/") :
+        root_dir += "/"
+
+    if not h5_dir.endswith("/") :
+        h5_dir += "/"
+
+    root_files = glob.glob(root_dir + "*.root")
+    h5_files = glob.glob(h5_dir + "*.h5") 
+
+    get_counts(root_files, h5_files, verbose)
+
+    
+
+#______
+if __name__ == "__main__" :
+    main()
