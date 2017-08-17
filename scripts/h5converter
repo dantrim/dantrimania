@@ -2,6 +2,11 @@
 
 function main {
 
+    if [[ -z ${ROOTSYS} ]]; then
+        echo "ROOTSYS not found, setup ROOT first"
+        return
+    fi
+
     echo "INFO: Converting files to HDF5"
     list_of_files=${@}
     file_array=( $list_of_files )
