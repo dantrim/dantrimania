@@ -246,7 +246,7 @@ def make_test_stack(bkgs, signals, data) : #, hist) :
     #upper = hist.fig.add_axes([0.1,0.4,0.9,0.9])
     #lower = hist.fig.add_axes([0.1,0.1,0.9,0.25])
 
-    do_logy = True#False
+    do_logy = False
     if do_logy :
         upper.set_yscale('log')
     nbins = np.arange(low[ivar], high[ivar] + bw[ivar], bw[ivar])
@@ -382,12 +382,12 @@ def make_test_stack(bkgs, signals, data) : #, hist) :
         else :
             ratio = d / prediction 
         ratio_y[idata] = ratio
-    lower.plot(ratio_x[:-1], ratio_y, 'ko')
+    lower.plot(ratio_x[:-1], ratio_y, 'ko', zorder=1000)
 
     # red line
     xl = np.linspace(low[ivar], high[ivar], 20)
     yl = np.ones(len(xl))
-    lower.plot(xl,yl, 'r--')
+    lower.plot(xl,yl, 'r--', zorder=0)
     
 
     # axes
@@ -396,7 +396,7 @@ def make_test_stack(bkgs, signals, data) : #, hist) :
     lower.set_ylim(0.0, 2)
     upper.set_xlim(0.0, 1)
     upper.set_xticklabels([])
-    lower.set_yticklabels([0.0, 0.5, 1.0, 1.5, 2.0])
+    #lower.set_yticklabels([0.0, 0.5, 1.0, 1.5, 2.0])
     lower.set_xlim(0.0, 1.0)
 
     for ax in [upper, lower] :
