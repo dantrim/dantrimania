@@ -23,7 +23,7 @@ def get_name(filename) :
 
 def get_file(filelist, name) :
     for f in filelist :
-        if name in f :
+        if name == get_name(f) :
             return f
     return None
 
