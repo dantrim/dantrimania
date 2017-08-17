@@ -7,6 +7,11 @@ function main {
         return
     fi
 
+    if [ ! $(which hdf-tuple-from-root 2>/dev/null) ]; then
+        echo "Cannot find path to hdf-tuple-from-root executable, did you call source setup_h5.sh?"
+        return 
+    fi
+
     echo "INFO: Converting files to HDF5"
     list_of_files=${@}
     file_array=( $list_of_files )
