@@ -5,7 +5,7 @@ function main {
     echo "INFO: Converting files to HDF5"
     list_of_files=${@}
     file_array=( $list_of_files )
-    echo "list of files = ${list_of_files}"
+    #echo "list of files = ${list_of_files}"
     #for f in $file_array ; do
     for findex in ${!file_array[@]}; do
         idxstr=$((findex+1))
