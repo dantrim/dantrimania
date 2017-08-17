@@ -383,6 +383,11 @@ def make_test_stack(bkgs, signals, data) : #, hist) :
             ratio = d / prediction 
         ratio_y[idata] = ratio
     lower.plot(ratio_x[:-1], ratio_y, 'ko')
+
+    # red line
+    xl = np.linspace(low[ivar], high[ivar], 20)
+    yl = np.ones(len(xl))
+    lower.plot(xl,yl, 'r--')
     
 
     # axes
