@@ -1,0 +1,33 @@
+#!/bin/bash
+
+function main {
+
+    echo "INFO: Converting files to HDF5"
+    list_of_files=${@}
+    file_array=( $list_of_files )
+    echo "list of files = ${list_of_files}"
+    look_for="CENTRAL_"
+    echo "INFO: > number of files ${#file_array[@]}"
+    #for f in $file_array ; do
+    for findex in ${!file_array[@]}; do
+        idxstr=$((findex+1))
+        f="${file_array[$findex]}"
+        echo "[${idxstr}/${#file_array[@]}] ${f}"
+        if [[ ${f} == *${look_for}* ]]; then
+            is_root=".root"
+            if [[ ${f} == *${is_root}* ]]; then
+                oname=$(basename ${f})
+                nf=$(echo "${oname}" | sed 's/root/h5/')
+                hdf-tuple-from-root ${f} ${nf} #1>/dev/null # remove warnings about missing vars
+            else
+                echo " > WARNING Skipping file ${f}"
+            fi
+            
+        else
+            echo " > WARNING Skipping file ${f}"
+        fi
+    done
+
+}
+
+main $*
