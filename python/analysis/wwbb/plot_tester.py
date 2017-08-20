@@ -477,7 +477,7 @@ def make_test_stack(selection, var, vars, bkgs, signals, data) : #, hist) :
         which_grid = 'both'
         if do_logy :
             which_grid = 'major'
-        ax.grid(color='k', which=which_grid, linestyle='--', lw=1, alpha=0.5)
+        ax.grid(color='k', which=which_grid, linestyle='--', lw=1, alpha=0.1)
 
     #print "upper ylabel = ", upper.get_position()
     ax_x = upper.get_position().x0;
@@ -516,9 +516,9 @@ def make_test_stack(selection, var, vars, bkgs, signals, data) : #, hist) :
     #upper.legend(loc=2, frameon=False, ncol=2, fontsize=16, numpoints=1)
 
 
-    save_name = "np_test_%s.png" % vars[ivar]
+    save_name = "./test_plots/np_test_%s.pdf" % vars[ivar]
     print "Saving plot to : %s" % save_name
-    fig.savefig(save_name,  bbox_inches='tight')#, dpi=200)
+    fig.savefig(save_name,  bbox_inches='tight', dpi=200)
     #hist.fig.savefig("np_test.png")#, dpi=200)
 
 def check_selected_sample(list_name, sample, selection_str, selection_name, relevant_variables) :
