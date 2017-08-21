@@ -9,6 +9,9 @@ import dantrimania.python.analysis.utility.utils.utils as utils
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
 
 import numpy as np
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import Rectangle
+import matplotlib.patches as mpatches
 
 
 def check_config(config) :
@@ -131,6 +134,24 @@ def add_labels(pad, region_name = "") :
     # region
     pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
 
+def make_error_bands(x, y, xerr, yerr, bw) :
+    error_boxes = []
+    for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
+        h = yc + ye - (yc - ye)
+        rect = Rectangle((xc, yc-ye), bw, h, label = 'Uncertainty',
+                            edgecolor='none',
+                            fill=False,
+                            color=None,
+                            zorder=100000)
+        error_boxes.append(rec)
+    pc = PatchCollection(error_boxes, label = 'Uncertainty',
+                            edgecolor='none',
+                            facecolor=None,
+                            alpha=0.0,
+                            hatch='\\\\\\',
+                            zorder=10000)
+    return pc
+
 def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
     print 50 * "-"
@@ -144,20 +165,24 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
     # group the histos
     bkg_histos = []
+    w2_histos = []
 
     # store color/label and index
     colors = {}
     labels = []
     weights = {}
+    weights2 = []
 
     for ibkg, bkg in enumerate(backgrounds) :
 
         # 'histo' is the array of values
         histo = []
+        w2_histo = []
 
         # get the 'chain' (iterator over the datasets in the selelection file)
         chain = bkg.chain()
         b_weights = []
+        b_weights2 = []
         for ibc, bc in enumerate(chain) :
 
             # get the eventweight and scale it by the lumi/scalefactor
@@ -169,14 +194,19 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
             # sumw2
             w2 = bc['eventweight'] ** 2
             w2 = lumis * w2
+            b_weights2 += list(w2)
 
             # data to fill the histo
             histo += list(bc[plot.vartoplot]) # TODO see how to avoid list() calls, use numpy
+            w2_histo += list(bc[plot.vartoplot])
 
         labels.append(bkg.name)
         bkg_histos.append(histo)
+        w2_histos.append(w2_histo)
         colors[bkg.name] = bkg.color
         weights[bkg.name] = b_weights
+        weights2.append(b_weights2)
+        #weights2[bkg.name] = b_weights2
 
     count_map = {}
     for ilabel, label in enumerate(labels) :
@@ -209,6 +239,16 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
                                 lw = 1,
                                 edgecolor = 'k',
                                 alpha = 1.0)
+
+    print "len w2_y = %d, len bins = %d  len w2 weights = %d" % (len(w2_histos), len(nbins), len(weights2) )
+    print " type w2_histos = ", type(w2_histos)
+    print " type nbins = ", type(nbins)
+    print " type weights2 = ", type(weights2)
+    w2_y, w2_x = np.histogram(w2_histos, bins = nbins, weights = weights2)
+    yerr = np.sqrt(w2_y)
+    xerr = [plot.binwidth + 0.5 for a in x]
+    stat_error_hatches = make_error_bands(x,y,xerr,yerr, plot.binwidth)
+    upper.add_collection(error_hatches)
 
     # total of the stack is the last array in the histgram since we stack
     total_sm_y = y[-1]
