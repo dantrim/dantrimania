@@ -121,7 +121,7 @@ class Sample(object) :
         self._filelist_dir = val
 
     # load the sample
-    def load(self, filelist_directory, h5_dir) :
+    def load(self, filelist_directory, h5_dir, dsid_select = "") :
 
         if not h5_dir.endswith("/") :
             h5_dir += "/"
@@ -161,7 +161,13 @@ class Sample(object) :
             dsid = dsid.split(".")[0]
             if is_data :
                 dsid = dsid[2:] # remove first 00
-            sample_dsids.append(dsid)
+
+            if dsid_select == "" :
+                sample_dsids.append(dsid)
+            else :
+                if int(dsid_select) == int(dsid) :
+                    sample_dsids.append(dsid)
+            
 
         sample_files = []
         for dsid in sample_dsids :
