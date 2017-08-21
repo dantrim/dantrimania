@@ -259,4 +259,10 @@ class SampleCacher(object) :
                         print "Loading   > %s (from pre-existing group)" % sample.name
                         sample.selection_file = full_filename
                         sample.selection_group = "/%s/%s/" % ( str(selection_group.name), sample.name )
+                    else :
+                        print "Loading   > %s did not find in pre-existing group, adding it now" % sample.name
+                        process_group = selection_group.create_group(sample.name)
+                        self.add_process_to_cache(process_group, sample)
+                        sample.selection_file = full_filename
+                        sample.selection_group = "/%s/%s/" % ( str(selection_group.name), sample.name )
             return full_filename
