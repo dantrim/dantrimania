@@ -135,15 +135,19 @@ def add_labels(pad, region_name = "") :
     pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
 
 def make_error_bands(x, y, xerr, yerr, bw) :
+
     error_boxes = []
     for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
         h = yc + ye - (yc - ye)
+        #print "error h = %.2f" % h
+        if yc == 0 :
+            continue
         rect = Rectangle((xc, yc-ye), bw, h, label = 'Uncertainty',
                             edgecolor='none',
                             fill=False,
                             color=None,
                             zorder=100000)
-        error_boxes.append(rec)
+        error_boxes.append(rect)
     pc = PatchCollection(error_boxes, label = 'Uncertainty',
                             edgecolor='none',
                             facecolor=None,
@@ -152,11 +156,10 @@ def make_error_bands(x, y, xerr, yerr, bw) :
                             zorder=10000)
     return pc
 
+
 def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
     print 50 * "-"
-
-    print "nb -- not adding overflow, not making error bars"
 
     xlow = plot.xlow
     xhigh = plot.xhigh
@@ -192,8 +195,10 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
             b_weights += list(w)
 
             # sumw2
-            w2 = bc['eventweight'] ** 2
-            w2 = lumis * w2
+            #w2 = bc['eventweight'] ** 2
+            #w2 = lumis * w2
+            w2 = lumis * bc['eventweight']
+            w2 = w2 ** 2
             b_weights2 += list(w2)
 
             # data to fill the histo
@@ -229,6 +234,9 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     # pads
     upper = plot.upper
     lower = plot.lower
+
+    # add overflow
+    bkg_histos = [np.clip(b, nbins[0], nbins[-1]) for b in bkg_histos]
     y, x, patches = upper.hist(bkg_histos,
                                 bins = nbins,
                                 color = colors,
@@ -240,15 +248,6 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
                                 edgecolor = 'k',
                                 alpha = 1.0)
 
-    print "len w2_y = %d, len bins = %d  len w2 weights = %d" % (len(w2_histos), len(nbins), len(weights2) )
-    print " type w2_histos = ", type(w2_histos)
-    print " type nbins = ", type(nbins)
-    print " type weights2 = ", type(weights2)
-    w2_y, w2_x = np.histogram(w2_histos, bins = nbins, weights = weights2)
-    yerr = np.sqrt(w2_y)
-    xerr = [plot.binwidth + 0.5 for a in x]
-    stat_error_hatches = make_error_bands(x,y,xerr,yerr, plot.binwidth)
-    upper.add_collection(error_hatches)
 
     # total of the stack is the last array in the histgram since we stack
     total_sm_y = y[-1]
@@ -257,6 +256,18 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     f = 1.8
     if plot.logy :
         f = 10000
+
+
+    w2_h = np.ones(len(nbins[:-1]))
+    for iw, w in enumerate(w2_histos) :
+        h2y, _ = np.histogram(w, bins = nbins, weights = weights2[iw])
+        w2_h += h2y
+    
+    yerr = np.sqrt(w2_h)
+    xerr = [plot.binwidth + 0.5 for a in x]
+    stat_error_hatches = make_error_bands(x,total_sm_y,xerr,yerr, plot.binwidth)
+    upper.add_collection(stat_error_hatches)
+
 
     #########################################
     # draw total sm line
@@ -283,7 +294,7 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
             histod += list(dc[plot.vartoplot])
         if max(histod) > maxy : maxy = max(histod)
 
-        datay = np.histogram(histod, bins = nbins) [0]
+        datay = np.histogram(np.clip(histod, nbins[0], nbins[-1]), bins = nbins) [0]
         datax = [dx + 0.5 * bw for dx in total_sm_x]
         upper.plot(datax[:-1], datay, 'ko', label = 'Data')
 
@@ -303,12 +314,22 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         for idata, d in enumerate(datay) :
             prediction = total_sm_y[idata]
             ratio = 1.0
-            if prediction == 0 :
+            if prediction == 0 or d == 0:
                 ratio = -5.0
             else :
                 ratio = d / prediction
             ratio_y[idata] = ratio
         lower.plot(ratio_x[:-1], ratio_y, 'ko', zorder=1000)
+
+        ratio_err = []
+        for ism, sm in enumerate(total_sm_y) :
+            sm_err = yerr[ism]
+            rel_error = 0
+            if sm != 0 :
+                rel_error = float(sm_err / sm)
+            ratio_err.append(rel_error)
+        stat_error_band = make_error_bands(ratio_x[:-1], np.ones(len(total_sm_y)), xerr, ratio_err, plot.binwidth) 
+        lower.add_collection(stat_error_band)
 
     # red line
     xl = np.linspace(xlow, xhigh, 20)
@@ -409,10 +430,11 @@ def main() :
             print "ERROR Requested variable (=%s) not found in configured plots" % select_var
             sys.exit()
     tmp_plots = []
-    for p in loaded_plots :
-        if p.vartoplot == select_var :
-            tmp_plots.append(p)
-    loaded_plots = tmp_plots
+    if select_var != "" :
+        for p in loaded_plots :
+            if p.vartoplot == select_var :
+                tmp_plots.append(p)
+        loaded_plots = tmp_plots
             
 
     # cache
