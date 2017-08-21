@@ -104,11 +104,32 @@ def make_legend(ordering, name_dict, pad) :
                 new_handles.append(handles[il])
     pad.legend(new_handles,
                 new_labels,
-                loc=2,
+                loc=1,
                 frameon=False,
                 ncol=2,
-                fontsize=14,
-                numpoints=1)
+                fontsize=12,
+                numpoints=1,
+                labelspacing=0.2,
+                columnspacing=0.4)
+
+def add_labels(pad, region_name = "") :
+
+    # ATLAS label
+    size = 18
+    at_text = 'ATLAS'
+    opts = dict(transform = pad.transAxes)
+    opts.update( dict(va='top', ha='left') )
+    pad.text(0.05, 0.97, at_text, size = size, style = 'italic', weight = 'bold',  **opts)
+
+    what_kind = 'Internal'
+    pad.text(0.23, 0.97, what_kind, size = size, **opts)
+
+    # lumi stuff
+    lumi = "36.1"
+    pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % ( lumi ), size = 0.75*size, **opts)
+
+    # region
+    pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
 
 def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
@@ -193,7 +214,7 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     total_sm_y = y[-1]
     total_sm_x = x
     maxy = max(total_sm_y)
-    f = 2.0
+    f = 1.8
     if plot.logy :
         f = 10000
 
@@ -268,10 +289,15 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     legend_order += sorted(labels, reverse=True)
     leg_names = {}
     leg_names['Data'] = 'Data'
-    leg_names['Total SM'] = 'Standard Model'
+    leg_names['Total SM'] = 'Total SM'
     for bkg in backgrounds :
         leg_names[bkg.name] = bkg.displayname 
     make_legend(legend_order, leg_names, upper)
+
+    ######################################
+    # ATLAS text
+    add_labels(upper, region_name = region.displayname)
+
 
     ######################################
     # save
@@ -291,6 +317,7 @@ def main() :
     parser.add_option("-c", "--config", default="", help="Configuration file for plotting")
     parser.add_option("-r", "--region", default="", help="Provide a region selection")
     parser.add_option("-o", "--output", default="./", help="Provide an output directory for plots (will make it if it does not exist)")
+    parser.add_option("-v", "--var", default="", help="Provide as specific variable to plot")
     parser.add_option("--logy", default=False, action="store_true", help="Set plots to have log y-axis")
     parser.add_option("--cache-dir", default="./sample_cache", help="Directory to place/look for the cached samples")
     (options, args) = parser.parse_args()
@@ -299,6 +326,7 @@ def main() :
     do_logy = options.logy
     region = options.region
     output_dir = options.output
+    select_var = options.var
 
     #
     print "plotter1d"
@@ -333,8 +361,19 @@ def main() :
             region_to_plot = r
             break
 
+    variables_found = []
     for p in loaded_plots :
-        print str(p)
+        variables_found.append(p.vartoplot)
+    if select_var != "" :
+        if select_var not in variables_found :
+            print "ERROR Requested variable (=%s) not found in configured plots" % select_var
+            sys.exit()
+    tmp_plots = []
+    for p in loaded_plots :
+        if p.vartoplot == select_var :
+            tmp_plots.append(p)
+    loaded_plots = tmp_plots
+            
 
     # cache
     cacher = sample_cacher.SampleCacher(cache_dir)
