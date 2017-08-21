@@ -169,6 +169,11 @@ class RatioCanvas(hist1d) :
         lower.set_xlim(self.xlow, self.xhigh)
         lower.set_ylim(0.0, 2.0)
 
+        majorticks = [0.0, 0.5, 1.0, 1.5, 2.0]
+        lower.set_yticks(majorticks, minor=False)
+        lower.set_yticks([], minor=True)
+        #lower.set_yticklabels([0.0, 0.5, 1.0, 1.5, 2.0])
+
         for ax in [upper, lower] :
             ax.tick_params(axis='both', which='both', labelsize=16)
             which_grid = 'both'
