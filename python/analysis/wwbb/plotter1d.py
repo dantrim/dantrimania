@@ -7,6 +7,8 @@ import sys
 import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.utils.utils as utils
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
+import dantrimania.python.analysis.utility.utils.plib_utils as plib
+plt = plib.import_pyplot()
 
 import numpy as np
 from matplotlib.collections import PatchCollection
@@ -103,17 +105,50 @@ def make_legend(ordering, name_dict, pad) :
     for l in ordering :
         for il, label in enumerate(labels) :
             if label == l :
-                new_labels.append(name_dict[l])
+                new_labels.append(name_dict[l].replace("SIG",""))
                 new_handles.append(handles[il])
+
+    leg_x, leg_y = 0.5, 0.75
     pad.legend(new_handles,
                 new_labels,
-                loc=1,
+                #loc=1,
+                loc=(leg_x, leg_y),
                 frameon=False,
                 ncol=2,
                 fontsize=12,
                 numpoints=1,
                 labelspacing=0.2,
                 columnspacing=0.4)
+
+    return leg_x, leg_y
+
+def make_signal_legend(labels, colors, coords = [], pad = None) :
+
+    handles, leg_labels = pad.get_legend_handles_labels()
+    sig_handles = []
+    sig_labels = []
+
+    for l in labels :
+        for il, ll in enumerate(leg_labels) :
+            if l == ll :
+                sig_handles.append(handles[il])
+                sig_labels.append(l.replace("SIG",""))
+
+    y_vals = []
+    for il, l in enumerate(sig_labels) :
+        y = coords[1] - 0.04 * (1.1*il+1)
+        y_vals.append(y)
+        pad.text(coords[0] + 0.1,  y, l,
+                    transform=pad.transAxes,
+                    fontsize=12,
+                    ha='left')# - 0.1 * (il + 1), l)
+
+    y_offset = 1.02
+    for iy, y in enumerate(y_vals) :
+        pad.plot([coords[0] + 0.007, coords[0] + 0.08], [y_offset * y, y_offset * y], '--', lw=1.5, color= colors[iy], transform=pad.transAxes)
+    
+        
+        
 
 def add_labels(pad, region_name = "") :
 
@@ -155,6 +190,59 @@ def make_error_bands(x, y, xerr, yerr, bw) :
                             zorder=10000)
     return pc
 
+
+def draw_signal_histos(pad = None, signals = [], var = "", bins = None) :
+
+    sig_histos = []
+    w2_histos = []
+    weights = []
+    weights2 = []
+
+    colors = []
+    labels = []
+
+    for signal in signals :
+        histo = []
+        w2_histo = []
+
+        s_weights = []
+        s_weights2 = []
+
+
+        chain = signal.chain()
+        for ic, c in enumerate(chain) :
+            lumis = np.ones(len(c[var]))
+            lumis[:] = signal.scalefactor
+            w = lumis * c['eventweight']
+            s_weights += list(w)
+
+            w2 = lumis * c['eventweight']
+            w2 = w2 ** 2
+            s_weights2 += list(w2)
+
+            histo += list(c[var])
+            w2_histo += list(c[var])
+
+        labels.append("SIG" + signal.displayname)
+        sig_histos.append(histo)
+        w2_histos.append(w2_histo)
+        weights.append(s_weights)
+        weights2.append(s_weights2)
+        colors.append(signal.color)
+
+
+
+    sig_histos = [np.clip(s, bins[0], bins[-1]) for s in sig_histos]
+    sy, sx, _ = pad.hist(sig_histos,
+                            bins = bins,
+                            color = colors,
+                            weights = weights,
+                            label = labels,
+                            ls = '--',
+                            stacked = False,
+                            histtype = 'step',
+                            lw = 1.5) 
+    return labels, colors
 
 def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
@@ -253,8 +341,12 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     total_sm_x = x
     maxy = max(total_sm_y)
     f = 1.65
+    if len(signals) :
+        f = 1.8
     if plot.logy :
         f = 10000
+        if len(signals) :
+            f *= 10
 
 
     w2_h = np.ones(len(nbins[:-1]))
@@ -296,6 +388,12 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         if max(datay) > maxy : maxy = max(datay)
         datax = [dx + 0.5 * bw for dx in total_sm_x]
         upper.plot(datax[:-1], datay, 'ko', label = 'Data')
+
+    ########################################
+    # signal
+    signal_labels = []
+    if len(signals) > 0 :
+        signal_labels, signal_colors = draw_signal_histos(pad = upper, signals = signals, var = plot.vartoplot, bins = nbins)
 
     ########################################
     # counts
@@ -356,7 +454,14 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     leg_names['Total SM'] = 'Total SM'
     for bkg in backgrounds :
         leg_names[bkg.name] = bkg.displayname 
-    make_legend(legend_order, leg_names, upper)
+    #legend_order += sorted(signal_labels, reverse = True)
+    #for sig in signal_labels :
+    #    leg_names[sig] = sig
+
+    leg_x, leg_y = make_legend(legend_order, leg_names, upper)
+
+    if len(signals) :
+        make_signal_legend(signal_labels, signal_colors, coords = (leg_x, leg_y), pad = upper)
 
     ######################################
     # ATLAS text

@@ -84,12 +84,40 @@ loaded_samples.append(dy)
 # data
 data = sample.Sample("data", "Data")
 data.is_data = True
-data.scale_factor = 1.0
+data.scalefactor = 1.0
 data.fillstyle = 0
 data.linestyle = '-'
 data.color = 'k'
 data.load(filelist_dir + "data_n0234", h5_dir_data)
 loaded_samples.append(data)
+
+#signals
+hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
+hh0.is_signal = True
+hh0.scalefactor = lumi_factor * 0.06 * 100
+hh0.fillstyle = 0
+hh0.linestyle = '--'
+hh0.color = 'r'
+hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
+loaded_samples.append(hh0)
+
+hh1 = sample.Sample("hh800", "X $800$ GeV ($\\sigma \\times$ 20)")
+hh1.is_signal = True
+hh1.scalefactor = lumi_factor * 20
+hh1.fillstyle = 0
+hh1.linestyle = '--'
+hh1.color = 'b'
+hh1.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '343775')
+loaded_samples.append(hh1)
+
+hh2 = sample.Sample("hh1000", "X $1000$ GeV ($\\sigma \\times$ 20)")
+hh2.is_signal = True
+hh2.scalefactor = lumi_factor * 20
+hh2.fillstyle = 0
+hh2.linestyle = '--'
+hh2.color = '#9cfd9d'
+hh2.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = "343777")
+loaded_samples.append(hh2)
 
 
 
@@ -110,6 +138,7 @@ trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pas
 r = region.Region("wwbbpre", "WW$bb$-pre")
 #r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
 #r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
 r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
 
@@ -117,11 +146,15 @@ loaded_regions.append(r)
 # plots
 #############################################################
 variables = {}
-variables["HT2Ratio"] = { "wwbbpre" : [0.05, 0, 1] } # if a 4th argument is given, override automatic setting of y-max
+#variables["HT2Ratio"] = { "wwbbpre" : [0.005, 0.98, 1.0] } # if a 4th argument is given, override automatic setting of y-max
+variables["HT2Ratio"] = { "wwbbpre" : [0.05, 0.0, 1.0] } # if a 4th argument is given, override automatic setting of y-max
 variables["nBJets"] = { "wwbbpre" : [1, 0, 12] }
 variables["dRll"] = { "wwbbpre" : [0.1, 0, 5] }
 variables["MT_1_scaled"] = { "wwbbpre" : [40, 0, 1500] }
-variables["mt2_llbb"] = { "wwbbpre" : [10, 0, 600] }
+variables["mt2_llbb"] = { "wwbbpre" : [10, 60, 400] }
+variables["dRbb"] = { "wwbbpre" : [0.1, 0, 6] }
+variables["l0_pt"] = { "wwbbpre" : [10, 0, 300] }
+variables["l1_pt"] = { "wwbbpre" : [10, 0, 200] }
 
 
 nice_names = {}
@@ -130,6 +163,8 @@ nice_names["nBJets"] = ["# $b-$jets"]
 nice_names["dRll"] = ["$\\Delta R_{\\ell \\ell}$"]
 nice_names["MT_1_scaled"] = ["M$_{T1}$", "GeV"]
 nice_names["mt2_llbb"] = ["$m_{T2}^{\\ell \\ell bb}$", "GeV"]
+nice_names["l0_pt"] = ["Lead lepton $p_{T}$", "GeV"]
+nice_names["l1_pt"] = ["Sub-lead lepton $p_{T}$", "GeV"]
 
 # load the plots 
 for var, bounds in variables.iteritems() :
