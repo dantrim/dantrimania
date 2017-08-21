@@ -139,7 +139,6 @@ def make_error_bands(x, y, xerr, yerr, bw) :
     error_boxes = []
     for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
         h = yc + ye - (yc - ye)
-        #print "error h = %.2f" % h
         if yc == 0 :
             continue
         rect = Rectangle((xc, yc-ye), bw, h, label = 'Uncertainty',
@@ -253,7 +252,7 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     total_sm_y = y[-1]
     total_sm_x = x
     maxy = max(total_sm_y)
-    f = 1.8
+    f = 1.65
     if plot.logy :
         f = 10000
 
@@ -292,9 +291,9 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         chain = data.chain()
         for idc, dc in enumerate(chain) :
             histod += list(dc[plot.vartoplot])
-        if max(histod) > maxy : maxy = max(histod)
 
         datay = np.histogram(np.clip(histod, nbins[0], nbins[-1]), bins = nbins) [0]
+        if max(datay) > maxy : maxy = max(datay)
         datax = [dx + 0.5 * bw for dx in total_sm_x]
         upper.plot(datax[:-1], datay, 'ko', label = 'Data')
 
@@ -328,7 +327,11 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
             if sm != 0 :
                 rel_error = float(sm_err / sm)
             ratio_err.append(rel_error)
-        stat_error_band = make_error_bands(ratio_x[:-1], np.ones(len(total_sm_y)), xerr, ratio_err, plot.binwidth) 
+        xerr = [plot.binwidth for a in ratio_x]
+
+        # for the data graph were move the x-center to the center of the bin
+        # so subtract off half the bin-width for the error hatches
+        stat_error_band = make_error_bands([xv - 0.5 * plot.binwidth for xv in ratio_x[:-1]], np.ones(len(total_sm_y)), xerr, ratio_err, plot.binwidth) 
         lower.add_collection(stat_error_band)
 
     # red line
