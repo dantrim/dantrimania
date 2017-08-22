@@ -127,6 +127,53 @@ class hist1d(object) :
     def yhigh(self, val) :
         self._yhigh = val
 
+class Canvas(hist1d) :
+    def __init__(self, name = "", figsize = (7,8), logy = False) :
+        hist1d.__init__(self, name, figsize)
+
+        self._is_ratio = False
+        self._pad = None
+      #  self.build_canvas(figsize, logy)
+
+    @property
+    def pad(self) :
+        return self._pad
+    @pad.setter
+    def pad(self, pad) :
+        self._pad = pad
+
+    def build_canvas(self, figsize = (7,8), logy = False) :
+
+        fig = plt.figure(figsize = figsize)
+        grid = GridSpec(100, 100)
+        pad = fig.add_subplot(grid[0:100,:])
+        if logy :
+            pad.set_yscale('log')
+
+        # axes
+        pad.set_xlim(self.xlow, self.xhigh)
+        pad.tick_params(axis = 'both', which = 'both', labelsize = 16)
+        which_grid = 'both'
+        if logy :
+            which_grid = 'major'
+        pad.grid(color = 'k', which = which_grid, linestyle = '--', lw = 1, alpha = 0.1)
+        pad.set_xlabel(self.labels[0],
+                horizontalalignment = 'right',
+                x = 1.0,
+                fontsize = 20)
+        pad.set_ylabel(self.labels[1],
+                horizontalalignment = 'right',
+                y = 1.0,
+                fontsize = 18)
+        pad.get_yaxis().set_label_coords(-0.16, 1.0)
+        self._fig = fig
+        self._pad = pad
+
+    def __str__(self) :
+        return "Canvas plot  name = %s  var = %s" % ( self.name, self.vartoplot )
+        
+        
+
 class RatioCanvas(hist1d) :
     def __init__(self, name = "", figsize = (7,8), logy = False) :
         hist1d.__init__(self, name, figsize)
@@ -204,4 +251,4 @@ class RatioCanvas(hist1d) :
         
 
     def __str__(self) :
-        return "Ratio plot  name = %s" % ( self.name )
+        return "Ratio plot  name = %s  var = %s" % ( self.name, self.vartoplot )
