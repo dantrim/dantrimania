@@ -313,6 +313,9 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
 
     # add overflow
     bkg_histos = [np.clip(b, nbins[0], nbins[-1]) for b in bkg_histos]
+    for ib, b in enumerate(bkg_histos) :
+        hb, _ = np.histogram(b, weights = weights[ib], bins = nbins)
+        print "Counts %s : %.2f" % (labels[ib], sum(hb))
     y, x, patches = upper.hist(bkg_histos,
                                 bins = nbins,
                                 color = colors,
