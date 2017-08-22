@@ -480,6 +480,7 @@ def main() :
     parser.add_option("-o", "--output", default="./", help="Provide an output directory for plots (will make it if it does not exist)")
     parser.add_option("-v", "--var", default="", help="Provide as specific variable to plot")
     parser.add_option("--logy", default=False, action="store_true", help="Set plots to have log y-axis")
+    parser.add_option("--skip-data", default=False, action="store_true", help="Don't include data in the plots")
     parser.add_option("--cache-dir", default="./sample_cache", help="Directory to place/look for the cached samples")
     (options, args) = parser.parse_args()
     config = options.config
@@ -488,6 +489,7 @@ def main() :
     region = options.region
     output_dir = options.output
     select_var = options.var
+    skip_data = options.skip_data
 
     #
     print "plotter1d"
@@ -546,6 +548,10 @@ def main() :
             if p.vartoplot == select_var :
                 tmp_plots.append(p)
         loaded_plots = tmp_plots
+
+    if skip_data :
+        del data
+        data = None
             
 
     # cache

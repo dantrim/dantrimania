@@ -92,33 +92,33 @@ data.color = 'k'
 data.load(filelist_dir + "data_n0234", h5_dir_data)
 loaded_samples.append(data)
 
-#signals
-hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
-hh0.is_signal = True
-hh0.scalefactor = lumi_factor * 0.06 * 100
-hh0.fillstyle = 0
-hh0.linestyle = '--'
-hh0.color = 'r'
-hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
-loaded_samples.append(hh0)
-
-hh1 = sample.Sample("hh800", "X $800$ GeV ($\\sigma \\times$ 20)")
-hh1.is_signal = True
-hh1.scalefactor = lumi_factor * 20
-hh1.fillstyle = 0
-hh1.linestyle = '--'
-hh1.color = 'b'
-hh1.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '343775')
-loaded_samples.append(hh1)
-
-hh2 = sample.Sample("hh1000", "X $1000$ GeV ($\\sigma \\times$ 20)")
-hh2.is_signal = True
-hh2.scalefactor = lumi_factor * 20
-hh2.fillstyle = 0
-hh2.linestyle = '--'
-hh2.color = '#9cfd9d'
-hh2.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = "343777")
-loaded_samples.append(hh2)
+##signals
+#hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
+#hh0.is_signal = True
+#hh0.scalefactor = lumi_factor * 0.06 * 100
+#hh0.fillstyle = 0
+#hh0.linestyle = '--'
+#hh0.color = 'r'
+#hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
+#loaded_samples.append(hh0)
+#
+#hh1 = sample.Sample("hh800", "X $800$ GeV ($\\sigma \\times$ 20)")
+#hh1.is_signal = True
+#hh1.scalefactor = lumi_factor * 20
+#hh1.fillstyle = 0
+#hh1.linestyle = '--'
+#hh1.color = 'b'
+#hh1.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '343775')
+#loaded_samples.append(hh1)
+#
+#hh2 = sample.Sample("hh1000", "X $1000$ GeV ($\\sigma \\times$ 20)")
+#hh2.is_signal = True
+#hh2.scalefactor = lumi_factor * 20
+#hh2.fillstyle = 0
+#hh2.linestyle = '--'
+#hh2.color = '#9cfd9d'
+#hh2.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = "343777")
+#loaded_samples.append(hh2)
 
 
 
@@ -143,19 +143,36 @@ r = region.Region("wwbbpre", "WW$bb$-pre")
 r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
 
+# CR ttbar
+r = region.Region("crtt0", "CR-$t\\bar{t}$ 0")
+r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && HT2Ratio<0.8" % ( trigger )
+loaded_regions.append(r)
+
+r = region.Region("crtt1", "CR-$t\\bar{t}$ 1$")
+#r = region.Region("crtt1", "CR-$t\\bar{t}$ 1 (-$H_{T2}^{R} \\in m_{T2}^{\\ell \\ell bb})$")
+r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9" % ( trigger )
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb<90 || mt2_llbb>140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
+loaded_regions.append(r)
+
+r = region.Region("vrtt0", "VR-$t\\bar{t}$ 0$")
+r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8" % ( trigger )
+loaded_regions.append(r)
+
 #############################################################
 # plots
 #############################################################
 variables = {}
 #variables["HT2Ratio"] = { "wwbbpre" : [0.005, 0.98, 1.0] } # if a 4th argument is given, override automatic setting of y-max
-variables["HT2Ratio"] = { "wwbbpre" : [0.05, 0.0, 1.0] } # if a 4th argument is given, override automatic setting of y-max
-variables["nBJets"] = { "wwbbpre" : [1, 0, 12] }
-variables["dRll"] = { "wwbbpre" : [0.1, 0, 5] }
-variables["MT_1_scaled"] = { "wwbbpre" : [40, 0, 1500] }
-variables["mt2_llbb"] = { "wwbbpre" : [10, 60, 400] }
-variables["dRbb"] = { "wwbbpre" : [0.1, 0, 6] }
-variables["l0_pt"] = { "wwbbpre" : [10, 0, 300] }
-variables["l1_pt"] = { "wwbbpre" : [10, 0, 200] }
+variables["HT2Ratio"] =     { "wwbbpre" : [0.05, 0.0, 1.0] , "crtt0" : [0.05, 0.0, 0.8] , "vrtt0" : [0.05, 0.0, 1.0] }
+variables["nBJets"] =       { "wwbbpre" : [1, 0, 12]       , "crtt0" : [1, 0, 12]       , "vrtt0" : [1, 0, 5] }
+variables["dRll"] =         { "wwbbpre" : [0.1, 0, 5]      , "crtt0" : [0.1, 0.9, 5]    , "vrtt0" : [0.03, 0, 0.9] }
+variables["MT_1_scaled"] =  { "wwbbpre" : [40, 0, 1500]    , "crtt0" : [40, 0, 1500]    , "vrtt0" : [40, 0, 1500] }
+variables["mt2_llbb"] =     { "wwbbpre" : [10, 60, 400]    , "crtt0" : [2, 90, 140]     , "vrtt0" : [2, 90, 140] }
+variables["dRbb"] =         { "wwbbpre" : [0.1, 0, 6]      , "crtt0" : [0.1, 0, 6]      , "vrtt0" : [0.1, 0, 6] }
+variables["l0_pt"] =        { "wwbbpre" : [10, 0, 300]     , "crtt0" : [10, 0, 300]     , "vrtt0" : [10, 0, 300] }
+variables["l1_pt"] =        { "wwbbpre" : [10, 0, 200]     , "crtt0" : [10, 0, 200]     , "vrtt0" : [10, 0, 200] }
+variables["mbb"] =          { "wwbbpre" : [40, 0, 600]     , "crtt0" : [2, 100,140]     , "vrtt0" : [2, 100, 140] }
 
 
 nice_names = {}
