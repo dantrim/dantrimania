@@ -12,3 +12,12 @@ def mkdir_p(path) :
             pass
         else :
             raise
+
+def file_exists(filename) :
+    if filename == "" :
+        print "BAD FILE Filename is empty"
+        return False
+    if not os.path.isfile(filename) :
+        print "BAD FILE File '%s' not found" % filename
+        return False
+    return True

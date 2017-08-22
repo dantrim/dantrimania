@@ -5,6 +5,8 @@ import os
 import sys
 
 import dantrimania.python.analysis.utility.samples.sample as sample
+import dantrimania.python.analysis.utility.samples.sample_utils as sample_utils
+import dantrimania.python.analysis.utility.samples.region_utils as region_utils
 import dantrimania.python.analysis.utility.utils.utils as utils
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
@@ -15,16 +17,6 @@ from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 import matplotlib.patches as mpatches
 
-
-def check_config(config) :
-
-    if config == "" :
-        print "ERROR Configuration file name provided is empty"
-        sys.exit()
-
-    if not os.path.isfile(config) :
-        print "ERROR Configuration file %s not found" % config
-        sys.exit()
 
 def categorize_samples(samples) :
 
@@ -45,7 +37,6 @@ def categorize_samples(samples) :
 
     return backgrounds, signals, data
 
-    check_selected_region(selected_region, loaded_regions)
 def check_selected_region(selected_region, loaded_regions) :
     found_region = False
     for region in loaded_regions :
@@ -146,9 +137,6 @@ def make_signal_legend(labels, colors, coords = [], pad = None) :
     y_offset = 1.02
     for iy, y in enumerate(y_vals) :
         pad.plot([coords[0] + 0.007, coords[0] + 0.08], [y_offset * y, y_offset * y], '--', lw=1.5, color= colors[iy], transform=pad.transAxes)
-    
-        
-        
 
 def add_labels(pad, region_name = "") :
 
@@ -298,6 +286,7 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         colors[bkg.name] = bkg.color
         weights[bkg.name] = b_weights
         weights2.append(b_weights2)
+
         #weights2[bkg.name] = b_weights2
 
     count_map = {}
@@ -502,7 +491,8 @@ def main() :
     print " > config:      %s" % config
     print " > cache dir:   %s" % cache_dir
 
-    check_config(config)
+    if not utils.file_exists(config) :
+        sys.exit()
 
     global loaded_samples
     global loaded_regions
@@ -518,11 +508,21 @@ def main() :
         print "ERROR No loaded samples found in configuration"
         sys.exit()
 
-    backgrounds, signals, data = categorize_samples(loaded_samples)
-    check_selected_region(selected_region, loaded_regions)
+    #check_selected_region(selected_region, loaded_regions)
+    if not region_utils.regions_unique(loaded_regions) :
+        print "ERROR Loaded regions are not unique, here are the counts:"
+        for rname, count in region_utils.region_counts(loaded_regions).iteritems() :
+            print " > %s : %d" % (rname, count)
+        sys.exit()
 
-    for r in loaded_regions :
-        print str(r)
+    if not region_utils.has_region(loaded_regions, selected_region) :
+        print "ERROR Requested region (=%s) not found in loaded regions:" % ( selected_region )
+        for r in loaded_regions :
+            print str(r)
+        sys.exit()
+
+    #backgrounds, signals, data = categorize_samples(loaded_samples)
+    backgrounds, signals, data = sample_utils.categorize_samples(loaded_samples)
 
     region_to_plot = None
     for r in loaded_regions :
