@@ -13,7 +13,6 @@ import dantrimania.python.analysis.utility.utils.plib_utils as plib
 
 plt = plib.import_pyplot()
 import numpy as np
-from matplotlib.legend_handler import HandlerLine2D
 
 class histo :
     def __init__(self, name = "" ) :
