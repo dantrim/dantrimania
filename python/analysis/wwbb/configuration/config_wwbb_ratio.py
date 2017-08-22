@@ -14,7 +14,7 @@ h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/c_aug16/data/h5/"
 #loaded_samples = []
 #loaded_signals = []
 
-lumi_factor = 36.0
+lumi_factor = 36.06
 
 # backgrounds
 ttbar = sample.Sample("ttbar", "$t\\bar{t}$")
@@ -54,7 +54,7 @@ dib.scalefactor = lumi_factor
 dib.fillstyle = 0
 dib.linestyle = '-'
 dib.color = "#785e6f" 
-dib.load(filelist_dir + "diboson_sherpa_llvv", h5_dir_mc)
+dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
 loaded_samples.append(dib)
 
 wjets = sample.Sample("Wjets", "$W + jets$")
@@ -73,13 +73,14 @@ ttv.color = "#b3e6fd"
 ttv.load(filelist_dir + "ttV", h5_dir_mc)
 loaded_samples.append(ttv)
 
-dy = sample.Sample("DY", "Drell-Yan")
-dy.scalefactor = lumi_factor
-dy.fillstyle = 0
-dy.linestyle = '-'
-dy.color = "#ffd787" 
-dy.load(filelist_dir + "drellyan_sherpa", h5_dir_mc)
-loaded_samples.append(dy)
+# drell-yan samples are contained in the Z+jets filelists
+#dy = sample.Sample("DY", "Drell-Yan")
+#dy.scalefactor = lumi_factor
+#dy.fillstyle = 0
+#dy.linestyle = '-'
+#dy.color = "#ffd787" 
+#dy.load(filelist_dir + "drellyan_sherpa", h5_dir_mc)
+#loaded_samples.append(dy)
 
 # data
 data = sample.Sample("data", "Data")
