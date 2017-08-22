@@ -2,9 +2,9 @@
 
 """ Create a scatter-plot matrix using Matplotlib. """
 
-from __future__ import division, print_function
+from __future__ import division #, print_function
 
-__author__ = "adrn <adrn@astro.columbia.edu>"
+#__author__ = "adrn <adrn@astro.columbia.edu>"
 
 # Standard library
 import os, sys
@@ -61,13 +61,23 @@ def scatter_plot_matrix(data, labels=None, axes=None, subplots_kwargs=dict(),
     
     xticks = yticks = None
     for ii in range(M):
+        set_y_ticks = True
+        set_x_ticks = True
         for jj in range(M):
             axes[ii,jj].scatter(data[jj], data[ii], **sc_kwargs)
-            
-            if yticks == None:
+
+            #if yticks == None:
+            #if len(yticks) == 0 :
+            #if not yticks.all() :
+            if set_y_ticks :
+                set_y_ticks = False
                 yticks = axes[ii,jj].get_yticks()[1:-1]
             
-            if xticks == None:
+            #if xticks == None:
+            #if len(xticks) == 0 :
+            #if not xticks.all() :
+            if set_x_ticks :
+                set_x_ticks = False
                 xticks = axes[ii,jj].get_xticks()[1:-1]
             
             # first column
