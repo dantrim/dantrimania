@@ -55,3 +55,40 @@ def get_required_variables(plots, region) :
     variables.append('eventweight')
 
     return variables
+
+def find_occurrences(string, substr) :
+    start = 0
+    while True :
+        start = string.find(substr, start)
+        if start == -1 : return
+        yield start
+        start += len(substr)
+
+def index_selection_string(selection_str, chain_name, varlist) :
+    tcut = selection_str
+    tcut = tcut.replace("&&", " & ")
+    tcut = tcut.replace("||", " | ")
+    var_strings = []
+    var_str_map = {}
+
+    logic = ['&', '|']
+    for var in varlist :
+        if var in tcut :
+            new_str = "(%s['%s']" % ( chain_name, var ) 
+            var_strings.append(new_str)
+            tcut = tcut.replace(var, new_str)
+            occurrences = find_occurrences(tcut, new_str)
+            for idx in occurrences :
+                sub = ""
+                for i, c in enumerate(tcut[idx:]) :
+                    if c in logic :
+                        break
+                    sub += c
+                substr_to_replace = sub
+                substr = substr_to_replace + ") "
+                tcut = tcut.replace(substr_to_replace, substr)
+
+    for l in logic :
+        tcut = tcut.replace(")%s" % l, ") %s" % l)
+
+    return tcut
