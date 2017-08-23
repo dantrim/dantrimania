@@ -3,6 +3,7 @@
 from optparse import OptionParser
 import os
 import sys
+from math import sqrt
 
 import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.samples.region as region
@@ -61,6 +62,7 @@ def get_counts(sample, idx_sel_str) :
 
     chunks = sample.chain()
     count = 0.0
+    sumw2 = 0.0
     for ic, chain in enumerate(chunks) :
         set_idx = "indices = np.array( %s )" % idx_sel_str
         exec(set_idx)
@@ -68,13 +70,15 @@ def get_counts(sample, idx_sel_str) :
 
         w = ds['eventweight']
         h, _ = np.histogram(ds['l0_pt'], weights = w)
+        hsw, _ = np.histogram(ds['l0_pt'], weights = w**2)
         count += sum(h)
+        sumw2 += sum(hsw)
 
         if not sample.is_signal :
             if count > 1000 :
                 break
 
-    return count
+    return count, sqrt(sumw2)
         
 
 def calculate_efficiency(lead_pt_cut, sub_lead_pt_cut, trig_type, sample, initial_region, varlist) :
@@ -100,12 +104,12 @@ def calculate_efficiency(lead_pt_cut, sub_lead_pt_cut, trig_type, sample, initia
 
     initial_sel_idx_str = sample_utils.index_selection_string(base_selection, 'chain', varlist)
 
-    initial_counts = get_counts(sample, initial_sel_idx_str)
+    initial_counts, initial_error = get_counts(sample, initial_sel_idx_str)
 
     selection_with_trigger = "%s && ( %s )" % ( base_selection, trigger_selection )
     trigger_sel_idx_str = sample_utils.index_selection_string(selection_with_trigger, 'chain', varlist)
     trigger_sel_idx_str = trigger_sel_idx_str.replace("']_nod0", "_nod0']")
-    trigger_counts = get_counts(sample, trigger_sel_idx_str)
+    trigger_counts, trigger_error = get_counts(sample, trigger_sel_idx_str)
 
     eff = float(trigger_counts) / float(initial_counts)
     return eff * 100
@@ -183,18 +187,92 @@ def make_trigger_eff(sample, initial_region, output_dir, varlist) :
             else :
                 data_array[l_idx][s_idx] = float(eff_or) /  float(eff)
         make_plot(sample, initial_region, trig_type, data_array, minz[trig_type], lead_pt_cuts, sub_lead_pt_cuts, output_dir)
-        
-        
-            
 
+def calculate_efficiency_a_b_pt(selection_den, selection_num, sample, varlist) :
+
+    den_idx_str = sample_utils.index_selection_string(selection_den, 'chain', varlist)
+    den_idx_str = den_idx_str.replace("']_nod0", "_nod0']")
+    num_idx_str = sample_utils.index_selection_string(selection_num, 'chain', varlist)
+    num_idx_str = num_idx_str.replace("']_nod0", "_nod0']")
+
+    den_counts, den_error = get_counts(sample, den_idx_str)
+    num_counts, num_error = get_counts(sample, num_idx_str)
+
+    print "den_counts = %.2f   num_counts = %.2f" % (den_counts, num_counts)
+
+    error_ratio = num_counts / den_counts
+    error_ratio = error_ratio * sqrt( (num_error / num_counts) ** 2  + (den_error / den_counts) ** 2 )
+
+    eff = float(num_counts) / float(den_counts)
+    return eff * 100, error_ratio * 100
+
+def make_di_give_si_eff(sample, region, output_dir, varlist) :
+
+    # calculate the efficiency to pass the dilepton triggers after requiring the
+    # single lepton triggers with lead pT cut > X
+
+    lead_pt_cuts = [str(pt) for pt in range(25, 100, 5)]
+
+    trig_single_2015 = "(trig_e60_lhmedium==1 || trig_mu20_iloose_L1MU15==1)"
+    trig_single_2016 = "(trig_e60_lhmedium_nod0==1 || trig_mu26_ivarmedium==1)"
+    single_lepton_triggers = "( %s || %s )" % (trig_single_2015, trig_single_2016)
+
+    trig_dilepton_2015 = "trig_pass2015==1"
+    trig_dilepton_2016 = "trig_pass2016update==1"
+    dilepton_triggers =  "( year==2015 && %s ) || ( year==2016 && %s )" % ( trig_dilepton_2015, trig_dilepton_2016 )
+
+    t15 = "( year==2015 && ( %s && %s ) )" % ( trig_dilepton_2015, trig_single_2015 )
+    t16 = "( year==2016 && ( %s && %s ) )" % ( trig_dilepton_2016, trig_single_2016 )
+    dil_and_single_triggers = "( %s || %s )" % ( t15, t16 ) 
+
+
+    efficiency_map = {}
+    error_map = {}
+    for ilpt, lpt in enumerate(lead_pt_cuts) :
+        denominator = "l0_pt > %s && ( %s )" % (lpt, single_lepton_triggers)
+        #denominator = "l0_pt > %s && ( %s )" % (lpt, dilepton_triggers) #single_lepton_triggers)
+        numerator = "l0_pt > %s && ( %s )" % ( lpt, dil_and_single_triggers )
+        efficiency_map[lpt], error_map[lpt] = calculate_efficiency_a_b_pt(denominator, numerator, sample, varlist)
+
+    fig, ax = plt.subplots()
+    x = []
+    y  = []
+    e = []
+    for pt, eff in efficiency_map.iteritems() :
+        x.append(float(pt))
+        y.append(eff)
+        e.append(error_map[pt])
+    ax.plot(x,y,'bo')
+    #ax.errorbar(x,y,e, fmt='o', color='b')
+    ax.set_title("Efficiency (Single AND Dilepton) / (Single)")
+    ax.set_xlabel("Lead lepton $p_{T}$ GeV", ha = 'right', x = 1.0)
+    ax.set_ylabel("$\\epsilon$(Dilepton $\\cap$ Single | Single) %", ha = 'right', y = 1.0)
+    #ax.set_ylabel("$\\epsilon$(Single | Dilepton) %", ha = 'right', y = 1.0)
+    ax.set_ylim(0.9*min(y), 110)
+    xl = np.linspace(min(x), max(x), 20)
+    yl = np.ones(len(xl)) * 100.
+    ax.plot(xl,yl, 'k--', lw = 1)
+    
+    ax.text(0.07,0.9, sample.displayname, transform =ax.transAxes, ha='left', weight='bold')
+
+    ######################################################
+    # save
+    utils.mkdir_p(output_dir)
+    if not output_dir.endswith("/") :
+        output_dir += "/"
+    save_name = output_dir + "trig_eff_di_giv_si_vPT_%s_%s.pdf" % ( sample.name, region.name )
+    print " >>> Saving plot to : %s" % os.path.abspath(save_name)
+    plt.savefig(save_name, bbox_tight = 'inches')
     
 
 def main() :
 
     parser = OptionParser()
     parser.add_option("-o", "--output", default="./", help="Output directory for plots")
+    parser.add_option("--di-give-si", action="store_true", default=False, help="Make the eff(Dilepton | Single) plots")
     (options, args) = parser.parse_args()
     output_dir = options.output
+    di_give_si = options.di_give_si
 
     samples = load_samples()
 
@@ -214,7 +292,10 @@ def main() :
     cacher.cache()
 
     for sample in samples :
-        make_trigger_eff(sample, r, output_dir, required_variables)
+        if not di_give_si :
+            make_trigger_eff(sample, r, output_dir, required_variables)
+        elif di_give_si :
+            make_di_give_si_eff(sample, r, output_dir, required_variables)
 
     
 
