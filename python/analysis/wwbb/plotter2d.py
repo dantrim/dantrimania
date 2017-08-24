@@ -16,6 +16,7 @@ from matplotlib.gridspec import GridSpec
 plt = plib.import_pyplot()
 import numpy as np
 from matplotlib.colors import LogNorm
+import matplotlib
 
 def get_requested_variables(varlist) :
 
@@ -74,7 +75,11 @@ def make_heat_plot(sample, varpair, output_dir, region) :
     bin_numbers = 60
     if sample.is_signal :
         bin_numbers = 30
-    h, x, y, p = pad.hist2d(data_x, data_y, cmap = 'jet', bins = bin_numbers, cmin=1)#, norm=LogNorm())
+    cmap = matplotlib.cm.jet
+    cmap = matplotlib.cm.BuPu
+    #cmap = matplotlib.cm.Blues
+    h, x, y, p = pad.hist2d(data_x, data_y, cmap = cmap, bins = bin_numbers, cmin=1)#, norm=LogNorm())
+    fig.colorbar(p)
 
     ##########################################
     # save name

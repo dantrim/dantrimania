@@ -120,9 +120,9 @@ def make_plot(sample, region, type, data, minz = 0, lead_pts = [], sub_pts= [], 
     fig, ax = plt.subplots()
 
     masked_array = np.ma.masked_where(data.T == 0, data.T)
-    cmap = matplotlib.cm.Reds
+    cmap = matplotlib.cm.PuRd
     if sample.is_signal :
-        cmap = matplotlib.cm.Blues
+        cmap = matplotlib.cm.BuPu
     im = ax.pcolor(masked_array, cmap = cmap)
     fig.colorbar(im)
 
@@ -221,16 +221,16 @@ def make_di_give_si_eff(sample, region, output_dir, varlist) :
     trig_dilepton_2016 = "trig_pass2016update==1"
     dilepton_triggers =  "( year==2015 && %s ) || ( year==2016 && %s )" % ( trig_dilepton_2015, trig_dilepton_2016 )
 
-    t15 = "( year==2015 && ( %s && %s ) )" % ( trig_dilepton_2015, trig_single_2015 )
-    t16 = "( year==2016 && ( %s && %s ) )" % ( trig_dilepton_2016, trig_single_2016 )
+    t15 = "( year==2015 && ( %s || %s ) )" % ( trig_dilepton_2015, trig_single_2015 )
+    t16 = "( year==2016 && ( %s || %s ) )" % ( trig_dilepton_2016, trig_single_2016 )
     dil_and_single_triggers = "( %s || %s )" % ( t15, t16 ) 
 
 
     efficiency_map = {}
     error_map = {}
     for ilpt, lpt in enumerate(lead_pt_cuts) :
-        denominator = "l0_pt > %s && ( %s )" % (lpt, single_lepton_triggers)
-        #denominator = "l0_pt > %s && ( %s )" % (lpt, dilepton_triggers) #single_lepton_triggers)
+        #denominator = "l0_pt > %s && ( %s )" % (lpt, single_lepton_triggers)
+        denominator = "l0_pt > %s && ( %s )" % (lpt, dilepton_triggers) #single_lepton_triggers)
         numerator = "l0_pt > %s && ( %s )" % ( lpt, dil_and_single_triggers )
         efficiency_map[lpt], error_map[lpt] = calculate_efficiency_a_b_pt(denominator, numerator, sample, varlist)
 
@@ -244,11 +244,11 @@ def make_di_give_si_eff(sample, region, output_dir, varlist) :
         e.append(error_map[pt])
     ax.plot(x,y,'bo')
     #ax.errorbar(x,y,e, fmt='o', color='b')
-    ax.set_title("Efficiency (Single AND Dilepton) / (Single)")
+    ax.set_title("Efficiency (Single OR Dilepton) / (Dilepton) $ee$ channel")
     ax.set_xlabel("Lead lepton $p_{T}$ GeV", ha = 'right', x = 1.0)
-    ax.set_ylabel("$\\epsilon$(Dilepton $\\cap$ Single | Single) %", ha = 'right', y = 1.0)
+    ax.set_ylabel("$\\epsilon$(Dilepton $\\cup$ Single | Dilepton) %", ha = 'right', y = 1.0)
     #ax.set_ylabel("$\\epsilon$(Single | Dilepton) %", ha = 'right', y = 1.0)
-    ax.set_ylim(0.9*min(y), 110)
+    ax.set_ylim(0.9*min(y), 130)
     xl = np.linspace(min(x), max(x), 20)
     yl = np.ones(len(xl)) * 100.
     ax.plot(xl,yl, 'k--', lw = 1)
@@ -260,7 +260,7 @@ def make_di_give_si_eff(sample, region, output_dir, varlist) :
     utils.mkdir_p(output_dir)
     if not output_dir.endswith("/") :
         output_dir += "/"
-    save_name = output_dir + "trig_eff_di_giv_si_vPT_%s_%s.pdf" % ( sample.name, region.name )
+    save_name = output_dir + "trig_eff_di_giv_si_vPT_%s_%s_eeOR.pdf" % ( sample.name, region.name )
     print " >>> Saving plot to : %s" % os.path.abspath(save_name)
     plt.savefig(save_name, bbox_tight = 'inches')
     
@@ -277,9 +277,9 @@ def main() :
     samples = load_samples()
 
     r = region.Region("wwbbpre_trig", "WW$bb$-pre (pre-trigger)")
-    r.tcut = "mll>20"
+    r.tcut = "mll>20 && nElectrons==2"
     #r.tcut = "nBJets>=2 && mll>20"
-    required_variables = ['nBJets', 'mll', 'l0_pt', 'l1_pt', 'year', 'eventweight']
+    required_variables = ['nBJets', 'mll', 'nElectrons', 'nMuons', 'l0_pt', 'l1_pt', 'year', 'eventweight']
 
     required_variables += trigger_variables()
 
