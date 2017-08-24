@@ -393,7 +393,8 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     print "     Total SM = %.2f" % sum(total_sm_y)
     if data :
         print "     Data     = %.2f" % sum(datay)
-        print "     Data/SM  = %.2f" % ( float(sum(datay)) / float(sum(total_sm_y)) )
+        if sum(total_sm_y) > 0 :
+            print "     Data/SM  = %.2f" % ( float(sum(datay)) / float(sum(total_sm_y)) )
 
     ########################################
     # ratio
