@@ -73,6 +73,7 @@ class SampleCacher(object) :
         return self._fields
     @fields.setter
     def fields(self, fields_list) :
+        fields_list = list(set(fields_list)) # remove duplicates
         self._fields = fields_list
 
     def __iter__(self) :
@@ -179,6 +180,7 @@ class SampleCacher(object) :
 
     def add_process_to_cache(self, process_group, sample) :
         relevant_vars = self.fields
+        relevant_vars = list(set(relevant_vars))
         field_select_str = ",".join("'%s'" % v for v in relevant_vars)
         sub_file_no = 0
         for file in sample.h5_files :
