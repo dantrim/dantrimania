@@ -113,11 +113,6 @@ class SampleCacher(object) :
                 var_strings.append(new_str)
                 tcut = tcut.replace(var, "(ds['%s']" % var)
                 occurrences = self.find_var_idxs(tcut, new_str) 
-                #print tcut
-                #print "  -> occurrences of %s = " % (new_str)
-                #for occ in occurrences :
-                #    print "       ", occ
-                #var_str_map[new_str] = occurrences
 
                 for idx in occurrences :
                     sub = ""
@@ -129,51 +124,8 @@ class SampleCacher(object) :
                     substr = substr_to_replace + ") "
                     tcut = tcut.replace(substr_to_replace, substr)
 
-#        #print "before ", tcut
-#        for vs, idxs in var_str_map.iteritems() :
-#            print "vs = %s  idx = %s" % (vs, idxs)
-#            for idx in idxs :
-#                print idx
-#                sub = ""
-#                for i, c in enumerate(tcut[idx:]) :
-#                    #print "  > C %s" % c
-#                    if c in logic :
-#                        break
-#                    sub += c
-#                substr_to_replace = sub
-#                #print "SUB = %s"%sub
-#                substr = substr_to_replace + ") "
-#                #for l in logic :
-#                #    substr = substr.replace(")%s" % l, ") %s" % l)
-#                tcut = tcut.replace(substr_to_replace, substr)
         for l in logic :
             tcut = tcut.replace(")%s" % l, ") %s" % l)
-                
-
-        #tcut += ")"
-        #print "after ", tcut
-
-        #for i, vs in enumerate(var_strings) :
-        #    idx = tcut.index(vs)
-        #    sub = ""
-        #    for i, c in enumerate(tcut[idx:]) :
-        #        if c in logic :
-        #            break
-        #        sub += c
-        #        
-        #    substr_to_replace = sub
-        #    substr = substr_to_replace +  ") "
-
-        #    for l in logic :
-        #        substr = substr.replace(")%s" % l, ") %s" % l)
-        #    #for l in logic :
-        #    #    substr = substr.replace("  )%s" % l, ") %s" % l)
-        #    #for l in logic :
-        #    #    substr = substr.replace(" ) %s" % l, ")  %s" % l)
-        #    
-        #    tcut = tcut.replace(substr_to_replace, substr)
-        #    #if vs == var_strings[-1] :
-        #    #    tcut += ")"
 
         return tcut
         
@@ -181,6 +133,7 @@ class SampleCacher(object) :
     def add_process_to_cache(self, process_group, sample) :
         relevant_vars = self.fields
         relevant_vars = list(set(relevant_vars))
+    
         field_select_str = ",".join("'%s'" % v for v in relevant_vars)
         sub_file_no = 0
         for file in sample.h5_files :
@@ -214,6 +167,9 @@ class SampleCacher(object) :
                 selection_group = selection_file.create_group(name)
                 selection_group.attrs['cut_string'] = self.selectionstr
 
+                varlist_str = ','.join(self.fields)
+                selection_group.attrs['variable_list'] = varlist_str
+
                 for sample in self.samples :
                     print "Caching %s" % sample.name
                     process_group = selection_group.create_group(sample.name)
@@ -240,10 +196,23 @@ class SampleCacher(object) :
                         print"  %s in file!" % name
                         selection_group = selection_file["%s" % name]
                         cut_definition = selection_group.attrs['cut_string']
+                        included_vars = selection_group.attrs['variable_list'].split(',')
+                        not_included_vars = []
+                        for field in self.fields :
+                            if field not in included_vars :
+                                not_included_vars.append(field)
+
                         if cut_definition != self.selectionstr :
                             print "ERROR Cut definition for %s in selection file %s does not match!" % ( name, full_filename )
                             print "ERROR Expected selection : %s" % self.selectionstr
                             print "ERROR Selection in file  : %s" % cut_definition
+                            sys.exit()
+
+                        if len(not_included_vars) > 0 :
+                            print "ERROR Stored fields (variables) in selection file %s does not contain some currently expected fields" % ( full_filename)
+                            print "ERROR Fields in file  : %s" % included_vars
+                            print "ERROR Expected        : %s" % self.fields
+                            print "ERROR  > not included : %s" % not_included_vars
                             sys.exit()
 
                 if not found_top_level :
