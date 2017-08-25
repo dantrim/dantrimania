@@ -68,9 +68,9 @@ def make_heat_plot(sample, varpair, output_dir, region) :
     grid = GridSpec(100,100)
     pad = fig.add_subplot(grid[0:100,:])
 
-    pad.set_title("%s vs %s for %s" % (var_x, var_y, sample.displayname) )
-    pad.set_xlabel(var_x)
-    pad.set_ylabel(var_y)
+    pad.set_title("%s vs %s for %s" % (var_x, var_y, sample.displayname), fontsize = 20 )
+    pad.set_xlabel(var_x, horizontalalignment = 'right', x = 1.0, fontsize = 20)
+    pad.set_ylabel(var_y, horizontalalignment = 'right', y = 1.0, fontsize = 20)
 
     bin_numbers = 60
     if sample.is_signal :
