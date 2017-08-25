@@ -504,10 +504,12 @@ def main() :
     global loaded_regions
     global selected_region
     global loaded_plots#, loaded_systematics, loaded_regions
+    global additional_variables
     selected_region = region
     loaded_samples = []
     loaded_regions = []
     loaded_plots = []
+    additional_variables = []
     execfile(config, globals(), locals())
 
     if len(loaded_samples) == 0 :
@@ -560,6 +562,9 @@ def main() :
     cacher.samples = loaded_samples
     cacher.region = region_to_plot
     required_variables = get_required_variables(loaded_plots, region_to_plot)
+    for av in additional_variables :
+        if av not in required_variables :
+            required_variables.append(av)
     cacher.fields = required_variables
     print str(cacher)
     cacher.cache()
