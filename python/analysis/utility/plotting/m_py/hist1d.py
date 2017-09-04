@@ -12,6 +12,7 @@ class hist1d(object) :
         self._fig = plt.figure(figsize = figsize)
         self._do_logy = logy
         self._auto_y = True
+        self._abs = False
         self._var = ""
 
         self._bounds = []
@@ -37,6 +38,13 @@ class hist1d(object) :
     @vartoplot.setter
     def vartoplot(self, var) :
         self._var = var
+
+    @property
+    def absvalue(self) :
+        return self._abs
+    @absvalue.setter
+    def absvalue(self, doit) :
+        self._abs = doit
 
     @property
     def autoy(self) :

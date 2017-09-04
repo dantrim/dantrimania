@@ -174,12 +174,12 @@ def make_error_bands(x, y, xerr, yerr, bw) :
                             edgecolor='none',
                             facecolor=None,
                             alpha=0.0,
-                            hatch='\\\\\\',
+                            hatch='\\\\\\\\',
                             zorder=10000)
     return pc
 
 
-def draw_signal_histos(pad = None, signals = [], var = "", bins = None) :
+def draw_signal_histos(pad = None, signals = [], var = "", bins = None, absval = False) :
 
     sig_histos = []
     w2_histos = []
@@ -208,8 +208,12 @@ def draw_signal_histos(pad = None, signals = [], var = "", bins = None) :
             w2 = w2 ** 2
             s_weights2 += list(w2)
 
-            histo += list(c[var])
-            w2_histo += list(c[var])
+            if absval :
+                histo += list(np.absolute(c[var]))
+                w2_histo += list(np.absolute(c[var]))
+            else :
+                histo += list(c[var])
+                w2_histo += list(c[var])
 
         labels.append("SIG" + signal.displayname)
         sig_histos.append(histo)
@@ -277,8 +281,12 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
             b_weights2 += list(w2)
 
             # data to fill the histo
-            histo += list(bc[plot.vartoplot]) # TODO see how to avoid list() calls, use numpy
-            w2_histo += list(bc[plot.vartoplot])
+            if plot.absvalue :
+                histo += list(np.absolute(bc[plot.vartoplot])) # TODO see how to avoid list() calls, use numpy
+                w2_histo += list(np.absolute(bc[plot.vartoplot]))
+            else :
+                histo += list(bc[plot.vartoplot])
+                w2_histo += list(bc[plot.vartoplot])
 
         labels.append(bkg.name)
         bkg_histos.append(histo)
@@ -374,7 +382,10 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         histod = []
         chain = data.chain()
         for idc, dc in enumerate(chain) :
-            histod += list(dc[plot.vartoplot])
+            if plot.absvalue :
+                histod += list(np.absolute(dc[plot.vartoplot]))
+            else :
+                histod += list(dc[plot.vartoplot])
 
         datay = np.histogram(np.clip(histod, nbins[0], nbins[-1]), bins = nbins) [0]
         if max(datay) > maxy : maxy = max(datay)
@@ -385,7 +396,8 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     # signal
     signal_labels = []
     if len(signals) > 0 :
-        signal_labels, signal_colors = draw_signal_histos(pad = upper, signals = signals, var = plot.vartoplot, bins = nbins)
+        signal_labels, signal_colors = draw_signal_histos(pad = upper, signals = signals, 
+                                        var = plot.vartoplot, bins = nbins, absval = plot.absvalue)
 
     ########################################
     # counts
