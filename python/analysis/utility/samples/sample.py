@@ -184,15 +184,15 @@ class Sample(object) :
             print "WARNING [samples %s load] Number of files found (=%d) not equal to number of sample dsids (=%d)" % ( self._name, len(sample_files), len(sample_dsids) )
             n_f = len(sample_files)
             n_d = len(sample_dsids)
-            choice = raw_input(" >>> Print files and dsids and EXIT? [y/n] ")
-            if choice.lower() == 'y' :
-                print "Loaded files:"
-                for i, f in enumerate(sample_files) :
-                    print "[%03d/%03d] %s" % (i+1, n_f, f)
-                print "Loaded dsids:"
-                for i, d in enumerate(sample_dsids) :
-                    print "[%03d/%03d] %s" % (i+1, n_d, d)
-                sys.exit()
+            #choice = raw_input(" >>> Print files and dsids and EXIT? [y/n] ")
+            #if choice.lower() == 'y' :
+            #    print "Loaded files:"
+            #    for i, f in enumerate(sample_files) :
+            #        print "[%03d/%03d] %s" % (i+1, n_f, f)
+            #    print "Loaded dsids:"
+            #    for i, d in enumerate(sample_dsids) :
+            #        print "[%03d/%03d] %s" % (i+1, n_d, d)
+            #    sys.exit()
 
         for d in sample_dsids :
             self._loaded_dsids.append(int(d))
