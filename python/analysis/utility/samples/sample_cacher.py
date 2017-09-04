@@ -3,6 +3,8 @@
 import os
 import sys
 
+import re
+
 import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.utils.utils as utils
 
@@ -111,7 +113,8 @@ class SampleCacher(object) :
             if var in tcut :
                 new_str = "(ds['%s']" % var
                 var_strings.append(new_str)
-                tcut = tcut.replace(var, "(ds['%s']" % var)
+                tcut = re.sub(r"\b%s\b" % var, "(ds['%s']" % var, tcut)
+                #tcut = tcut.replace(var, "(ds['%s']" % var)
                 occurrences = self.find_var_idxs(tcut, new_str) 
 
                 for idx in occurrences :
