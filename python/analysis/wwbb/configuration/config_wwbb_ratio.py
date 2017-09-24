@@ -8,25 +8,25 @@ import dantrimania.python.analysis.utility.plotting.m_py.hist1d as hist1d
 # additional variables / common variables
 ##################################################################################
 additional_variables = ['nBJets', 'MT_1_scaled', 'mt2_llbb', 'mbb',
-                        'l0_pt', 'l1_pt', 'HT2Ratio', 'dRll', 'dRbb', 'mt2_bb']
+                        'l0_pt', 'l1_pt', 'HT2Ratio', 'dRll', 'dRbb', 'mt2_bb',
+                        'nBLMJets', 'nBLSJets', 'nSJets']
 
 ##################################################################################
 # sample definition
 ##################################################################################
 filelist_dir = "/data/uclhc/uci/user/dantrim/n0234val/filelists/"
-h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/d_aug23/mc/h5/"
-h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/d_aug23/data/h5/"
-#h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/c_aug16/mc/h5/"
-#h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/c_aug16/data/h5/"
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/data/h5/"
 
 #loaded_samples = []
 #loaded_signals = []
 
 lumi_factor = 36.06
+#lumi_factor = 100
 
 # backgrounds
-ttbar = sample.Sample("ttbar", "$t\\bar{t}$")
-ttbar.scalefactor = lumi_factor * 1.13
+ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 1.13$")
+ttbar.scalefactor = lumi_factor #* 1.13
 ttbar.fillstyle = 0
 ttbar.linestyle = '-'
 ttbar.color = "#f6f5f0"
@@ -144,54 +144,80 @@ isDF = "(nElectrons==1 && nMuons==1)"
 #isDFOS = "(nLeptons == 2 && nElectrons == 1 && nMuons == 1 && l0_pt > 25 && l1_pt > 20)" # && (l0_q * l1_q) < 0"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 
-r = region.Region("wwbbpre", "WW$bb$-pre")
+r = region.Region("wwbbpre2", "WW$bb$-pre (no # b-jet cut)")
 #r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
 #r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
 #r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
+r.tcut = "%s && nBJets==1 && nBLSJets==2 && nSJets==1 && mll>20 && l0_pt>25 && l1_pt>20 && mbb_bls>80 && mbb_bls<140" % ( trigger )#,)isSF, isDF) #, trigger)
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
 
-# CR ttbar
-r = region.Region("crtt0", "CR-$t\\bar{t}$ 0")
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && HT2Ratio<0.8" % ( trigger )
+## CR ttbar
+#r = region.Region("crtt0", "CR-$t\\bar{t}$ 0")
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && HT2Ratio<0.8" % ( trigger )
+#loaded_regions.append(r)
+#
+#r = region.Region("crtt1", "CR-$t\\bar{t}$ 1$")
+##r = region.Region("crtt1", "CR-$t\\bar{t}$ 1 (-$H_{T2}^{R} \\in m_{T2}^{\\ell \\ell bb})$")
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
+##r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9" % ( trigger )
+##r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb<90 || mt2_llbb>140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
+#loaded_regions.append(r)
+#
+#r = region.Region("vrtt0", "VR-$t\\bar{t}$ 0$")
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8" % ( trigger )
+#loaded_regions.append(r)
+#
+#r = region.Region("crtt2", "CR-$t\\bar{t}$ 2")
+## CR r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.4" % ( trigger )
+## VR HT
+##r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio>0.8" % ( trigger )
+## VR dRll
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
+##r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
+#loaded_regions.append(r)
+#
+r = region.Region("crtt3", "CR-$t\\bar{t}$ (Top)")
+r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
 loaded_regions.append(r)
-
-r = region.Region("crtt1", "CR-$t\\bar{t}$ 1$")
-#r = region.Region("crtt1", "CR-$t\\bar{t}$ 1 (-$H_{T2}^{R} \\in m_{T2}^{\\ell \\ell bb})$")
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb>90 && mt2_llbb<140) && dRll<0.9" % ( trigger )
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<100 || mbb>140) && (mt2_llbb<90 || mt2_llbb>140) && dRll<0.9 && HT2Ratio>0.8" % ( trigger )
-loaded_regions.append(r)
-
-r = region.Region("vrtt0", "VR-$t\\bar{t}$ 0$")
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8" % ( trigger )
-loaded_regions.append(r)
-
-r = region.Region("crtt2", "CR-$t\\bar{t}$ 2")
-# CR r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.4" % ( trigger )
-# VR HT
+#
+#r = region.Region("vrdrll", "VR$_{Top}^{dRll}$")
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
+#loaded_regions.append(r)
+#
+#r = region.Region("vrht2ratio", "VR$_{Top}^{HT2Ratio}$")
 #r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio>0.8" % ( trigger )
-# VR dRll
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
+#loaded_regions.append(r)
+#
+#
+#r = region.Region("srlike", "SR")
+#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio>0.8 && mt2_bb>150" % ( trigger )
+#loaded_regions.append(r)
 
-
-loaded_regions.append(r)
+#auto blind
+if "sr" in selected_region.lower() :
+    del data
+    data = None
 
 #############################################################
 # plots
 #############################################################
 variables = {}
-#variables["HT2Ratio"] = { "wwbbpre" : [0.005, 0.98, 1.0] } # if a 4th argument is given, override automatic setting of y-max
-variables["HT2Ratio"] =     { "wwbbpre" : [0.05, 0.0, 1.0] , "crtt2" : [0.01, 0.2, 0.8] , "vrtt0" : [0.05, 0.0, 1.0] }
-variables["nBJets"] =       { "wwbbpre" : [1, 0, 12]       , "crtt2" : [1, 0, 6]       , "vrtt0" : [1, 0, 5] }
-variables["dRll"] =         { "wwbbpre" : [0.1, 0, 5]      , "crtt2" : [0.05, 0.0, 0.9]    , "vrtt0" : [0.03, 0, 0.9] }
-variables["MT_1_scaled"] =  { "wwbbpre" : [40, 0, 1500]    , "crtt2" : [40, 0, 1500]    , "vrtt0" : [40, 0, 1500] }
-variables["mt2_llbb"] =     { "wwbbpre" : [10, 60, 400]    , "crtt2" : [2, 90, 140]     , "vrtt0" : [2, 90, 140] }
-variables["dRbb"] =         { "wwbbpre" : [0.1, 0, 6]      , "crtt2" : [0.1, 0, 6]      , "vrtt0" : [0.1, 0, 6] }
-variables["l0_pt"] =        { "wwbbpre" : [10, 0, 300]     , "crtt2" : [10, 0, 300]     , "vrtt0" : [10, 0, 300] }
-variables["l1_pt"] =        { "wwbbpre" : [10, 0, 200]     , "crtt2" : [10, 0, 200]     , "vrtt0" : [10, 0, 200] }
-variables["mbb"] =          { "wwbbpre" : [40, 0, 600]     , "crtt2" : [2, 100,140]     , "vrtt0" : [2, 100, 140] }
+#variables["HT2Ratio"] = { "wwbbpre2" : [0.005, 0.98, 1.0] } # if a 4th argument is given, override automatic setting of y-max
+#variables["HT2Ratio"] =     { "wwbbpre2" : [0.05, 0.0, 1.0] , "crtt3" : [0.03, 0.2, 0.8] , "vrtt0" : [0.05, 0.0, 1.0] }
+variables["HT2Ratio"] =     { "wwbbpre2" : [0.05, 0.0, 1.0] , "crtt3" : [0.01, 0.8, 1.0] , "vrtt0" : [0.05, 0.0, 1.0] }
+variables["nBJets"] =       { "wwbbpre2" : [1, 0, 6]       , "crtt3" : [1, 0, 6]       , "vrtt0" : [1, 0, 5] }
+variables["dRll"] =         { "wwbbpre2" : [0.1, 0, 5]      , "crtt3" : [0.05, 0.9, 2.0]    , "vrtt0" : [0.03, 0, 0.9] }
+#variables["dRll"] =         { "wwbbpre2" : [0.1, 0, 5]      , "crtt3" : [0.05, 0.0, 0.9]    , "vrtt0" : [0.03, 0, 0.9] }
+variables["MT_1_scaled"] =  { "wwbbpre2" : [40, 0, 1500]    , "crtt3" : [40, 0, 1500]    , "vrtt0" : [40, 0, 1500] }
+variables["mt2_llbb"] =     { "wwbbpre2" : [10, 60, 400]    , "crtt3" : [2, 90, 140]     , "vrtt0" : [2, 90, 140] }
+variables["dRbb"] =         { "wwbbpre2" : [0.1, 0, 6]      , "crtt3" : [0.1, 0, 6]      , "vrtt0" : [0.1, 0, 6] }
+variables["l0_pt"] =        { "wwbbpre2" : [10, 0, 300]     , "crtt3" : [10, 0, 300]     , "vrtt0" : [10, 0, 300] }
+variables["l1_pt"] =        { "wwbbpre2" : [10, 0, 200]     , "crtt3" : [10, 0, 200]     , "vrtt0" : [10, 0, 200] }
+variables["mbb"] =          { "wwbbpre2" : [40, 0, 600]     , "crtt3" : [2, 100,140]     , "vrtt0" : [2, 100, 140] }
+#variables["mt2_bb"] =       { "srlike"  : [5, 150, 250] }
+#variables["nBLSJets"] =     { "wwbbpre2" : [1, 0, 6] }
+#variables["nBLMJets"] =     { "wwbbpre2" : [1, 0, 6] }
 
 
 nice_names = {}
@@ -202,6 +228,7 @@ nice_names["MT_1_scaled"] = ["M$_{T1}$", "GeV"]
 nice_names["mt2_llbb"] = ["$m_{T2}^{\\ell \\ell bb}$", "GeV"]
 nice_names["l0_pt"] = ["Lead lepton $p_{T}$", "GeV"]
 nice_names["l1_pt"] = ["Sub-lead lepton $p_{T}$", "GeV"]
+nice_names["mt2_bb"] = ["$m_{T2}^{bb}", "GeV"]
 
 # load the plots 
 for var, bounds in variables.iteritems() :
@@ -212,6 +239,9 @@ for var, bounds in variables.iteritems() :
     if selected_region in logy_regions or do_logy :
         logy = True
     p = hist1d.RatioCanvas(logy = logy)
+    if "abs(" in var :
+        var = var.replace("abs(", "").replace(")","")
+        p.absvalue = True
     p.vartoplot = var
     p.bounds = bounds[selected_region]
     name = var.replace("[","").replace("]","").replace("(","").replace(")","")

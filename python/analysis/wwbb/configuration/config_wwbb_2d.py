@@ -8,8 +8,9 @@ import dantrimania.python.analysis.utility.plotting.m_py.hist1d as hist1d
 # sample definition
 ##################################################################################
 filelist_dir = "/data/uclhc/uci/user/dantrim/n0234val/filelists/"
-h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/c_aug16/mc/h5/"
-h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/c_aug16/data/h5/"
+
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/data/h5/"
 
 #loaded_samples = []
 #loaded_signals = []
@@ -137,32 +138,36 @@ isDF = "(nElectrons==1 && nMuons==1)"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 
 r = region.Region("wwbbpre", "WW$bb$-pre")
-#r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
-#r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
 r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
+
+r = region.Region("wwbbpre_wtblm", "WW$bb$-pre (BLM)")
+r.tcut = "%s && nBJets==1 && nBLMJets==2 && nSJets>=1 && mll>20 && l0_pt>25 && l1_pt>20 && mbb_blm>80 && mbb_blm<140" % ( trigger )#,)isSF, isDF) #, trigger)
+loaded_regions.append(r)
+
 
 #############################################################
 # plots
 #############################################################
 variables = {}
 #variables["HT2Ratio"] = { "wwbbpre" : [0.005, 0.98, 1.0] } # if a 4th argument is given, override automatic setting of y-max
-variables["HT2Ratio"] = { "wwbbpre" : [0.05, 0.0, 1.0] } # if a 4th argument is given, override automatic setting of y-max
-variables["nBJets"] = { "wwbbpre" : [1, 0, 12] }
-variables["dRll"] = { "wwbbpre" : [0.1, 0, 5] }
-variables["MT_1_scaled"] = { "wwbbpre" : [40, 0, 1500] }
-variables["mt2_llbb"] = { "wwbbpre" : [10, 60, 400] }
-variables["dRbb"] = { "wwbbpre" : [0.1, 0, 6] }
-variables["l0_pt"] = { "wwbbpre" : [10, 0, 300] }
-variables["l1_pt"] = { "wwbbpre" : [10, 0, 200] }
+variables["HT2Ratio_blm"] =     { "wwbbpre" : [0.05, 0.0, 1.0] } # if a 4th argument is given, override automatic setting of y-max
+variables["nBJets"] =           { "wwbbpre" : [1, 0, 12] }
+variables["nBLMJets"] =         { "wwbbpre" : [1, 0, 12] }
+variables["dRll"] =             { "wwbbpre" : [0.1, 0, 5] }
+variables["MT_1_scaled_blm"] =  { "wwbbpre" : [40, 0, 1500] }
+variables["mt2_llbb_blm"] =     { "wwbbpre" : [10, 60, 400] }
+variables["dRbb_blm"] =         { "wwbbpre" : [0.1, 0, 6] }
+variables["l0_pt"] =            { "wwbbpre" : [10, 0, 300] }
+variables["l1_pt"] =            { "wwbbpre" : [10, 0, 200] }
 
 
 nice_names = {}
-nice_names["HT2Ratio"] = ["$H_{T2}^{R}$"]
+nice_names["HT2Ratio_blm"] = ["$H_{T2}^{R}$"]
 nice_names["nBJets"] = ["# $b-$jets"]
+nice_names["nBJets_blm"] = ["# $b-$jets (BLM)"]
 nice_names["dRll"] = ["$\\Delta R_{\\ell \\ell}$"]
-nice_names["MT_1_scaled"] = ["M$_{T1}$", "GeV"]
-nice_names["mt2_llbb"] = ["$m_{T2}^{\\ell \\ell bb}$", "GeV"]
+nice_names["MT_1_scaled_blm"] = ["M$_{T1}$", "GeV"]
+nice_names["mt2_llbb_blm"] = ["$m_{T2}^{\\ell \\ell bb}$", "GeV"]
 nice_names["l0_pt"] = ["Lead lepton $p_{T}$", "GeV"]
 nice_names["l1_pt"] = ["Sub-lead lepton $p_{T}$", "GeV"]
