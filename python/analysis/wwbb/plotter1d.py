@@ -9,6 +9,7 @@ import dantrimania.python.analysis.utility.samples.sample_utils as sample_utils
 import dantrimania.python.analysis.utility.samples.region_utils as region_utils
 import dantrimania.python.analysis.utility.utils.utils as utils
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
+import dantrimania.python.analysis.utility.plotting.m_py.errorbars as errorbars
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
 plt = plib.import_pyplot()
 
@@ -378,6 +379,7 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     # data
     datay = None
     datax = None
+    data_err = None
     if data :
         histod = []
         chain = data.chain()
@@ -391,6 +393,14 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
         if max(datay) > maxy : maxy = max(datay)
         datax = [dx + 0.5 * bw for dx in total_sm_x]
         upper.plot(datax[:-1], datay, 'ko', label = 'Data')
+
+        # draw poisson errors
+        data_err_low, data_err_high = errorbars.poisson_interval(datay)
+        data_err_low = datay - data_err_low
+        data_err_high = data_err_high - datay
+        data_err = [data_err_low, data_err_high]
+        upper.errorbar(datax[:-1], datay, yerr = [data_err_low, data_err_high], fmt='none', color='k')
+        
 
     ########################################
     # signal
@@ -413,15 +423,27 @@ def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :
     if data :
         ratio_y = np.ones(len(datay))
         ratio_x = datax
+        ratio_data_err_low = np.zeros(len(datay)) 
+        ratio_data_err_high = np.zeros(len(datay))
         for idata, d in enumerate(datay) :
             prediction = total_sm_y[idata]
             ratio = 1.0
+            ratio_low = 0.0
+            ratio_high = 0.0
             if prediction == 0 or d == 0:
                 ratio = -5.0
             else :
                 ratio = d / prediction
+                ratio_low = data_err_low[idata] / prediction
+                ratio_high = data_err_high[idata] / prediction
             ratio_y[idata] = ratio
+            ratio_data_err_low[idata] = ratio_low
+            ratio_data_err_high[idata] = ratio_high
+
         lower.plot(ratio_x[:-1], ratio_y, 'ko', zorder=1000)
+
+        # plot the ratio data errors
+        lower.errorbar(ratio_x[:-1], ratio_y, yerr = [ratio_data_err_low, ratio_data_err_high], fmt='none', color='k') 
 
         ratio_err = []
         for ism, sm in enumerate(total_sm_y) :
