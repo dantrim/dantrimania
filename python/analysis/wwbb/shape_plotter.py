@@ -25,7 +25,48 @@ class histo :
         self.e = None
         self.e_bars = None
 
-def make_histo(pad, sample, filled = False, variable = "", bins = None) :
+def get_variables_from_tcut(tcut) :
+
+    operators = ["==", ">=", "<=", ">", "<", "!=", "*", "-"]
+    logics = ["&&", "||", ")", "(", "abs"]
+    vars_only = tcut
+    for op in operators :
+        vars_only = vars_only.replace(op, " ")
+    for log in logics :
+        vars_only = vars_only.replace(log, " ")
+    vars_only = vars_only.split()
+    out = []
+    for v in vars_only :
+        if v not in out and not v.isdigit() :
+            try :
+                flv = float(v)
+            except :
+                out.append(v)
+    #vars_only = [v for v in vars_only if not v.isdigit()]
+
+    return out
+
+def get_required_variables(plots, region) :
+
+    variables = []
+    for p in plots :
+        if p.vartoplot not in variables :
+            variables.append(p.vartoplot)
+
+    tcut = region.tcut
+    selection_variables = get_variables_from_tcut(tcut)
+    for sv in selection_variables :
+        if sv not in variables :
+            variables.append(sv)
+
+    # we always need the eventweight, which will not show up in the tcut
+    variables.append("eventweight")
+
+    # TODO when loading systematics we need to store the weight leafs
+
+    return variables
+
+def make_histo(pad, sample, filled = False, variable = "", bins = None, absval = False) :
 
     chain = sample.chain()
 
@@ -47,8 +88,12 @@ def make_histo(pad, sample, filled = False, variable = "", bins = None) :
         w2 += list(ch_w2)
 
         # data
-        h += list(ch[variable])
-        h_w2 += list(ch[variable])
+        if absval :
+            h += list(np.absolute(ch[variable])) 
+            h_w2 += list(np.absolute(ch[variable]))
+        else :
+            h += list(ch[variable])
+            h_w2 += list(ch[variable])
 
     hist = histo(sample.name)
     y, bin_edges = np.histogram(h, bins = bins, weights = w, normed = 1)
@@ -105,17 +150,17 @@ def make_shape_plot(plot, region, backgrounds, signals, output_dir) :
 
     for bkg in backgrounds :
         h_maxy, h_miny = make_histo(pad, bkg, variable = plot.vartoplot,
-                                                filled = True, bins = nbins)
+                                                filled = True, bins = nbins, absval = plot.absvalue)
         if h_maxy > maxy : maxy = h_maxy
         if h_miny < miny  : miny = h_miny
 
     for sig in signals :
         h_maxy, h_miny = make_histo(pad, sig, variable = plot.vartoplot,
-                                                filled = False, bins = nbins)
+                                                filled = False, bins = nbins, absval = plot.absvalue)
         if h_maxy > maxy : maxy = h_maxy
         if h_miny < miny : miny = h_miny
 
-    f = 1.65
+    f = 1.55
     low = 0.0
     if plot.logy :
         f = 100
@@ -170,10 +215,12 @@ def main() :
     global loaded_regions
     global selected_region
     global loaded_plots
+    global additional_variables
     selected_region = region
     loaded_samples = []
     loaded_regions = []
     loaded_plots = []
+    additional_variables = []
     execfile(config, globals(), locals())
 
     if len(loaded_samples) == 0 :
@@ -220,7 +267,11 @@ def main() :
     cacher = sample_cacher.SampleCacher(cache_dir)
     cacher.samples = loaded_samples
     cacher.region = region_to_plot
-    required_variables = sample_utils.get_required_variables(loaded_plots, region_to_plot) 
+    #required_variables = sample_utils.get_required_variables(loaded_plots, region_to_plot) 
+    required_variables = get_required_variables(loaded_plots, region_to_plot)
+    for av in additional_variables :
+        if av not in required_variables :
+            required_variables.append(av)
     cacher.fields = required_variables
     print str(cacher)
     cacher.cache()
