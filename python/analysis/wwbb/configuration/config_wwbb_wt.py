@@ -33,16 +33,16 @@ ttbar.color = "#f6f5f0"
 ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
 loaded_samples.append(ttbar)
 
-#wt = sample.Sample("Wt", "$Wt$")# \\times 0.83$")
+wt = sample.Sample("Wt", "$Wt$")# \\times 0.83$")
 #wt = sample.Sample("WtHPP", "$Wt$ (H++)")# \\times 0.83$")
-wt = sample.Sample("WtAMC", "$Wt$ (aMC@NLO)")# \\times 0.83$")
+#wt = sample.Sample("WtAMC", "$Wt$ (aMC@NLO)")# \\times 0.83$")
 wt.scalefactor = lumi_factor# * 0.83
 wt.fillstyle = 0
 wt.linestyle = '-'
 wt.color = "#698bae" 
-wt.load(filelist_dir + "WtAMC", h5_dir_mc)
+#wt.load(filelist_dir + "WtAMC", h5_dir_mc)
 #wt.load(filelist_dir + "WtHPP", h5_dir_mc)
-#wt.load(filelist_dir + "Wt", h5_dir_mc)
+wt.load(filelist_dir + "Wt", h5_dir_mc)
 loaded_samples.append(wt)
 
 ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
