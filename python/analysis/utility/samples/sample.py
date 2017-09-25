@@ -120,6 +120,14 @@ class Sample(object) :
     def filelistdir(self, val = "") :
         self._filelist_dir = val
 
+    def load_file(self, filename) :
+
+        if not filename.endswith(".h5") :
+            print "ERROR [samples %s load] Input file does not have '.h5' extension" % filename
+            sys.exit()
+
+        self._loaded_h5_files.append(filename)
+
     # load the sample
     def load(self, filelist_directory, h5_dir, dsid_select = "") :
 
