@@ -133,7 +133,7 @@ class SampleCacher(object) :
         return tcut
         
 
-    def add_process_to_cache(self, process_group, sample) :
+    def add_process_to_cache(self, process_group, sample, treename) :
         relevant_vars = self.fields
         relevant_vars = list(set(relevant_vars))
     
@@ -141,7 +141,7 @@ class SampleCacher(object) :
         sub_file_no = 0
         for file in sample.h5_files :
             with h5py.File(file, 'r') as sample_file :
-                set_ds = "ds = sample_file['superNt'][ %s ]" % field_select_str
+                set_ds = "ds = sample_file['%s'][ %s ]" % ( treename, field_select_str )
                 exec(set_ds)
                 #print "len before %d "% len(ds)
                 indices_select_str = self.index_selection_string()
@@ -156,7 +156,7 @@ class SampleCacher(object) :
                 sub_file_no += 1
                 
 
-    def cache(self) :
+    def cache(self, treename = "superNt") :
         """ main cache functionality here """
 
         output_directory = self.outdir
@@ -176,7 +176,7 @@ class SampleCacher(object) :
                 for sample in self.samples :
                     print "Caching %s" % sample.name
                     process_group = selection_group.create_group(sample.name)
-                    self.add_process_to_cache(process_group, sample)
+                    self.add_process_to_cache(process_group, sample, treename)
                     sample.selection_file = full_filename
                     sample.selection_group = "/%s/%s/" % ( str(selection_group.name), sample.name )
             return full_filename
@@ -236,7 +236,7 @@ class SampleCacher(object) :
                     else :
                         print "Loading   > %s did not find in pre-existing group, adding it now" % sample.name
                         process_group = selection_group.create_group(sample.name)
-                        self.add_process_to_cache(process_group, sample)
+                        self.add_process_to_cache(process_group, sample, treename)
                         sample.selection_file = full_filename
                         sample.selection_group = "/%s/%s/" % ( str(selection_group.name), sample.name )
             return full_filename
