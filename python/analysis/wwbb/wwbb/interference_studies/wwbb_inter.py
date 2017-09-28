@@ -30,7 +30,8 @@ def get_samples() :
     wwbb_double_single.scalefactor = 36.1
     #wwbb_double_single.load_file("./wwbb_samples/wwbb_test_dub.h5")
     #wwbb_double_single.load_file("./wwbb_samples/wwbb_truth_double_single_res.h5")
-    wwbb_double_single.load_file("./wwbb_samples/wwbb_truth_nf.h5")
+    #wwbb_double_single.load_file("./wwbb_samples/wwbb_truth_nf.h5")
+    wwbb_double_single.load_file("./wwbb_samples/wwbb_truth_407326_full_dub_sing.h5")
     samples.append(wwbb_double_single)
 
     return samples
@@ -199,7 +200,7 @@ def main() :
 
     # region
     reg = region.Region("wwbb", "WW$bb$")
-    reg.tcut = "mll>20 && l0_pt>25 && l1_pt>20 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 &&  met>400 && dRll<1.2 && ht2ratio>0.7"
+    reg.tcut = "mll>20 && l0_pt>25 && l1_pt>20 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 && met>200"
 
 
 
