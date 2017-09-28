@@ -25,24 +25,28 @@ lumi_factor = 36.06
 #lumi_factor = 100
 
 # backgrounds
-ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 1.03$")
-ttbar.scalefactor = lumi_factor * 1.03
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 1.03$")
+ttbar = sample.Sample("ttbarAMC", "$t\\bar{t}$ (aMC@NLO")
+#ttbar = sample.Sample("ttbarPP8", "$t\\bar{t}$ (PP8)")
+ttbar.scalefactor = lumi_factor# * 1.03
 ttbar.fillstyle = 0
 ttbar.linestyle = '-'
 ttbar.color = "#f6f5f0"
-ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
+#ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
+ttbar.load(filelist_dir + "ttbar_amcatnlo", h5_dir_mc)
+#ttbar.load(filelist_dir + "ttbar_pp8", h5_dir_mc)
 loaded_samples.append(ttbar)
 
-wt = sample.Sample("Wt", "$Wt$")# \\times 0.83$")
+#wt = sample.Sample("Wt", "$Wt$")# \\times 0.83$")
 #wt = sample.Sample("WtHPP", "$Wt$ (H++)")# \\times 0.83$")
-#wt = sample.Sample("WtAMC", "$Wt$ (aMC@NLO)")# \\times 0.83$")
+wt = sample.Sample("WtAMC", "$Wt$ (aMC@NLO)")# \\times 0.83$")
 wt.scalefactor = lumi_factor# * 0.83
 wt.fillstyle = 0
 wt.linestyle = '-'
 wt.color = "#698bae" 
-#wt.load(filelist_dir + "WtAMC", h5_dir_mc)
+wt.load(filelist_dir + "WtAMC", h5_dir_mc)
 #wt.load(filelist_dir + "WtHPP", h5_dir_mc)
-wt.load(filelist_dir + "Wt", h5_dir_mc)
+#wt.load(filelist_dir + "Wt", h5_dir_mc)
 loaded_samples.append(wt)
 
 ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
