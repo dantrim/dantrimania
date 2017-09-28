@@ -260,3 +260,93 @@ class RatioCanvas(hist1d) :
 
     def __str__(self) :
         return "Ratio plot  name = %s  var = %s" % ( self.name, self.vartoplot )
+
+class DoubleRatioCanvas(hist1d) :
+    def __init__(self, name = "", figsize = (7,10), logy = False) :
+        hist1d.__init__(self, name, figsize)
+        del self._fig
+        self._fig = None
+        self._upper = None
+        self._middle = None
+        self._lower = None
+
+    @property
+    def upper(self) :
+        return self._upper
+    @upper.setter
+    def upper(self, pad) :
+        self._upper = pad
+
+    @property
+    def middle(self) :
+        return self._middle
+    @middle.setter
+    def middle(self, pad) :
+        self._middle = pad
+
+    @property
+    def lower(self) :
+        return self._lower
+    @lower.setter
+    def lower(self, pad) :
+        self._lower = pad
+
+    def build(self, figsize = (7,10)) :
+        fig = plt.figure(figsize = figsize)
+        grid = GridSpec(100,100)
+        upper = fig.add_subplot(grid[0:65, :])
+        middle = fig.add_subplot(grid[66:83, :])
+        lower = fig.add_subplot(grid[85:100, :])
+        if self.logy :
+            upper.set_yscale('log')
+
+        # axes
+        upper.set_xticklabels([])
+        middle.set_xticklabels([])
+        upper.set_xlim(self.xlow, self.xhigh)
+        middle.set_xlim(self.xlow, self.xhigh)
+        lower.set_xlim(self.xlow, self.xhigh)
+
+        middle.set_ylim(0.0, 2.0)
+        lower.set_ylim(0.0, 2.0)
+
+
+        #majorticks = [0.0, 0.5, 1.0, 1.5, 2.0]
+        #middle.set_yticks(majorticks, minor = False)
+        #lower.set_yticks(majorticks, minor = False)
+
+        #middle.set_yticks([], minor = True)
+        #lower.set_yticks([], minor = True)
+
+        for ax in [upper, middle, lower] :
+            ax.tick_params(axis='both', which='both', labelsize=14)
+            which_grid = 'both'
+            if self.logy :
+                which_grid = 'major'
+            ax.grid(color='k', which=which_grid, linestyle='--', lw=1, alpha=0.1)
+        ax_x = upper.get_position().x0
+        lower.set_xlabel(self.labels[0],
+                            horizontalalignment = 'right',
+                            x = 1.0,
+                            fontsize = 20)
+
+        upper.set_ylabel(self.labels[1],
+                            horizontalalignment = 'right',
+                            y = 1.0,
+                            fontsize = 18)
+
+        middle.set_ylabel("Num / Den", fontsize = 12)
+        lower.set_ylabel("Num / Den", fontsize = 12)
+
+        upper.get_yaxis().set_label_coords(-0.16, 1.0)
+        middle.get_yaxis().set_label_coords(-0.16, 0.5)
+        lower.get_yaxis().set_label_coords(-0.16, 0.5)
+
+        self.fig = fig
+        self.upper = upper
+        self.middle = middle
+        self.lower = lower
+
+    def __str__(self) :
+        return "DoubleRatio plot name = %s var = %s" % ( self.name, self.vartoplot )
+
