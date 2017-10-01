@@ -188,6 +188,10 @@ variables["l1_pt"] =            { "wwbbpre" : [10, 0, 200] }
 variables["mt2_bb"] =           { "wwbbpre" : [20, 0, 600] }
 variables["abs(dphi_met_ll)"] = { "wwbbpre" : [0.1, 0, 3.2] }
 variables["met"] =              { "wwbbpre" : [10, 0, 400] }
+variables["abs(dphi_j0_l0)"] =  { "wwbbpre" : [0.1, 0, 3.2] }
+variables["abs(dphi_j0_ll)"] =  { "wwbbpre" : [0.1, 0, 3.2] }
+variables["abs(dphi_bj0_l0)"] = { "wwbbpre" : [0.1, 0, 3.2] }
+variables["abs(dphi_bj0_ll)"] = { "wwbbpre" : [0.1, 0, 3.2] }
 
 
 nice_names = {}

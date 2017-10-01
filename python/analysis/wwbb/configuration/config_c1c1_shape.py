@@ -157,7 +157,7 @@ isDF = "(nElectrons==1 && nMuons==1)"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 
 r = region.Region("c1c1pre", "$\\chi_{1}^{\\pm} \\chi_{1}^{\\mp}$-pre")
-r.tcut = "l0_pt>25 && l1_pt>20 && mll>20 && cosThetaB<0.5 && cosThetaB>-0.5 && GAM<0.4" 
+r.tcut = "l0_pt>25 && l1_pt>20 && mll>20"
 loaded_regions.append(r)
 
 #############################################################
