@@ -10,6 +10,7 @@ import dantrimania.python.analysis.utility.samples.region_utils as region_utils
 import dantrimania.python.analysis.utility.utils.utils as utils
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
 import dantrimania.python.analysis.utility.plotting.m_py.errorbars as errorbars
+import dantrimania.python.analysis.utility.plotting.m_py.hist_utils as hist_utils
 import dantrimania.python.analysis.utility.stats.significance as significance
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
 plt = plib.import_pyplot()
@@ -95,7 +96,10 @@ def make_zn_plot(plot, region, backgrounds, signals, rel_unc, output_dir) :
     middle = plot.middle
     lower = plot.lower
 
-    # add overflow
+    #################################################################
+    # upper pad
+
+    # add overflow bin
     bkg_histos = [np.clip(b, nbins[0], nbins[-1]) for b in bkg_histos]
     for ib, b in enumerate(bkg_histos) :
         hb, _ = np.histogram(b, weights = weights[ib], bins = nbins)
@@ -109,6 +113,104 @@ def make_zn_plot(plot, region, backgrounds, signals, rel_unc, output_dir) :
                         lw = 1,
                         edgecolor = 'k',
                         alpha = 1.0)
+
+    # determine the max of the y-axis
+    total_sm_y = y[-1]
+    total_sm_x = x
+    maxy = max(total_sm_y)
+    multiplier = 1.65
+    if len(signals) :
+        multiplier = 1.8
+    if plot.logy :
+        multiplier = 1e4
+        if len(signals) :
+            multiplier = 1e5
+
+    # draw MC stat uncertainty hatches
+    histo_w2 = np.ones(len(nbins[:-1]))
+    for iw, w in enumerate(sumw2_histos) :
+        h_err, _ = np.histogram(w, bins = nbins, weights = weights2[iw])
+        histo_w2 += h_err
+    yerr = np.sqrt(histo_w2)
+    xerr = [plot.binwidth + 0.5 for a in x]
+    stat_error_hatches = errorbars.error_hatches( x, total_sm_y, xerr, yerr, plot.binwidth )
+    upper.add_collection(stat_error_hatches)
+
+    # draw total SM line
+    hist_utils.draw_bounding_line(upper, total_sm_x[:-1], total_sm_y, plot.binwidth)
+
+    # draw signal histos
+    signal_labels = []
+    signal_colors = []
+    if len(signals) > 0  :
+        signal_labels, signal_colors, signal_sy, signal_sx = hist_utils.overlay_histos(pad = upper,
+                                        samples = signals,
+                                        variable_name = plot.vartoplot,
+                                        bins = nbins,
+                                        absvalue = plot.absvalue)
+
+    #################################################################
+    # middle, signifance going right
+    middle.set_ylabel("Z $\\downarrow$", fontsize = 18)
+    middle.set_ylim(0, 3)
+
+    maxz = 3
+    for isample, signal in enumerate(signals) :
+        sig_values_y = []
+        for ix in range(len(total_sm_x)) : # loop over the bins in the histogram
+            b = sum( [sm for sm in total_sm_y[ix : -1]] )
+            s = sum( [bc for bc in signal_sy[isample][ix : -1]] )
+            #b = sum( [sm for sm in total_sm_y[:ix+1]] )
+            #s = sum( [bc for bc in signal_sy[isample][:ix+1]] )
+            zn = significance.binomial_exp_z(s, b, rel_unc)
+            sig_values_y.append(zn)
+            if zn > maxz : maxz = zn
+        middle.plot(total_sm_x + 0.5 * plot.binwidth, sig_values_y, markerfacecolor = signal.color,
+                                    marker = '>',
+                                    markeredgecolor = signal.color,
+                                    linestyle = 'None',
+                                    markersize = 4)
+    if maxz > 5 :
+        maxz = 5
+    middle.set_ylim(0, maxz + 0.2)
+
+    #################################################################
+    # lower, signifcance going left
+    lower.set_ylabel("Z $\\uparrow$", fontsize = 18)
+    lower.set_ylim(0, 3)
+
+    maxz = 3
+    for isample, signal in enumerate(signals) :
+        sig_values_y = []
+        #print "x values = %s" % total_sm_x
+        for ix in range(len(total_sm_x)) : # loop over the bins in the histogram
+            #b = sum( [sm for sm in total_sm_y[ix : -1]] )
+            #s = sum( [bc for bc in signal_sy[isample][ix : -1]] )
+            b = sum( [sm for sm in total_sm_y[:ix+1]] )
+            s = sum( [bc for bc in signal_sy[isample][:ix+1]] )
+            zn = significance.binomial_exp_z(s, b, rel_unc)
+            #print " x >= %.2f (s, b) = (%.2f, %.2f) -> z = %.5f" % ( total_sm_x[ix], s, b, zn )
+            sig_values_y.append(zn)
+            if zn > maxz : maxz = zn
+        lower.plot(total_sm_x + 0.5 * plot.binwidth, sig_values_y,
+                    markerfacecolor = signal.color,
+                    marker = '<',
+                    markeredgecolor = signal.color,
+                    linestyle = 'None',
+                    markersize = 4)
+    if maxz > 5 :
+        maxz = 5
+    lower.set_ylim(0, maxz + 0.2)
+
+    
+
+    ## draw exclusion threshold
+    for pad in [middle, lower] :
+        xl = np.linspace(xlow, xhigh, 20)
+        yl = np.ones(len(xl)) * 1.64
+        pad.plot(xl, yl, 'r--', zorder = 0, alpha = 0.6)
+    
+
 
     ####################################################
     # save
