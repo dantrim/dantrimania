@@ -165,7 +165,7 @@ r = region.Region("wwbbpre", "WW$bb$-pre")
 #r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
 #r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
 #r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
-r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % ( trigger )#,)isSF, isDF) #, trigger)
+r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140 && mt2_llbb>80 && mt2_llbb<140 && HT2Ratio>0.7 && dRll<1.0" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
 
 #############################################################
