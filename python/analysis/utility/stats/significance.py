@@ -15,6 +15,15 @@ def binomial_exp_z(s, b, rel_unc_b) :
     https://root.cern.ch/root/html526/src/RooStats__NumberCountingUtils.cxx.html
     """
 
+    if b == 0 :
+        return -5
+
+    if s == 0 :
+        return -5
+
+    if s / b < 1e-3 :
+        return -5
+
     total_assumed = s + b
     tau = 1.0 / b / ( rel_unc_b * rel_unc_b )
     auxiliary = b * tau
@@ -26,6 +35,12 @@ def binomial_obs_z(obs, b, rel_unc_b) :
     RooStats::NumberCountingUtils::BinomialObsZ
     https://root.cern.ch/root/html526/src/RooStats__NumberCountingUtils.cxx.html
     """
+
+    if b == 0 :
+        return -5
+
+    if s == 0 :
+        return -5
 
     tau = 1. / b / ( rel_unc_b * rel_unc_b )
     auxiliary = b * tau
