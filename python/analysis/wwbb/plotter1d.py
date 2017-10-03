@@ -226,6 +226,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", bins = None, absval =
 
 
     sig_histos = [np.clip(s, bins[0], bins[-1]) for s in sig_histos]
+
     sy, sx, _ = pad.hist(sig_histos,
                             bins = bins,
                             color = colors,
@@ -235,6 +236,14 @@ def draw_signal_histos(pad = None, signals = [], var = "", bins = None, absval =
                             stacked = False,
                             histtype = 'step',
                             lw = 1.5) 
+    print 15 * '- '
+    if len(signals) == 1 :
+        print "Counts %s : %.2f" % ( signals[0].name, sum(list(sy)) )
+    else :
+        for isignal, signal_y in enumerate(sy) :
+            print "Counts %s : %.2f" % ( signals[isignal].name, sum( list(signal_y) ) )
+
+
     return labels, colors
 
 def make_ratio_plot(plot, region, backgrounds, signals, data, output_dir) :

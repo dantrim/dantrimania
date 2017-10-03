@@ -7,9 +7,9 @@ import dantrimania.python.analysis.utility.plotting.m_py.hist1d as hist1d
 ##################################################################################
 # additional variables / common variables
 ##################################################################################
-additional_variables = ['nBJets', 'MT_1_scaled', 'mt2_llbb', 'mbb',
-                        'l0_pt', 'l1_pt', 'HT2Ratio', 'dRll', 'dRbb', 'mt2_bb',
-                        'nBLMJets', 'nBLSJets', 'nSJets']
+additional_variables = ['nBJets', 'nSJets', 'MT_1_scaled', 'mt2_llbb', 'mbb',
+                        'l0_pt', 'l1_pt', 'HT2Ratio', 'dRll', 'dRbb', 'mt2_bb']
+                       # 'nBLMJets', 'nBLSJets', 'nSJets']
 
 ##################################################################################
 # sample definition
@@ -17,6 +17,7 @@ additional_variables = ['nBJets', 'MT_1_scaled', 'mt2_llbb', 'mbb',
 filelist_dir = "/data/uclhc/uci/user/dantrim/n0234val/filelists/"
 h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/mc/h5/"
 h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/data/h5/"
+h5_sig_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0234/g_oct2_l1topo/mc/h5/"
 
 #loaded_samples = []
 #loaded_signals = []
@@ -101,14 +102,14 @@ data.load(filelist_dir + "data_n0234", h5_dir_data)
 loaded_samples.append(data)
 
 ##signals
-#hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
-#hh0.is_signal = True
-#hh0.scalefactor = lumi_factor * 0.06 * 100
-#hh0.fillstyle = 0
-#hh0.linestyle = '--'
-#hh0.color = 'r'
-#hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
-#loaded_samples.append(hh0)
+hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
+hh0.is_signal = True
+hh0.scalefactor = lumi_factor * 0.06 * 100
+hh0.fillstyle = 0
+hh0.linestyle = '--'
+hh0.color = 'r'
+hh0.load(filelist_dir + "wwbb_susy2", h5_sig_mc, dsid_select = '342053')
+loaded_samples.append(hh0)
 #
 #hh1 = sample.Sample("hh800", "X $800$ GeV ($\\sigma \\times$ 20)")
 #hh1.is_signal = True
@@ -144,12 +145,17 @@ isDF = "(nElectrons==1 && nMuons==1)"
 #isDFOS = "(nLeptons == 2 && nElectrons == 1 && nMuons == 1 && l0_pt > 25 && l1_pt > 20)" # && (l0_q * l1_q) < 0"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 
-r = region.Region("wwbbpre2", "WW$bb$-pre (no # b-jet cut)")
-#r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
-#r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
-r.tcut = "%s && nBJets==1 && nBLSJets==2 && nSJets==1 && mll>20 && l0_pt>25 && l1_pt>20 && mbb_bls>80 && mbb_bls<140" % ( trigger )#,)isSF, isDF) #, trigger)
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140" % ( trigger )#,)isSF, isDF) #, trigger)
+trigger_single = "(( year == 2015 && ( (trig_pass2015==1) || (trig_e60_lhmedium==1 || trig_mu20_iloose_L1MU15))) || ( year == 2016 && ( (trig_pass2016update==1) || (trig_e60_lhmedium_nod0==1 || trig_mu26_ivarmedium==1))))"
+
+r = region.Region("wwbbpre2", "WW$bb$-pre")
+#r.tcut = "%s && nBJets==1 && nBLSJets==2 && nSJets==1 && mll>20 && l0_pt>25 && l1_pt>20 && mbb_bls>80 && mbb_bls<140" % ( trigger )#,)isSF, isDF) #, trigger)
+#r.tcut = "nBJets==2 && mll>20"
+r.tcut = "nBJets==2 && mll>20 && dphi_met_ll<1.4 && dphi_met_ll>-1.4 && l0_pt>15 && l1_pt>10"
+#r.tcut = "nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20"
+#r.tcut = "(%s) && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % (trigger_single)
+#r.tcut = "(%s) && nBJets==2 && mll>20" % (trigger_single)
+#r.tcut = "%s && nBJets==2 && mll>20" % trigger
+#r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % trigger
 loaded_regions.append(r)
 
 ## CR ttbar

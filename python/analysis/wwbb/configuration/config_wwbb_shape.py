@@ -162,10 +162,8 @@ isDF = "(nElectrons==1 && nMuons==1)"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 
 r = region.Region("wwbbpre", "WW$bb$-pre")
-#r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
-#r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
-#r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
-r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % ( trigger )#,)isSF, isDF) #, trigger)
+#r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % ( trigger )#,)isSF, isDF) #, trigger)
+r.tcut = "nBJets==2 && mll>20"
 loaded_regions.append(r)
 
 #############################################################
