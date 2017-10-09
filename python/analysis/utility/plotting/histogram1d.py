@@ -134,6 +134,11 @@ class histogram1d(object) :
             self._sumw2_histogram, _ = np.histogram(self._data, bins = self.bins, weights = self._weights2)
             return self._histogram
 
+    def maximum(self) :
+        return max(self.histogram)
+    def minimum(self) :
+        return min(self.histogram)
+
     def bin_from_x(self,xval) :
         #original idea from https://stackoverflow.com/questions/12141150/from-list-of-integers-get-number-closest-to-a-given-value
         pos = bisect_left(self.bins, xval)
