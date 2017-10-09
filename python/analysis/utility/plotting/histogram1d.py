@@ -20,6 +20,7 @@ class histogram1d(object) :
 
         self._bin_content = np.array([])
         self._histogram = np.histogram([]) # histogram object
+        self._raw_histogram = np.histogram([])
         self._sumw2_histogram = np.histogram([])
 
         # if number of bins == 3 the assumption is that:
@@ -129,6 +130,7 @@ class histogram1d(object) :
             return np.array([])
         else :
             self._histogram, _ = np.histogram(self._data, bins = self.bins, weights = self._weights)
+            self._raw_histogram, _ = np.histogram(self._data, bins = self.bins, weights = np.ones(len(self._data)))
             self._sumw2_histogram, _ = np.histogram(self._data, bins = self.bins, weights = self._weights2)
             return self._histogram
 
@@ -137,7 +139,7 @@ class histogram1d(object) :
         pos = bisect_left(self.bins, xval)
         return pos
 
-    def integral(self, xvals = [0,-1]) :
+    def integral(self, xvals = [0,-1], raw = False) :
 
         """ take the integral of the events within the histogram bounds
         note: will not take into account the overflow bin(s) unless the
@@ -148,18 +150,24 @@ class histogram1d(object) :
             raise ValueError('%s integral : requested bounds %s not correct size (need=2, provided=%d)'
                 % ( type(self).__name__, xvals, len(xvals) ))
 
-        h = self.histogram # this also resets the sumw2
+        h = self.histogram # this also resets the sumw2 and raw histograms
         if not h.any() :
             return 0.0
 
         if xvals == [0,-1] :
-            return np.sum(self._histogram)
+            if raw :
+                return np.sum(self._raw_histogram)
+            else :
+                return np.sum(self._histogram)
         else :
             bin_low = self.bin_from_x(xvals[0])
             bin_high = self.bin_from_x(xvals[1])
-            return np.sum(self._histogram[int(bin_low):int(bin_high)])
+            if raw :
+                return np.sum(self._histogram[int(bin_low):int(bin_high)])
+            else :
+                return np.sum(self._histogram[int(bin_low):int(bin_high)])
 
-    def integral_and_error(self, xvals = [0,-1]) :
+    def integral_and_error(self, xvals = [0,-1], raw = False) :
 
         """ take the integral of the events within the histogram bounds
         note: will not take into account the overflow bin(s) unless the
@@ -170,14 +178,21 @@ class histogram1d(object) :
             raise ValueError('%s integral_and_error : requested bounds %s not correct size (need=2, provided=%d)'
                         % ( type(self).__name__, xvals, len(xvals) ))
 
-        h = self.histogram # this also resets the sumw2
+        h = self.histogram # this also resets the sumw2 and raw histograms
         if not h.any() :
             return 0.0, 0.0
 
         if xvals == [0,-1] :
-            return np.sum(self._histogram), np.sqrt(np.sum(self._sumw2_histogram)) 
+            if raw :
+                return np.sum(self._raw_histogram), np.sqrt(np.sum(self._raw_histogram))
+            else :
+                return np.sum(self._histogram), np.sqrt(np.sum(self._sumw2_histogram)) 
         else :
             bin_low = self.bin_from_x(xvals[0])
             bin_high = self.bin_from_x(xvals[1])
-            return np.sum(self._histogram[int(bin_low):int(bin_high)]), \
-                        np.sqrt(np.sum(self._sumw2_histogram[int(bin_low):int(bin_high)]))
+            if raw :
+                return np.sum(self._raw_histogram[int(bin_low):int(bin_high)]), \
+                        np.sqrt(np.sum(self._raw_histogram[int(bin_low):int(bin_high)]))
+            else :
+                return np.sum(self._histogram[int(bin_low):int(bin_high)]), \
+                            np.sqrt(np.sum(self._sumw2_histogram[int(bin_low):int(bin_high)]))
