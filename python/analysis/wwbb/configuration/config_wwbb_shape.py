@@ -26,22 +26,22 @@ h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/data/h5/"
 lumi_factor = 36.06
 
 # backgrounds
-ttbar = sample.Sample("ttbar", "$t\\bar{t}$")
-ttbar.scalefactor = lumi_factor 
-ttbar.fillstyle = 0
-ttbar.linestyle = '-'
-ttbar.color = "#bc5c61"
-#ttbar.color = "#f6f5f0"
-ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
-loaded_samples.append(ttbar)
-
-wt = sample.Sample("Wt", "$Wt$")
-wt.scalefactor = lumi_factor
-wt.fillstyle = 0
-wt.linestyle = '-'
-wt.color = "#698bae" 
-wt.load(filelist_dir + "Wt", h5_dir_mc)
-loaded_samples.append(wt)
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$")
+#ttbar.scalefactor = lumi_factor 
+#ttbar.fillstyle = 0
+#ttbar.linestyle = '-'
+#ttbar.color = "#bc5c61"
+##ttbar.color = "#f6f5f0"
+#ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
+#loaded_samples.append(ttbar)
+#
+#wt = sample.Sample("Wt", "$Wt$")
+#wt.scalefactor = lumi_factor
+#wt.fillstyle = 0
+#wt.linestyle = '-'
+#wt.color = "#698bae" 
+#wt.load(filelist_dir + "Wt", h5_dir_mc)
+#loaded_samples.append(wt)
 #
 #ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
 #ztt.scalefactor = lumi_factor
