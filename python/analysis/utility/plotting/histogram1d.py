@@ -71,6 +71,9 @@ class histogram1d(object) :
     def bins(self) :
         return self._bins
 
+    def bin_centers(self) :
+        return [ edge + 0.5 * self.bin_width for edge in self.bins[:-1] ]
+
     def nbins(self) :
         return len(self._bins) - 1
 
