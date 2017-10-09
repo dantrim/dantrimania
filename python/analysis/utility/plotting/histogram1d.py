@@ -18,7 +18,6 @@ class histogram1d(object) :
         self._weights = np.array([]) # weights
         self._weights2 = np.array([]) # weights squared
 
-        self._bin_content = np.array([])
         self._histogram = np.histogram([]) # histogram object
         self._raw_histogram = np.histogram([])
         self._sumw2_histogram = np.histogram([])
@@ -101,7 +100,7 @@ class histogram1d(object) :
             raise ValueError('%s : adding overflow for variable width binning not yet supported!'
                     % ( type(self).__name__) )
 
-    def fill(self, input_data = None, input_weights = None) :
+    def fill(self, input_data = None, input_weights = np.array([])) :
         self._empty = False
         self._data = np.concatenate((self._data, input_data))
 
@@ -201,3 +200,18 @@ class histogram1d(object) :
             else :
                 return np.sum(self._histogram[int(bin_low):int(bin_high)]), \
                             np.sqrt(np.sum(self._sumw2_histogram[int(bin_low):int(bin_high)]))
+
+    def divide(self, h_denominator = None) :
+        """ divide 'this' histogram by the histogram1d object 'h_denominator',
+        returns the bin contents (y-values) of the ratio of each bin
+        """
+        h_num = self.histogram
+        h_den = h_denominator.histogram
+        division = np.ones(len(h_num))
+
+        with np.errstate(divide = 'ignore', invalid = 'ignore') :
+            division = np.true_divide(h_num, h_den)
+            division[division == np.inf] = 0
+            division = np.nan_to_num(division)
+        return division
+            
