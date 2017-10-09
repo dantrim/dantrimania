@@ -7,6 +7,7 @@
 *.swn
 *.swo
 *.swm
+*.swl
 *.pyc
 *.so
 *.dylib
