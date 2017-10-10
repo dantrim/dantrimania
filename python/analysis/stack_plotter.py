@@ -148,6 +148,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
         chain = signal.chain()
         for isc, sc in enumerate(chain) :
+
             lumis = signal.scalefactor * np.ones(len(sc[var]))
             weights = lumis * sc['eventweight']
 
@@ -176,7 +177,8 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
                 ls = '--',
                 stacked = False,
                 histtype = 'step',
-                lw = 1.5)
+                lw = 1.5,
+                zorder = 1e5)
                 
 
     print 15 * '- '
@@ -326,7 +328,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
                                         signals = signals,
                                         var = plot.vartoplot,
                                         binning = binning,
-                                        bins = histogram_sm.bins[:-1],
+                                        bins = histogram_sm.bins,
                                         absval = plot.absvalue) 
 
     ##################################
