@@ -214,4 +214,18 @@ class histogram1d(object) :
             division[division == np.inf] = 0
             division = np.nan_to_num(division)
         return division
-            
+
+    def mean(self) :
+        """ return the mean of the data contained in this histogram
+        """
+        return np.mean(self.data)
+
+    def std(self) :
+        """ return the standard deviation of the data contained in this histogram
+        """
+        return np.std(self.data)
+
+    def var(self) :
+        """ return the variance of the data contained in this histogram
+        """
+        return np.var(self.data)
