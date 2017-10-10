@@ -201,6 +201,15 @@ class histogram1d(object) :
                 return np.sum(self._histogram[int(bin_low):int(bin_high)]), \
                             np.sqrt(np.sum(self._sumw2_histogram[int(bin_low):int(bin_high)]))
 
+    def y_error(self) :
+        """ return an array of the statistical errors
+        """
+
+        h = self.histogram # refreshes sumw2 histogram
+        if not h.any() :
+            return np.array([])
+        return np.sqrt(self._sumw2_histogram)
+
     def divide(self, h_denominator = None) :
         """ divide 'this' histogram by the histogram1d object 'h_denominator',
         returns the bin contents (y-values) of the ratio of each bin
@@ -229,3 +238,27 @@ class histogram1d(object) :
         """ return the variance of the data contained in this histogram
         """
         return np.var(self.data)
+
+    def bounding_line(self) :
+        """ return a set of points that define the bounding line of the
+        histogram
+        """
+
+        h = self.histogram # refresh the histograms
+        if not h.any() :
+            return [], []
+
+        x = []
+        y = []
+
+        for iedge, edge in enumerate(self.bins[:-1]) :
+            x.append(edge)
+            x.append(edge + self.bin_width)
+            y.append(h[iedge])
+            y.append(h[iedge])
+        x.append(x[-1])
+        y.append(np.min(h))
+
+        return x, y
+
+
