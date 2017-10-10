@@ -29,6 +29,9 @@ def error_hatches(x, y, xerr, yerr, bin_width) :
     yerr : error in +/- y direction at data points
     bin_width : histogram bin width
     """
+
+    if len(x) != len(y) :
+        raise ValueError('error_hatches : Length of input x-values (=%d) does not equal length of input y-values (=%d)' % ( len(x), len(y) ) )
     
     error_boxes = []
     for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
