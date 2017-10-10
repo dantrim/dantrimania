@@ -62,6 +62,81 @@ def get_required_variables(plots, region) :
     return variables
 
 #############################################################################
+def make_legend(ordered_labels, pad) :
+
+    handles, labels = pad.get_legend_handles_labels()
+    new_handles = []
+    new_labels = []
+    for l in ordered_labels :
+        for il, label in enumerate(labels) :
+            if label == l :
+                new_labels.append(l.replace("SIG",""))
+                new_handles.append(handles[il])
+
+    leg_x, leg_y = 0.5, 0.75
+    pad.legend(new_handles,
+                new_labels,
+                loc = (leg_x, leg_y),
+                frameon = False,
+                ncol = 2,
+                fontsize = 12,
+                numpoints = 1,
+                labelspacing = 0.2,
+                columnspacing = 0.4)
+
+    return leg_x, leg_y
+
+#############################################################################
+def make_signal_legend(labels, colors, coords = [], pad = None) :
+
+    handles, leg_labels = pad.get_legend_handles_labels()
+    sig_handles = []
+    sig_labels = []
+
+    for l in labels :
+        for il, ll in enumerate(leg_labels) :
+            if l == ll :
+                sig_handles.append(handles[il])
+                sig_labels.append(l.replace("SIG",""))
+    y_vals = []
+    for il, l in enumerate(sig_labels) :
+        y = coords[1] - 0.04 * (1.1*il+1)
+        y_vals.append(y)
+        pad.text(coords[0] + 0.1, y, l,
+                    transform = pad.transAxes,
+                    fontsize = 12,
+                    ha = 'left')
+
+    y_offset = 1.02
+    for iy, y in enumerate(y_vals) :
+        pad.plot([coords[0] + 0.007, coords[0] + 0.08],
+                    [y_offset * y, y_offset * y],
+                    '--',
+                    lw = 1.5, color = colors[iy], transform = pad.transAxes)
+
+#############################################################################
+def add_labels(pad, region_name = "") :
+
+    # ATLAS label
+    size = 18
+    text = 'ATLAS'
+    opts = dict(transform = pad.transAxes)
+    opts.update( dict(va = 'top', ha = 'left') )
+    pad.text(0.05, 0.97, text, size = size, style = 'italic', weight = 'bold', **opts)
+
+    what_kind = 'Internal'
+    pad.text(0.23, 0.97, what_kind, size = size, **opts)
+
+    # lumi stuff
+    lumi = "36.1"
+    pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
+
+    # region
+    pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
+
+
+
+#############################################################################
 def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins = None, absval = False) :
 
     histograms_signal = []
@@ -82,7 +157,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
             h.fill(hist_data, weights)
 
-        labels_sig.append(signal.displayname)
+        labels_sig.append("SIG" + signal.displayname)
         colors_sig.append(signal.color)
 
         # overflow
@@ -106,9 +181,10 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
     print 15 * '- '
     for isignal, histo in enumerate(histograms_signal) :
-        integral, error = histo.integral_and_error()
-        integral_raw, error_raw = histo.integral_and_error(raw=True)
-        print " > %s : %10.2f +/- %.2f (raw: %10.2f +/- %.2f)" % (signals[isignal].name.ljust(15), integral, error, integral_raw, error_raw)
+        print histo.count_str(rmlist=["signal_histo_"])
+        #integral, error = histo.integral_and_error()
+        #integral_raw, error_raw = histo.integral_and_error(raw=True)
+        #print " > %s : %10.2f +/- %.2f (raw: %10.2f +/- %.2f)" % (signals[isignal].name.ljust(15), integral, error, integral_raw, error_raw)
 
     return labels_sig, colors_sig
 
@@ -123,7 +199,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
     canvas.labels = plot.labels
     canvas.logy = plot.logy
     canvas.x_bounds = plot.bounds[1:]
-    canvas.r_bounds = plot.bounds[1:]
+    #canvas.r_bounds = plot.bounds[1:]
     canvas.build()
     upper_pad = canvas.upper_pad
     lower_pad = canvas.lower_pad
@@ -175,9 +251,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
         hstack.add(h)
 
     # order the stack
-    print "order before = %s" % hstack.order
     hstack.sort(reverse = True)
-    print "order after = %s" % hstack.order
 
     ordered_labels_bkg = []
     ordered_colors_bkg = []
@@ -191,22 +265,25 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
 
     # get y-axis maxima
     maxy = histogram_sm.maximum()
-    miny = histogram_sm.minimum()
+    miny = 0.0
+    if plot.logy :
+        miny = 1e-2
 
     multiplier = 1.65
     if len(signals) :
         multiplier = 1.8
     if plot.logy :
-        multiplier = 1e4
-        if len(signals) :
-            multiplier = 1.e5
+        multiplier = 1e3
+        if len(signals) > 2 :
+            multiplier = 1e4
     maxy = multiplier * maxy
     upper_pad.set_ylim(miny, maxy)
 
     # statistical error band
-    x_error = np.zeros(len(histogram_sm.y_error())) 
+    sm_x_error = np.zeros(len(histogram_sm.y_error())) 
+    sm_y_error = histogram_sm.y_error()
     stat_error_band = errorbars.error_hatches(histogram_sm.bins[:-1], histogram_sm.histogram, \
-                                x_error, histogram_sm.y_error(), plot.bin_width) 
+                                sm_x_error, sm_y_error, plot.bin_width) 
 
     # total sm line
     sm_line = histogram_sm.bounding_line()
@@ -242,6 +319,16 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
     # draw total sm
     upper_pad.plot(sm_line[0], sm_line[1], ls = '-', color = 'k', label = 'Total SM', lw = 2)
 
+    #################################
+    # signal
+    if len(signals) > 0 :
+        signal_labels, signal_colors = draw_signal_histos(pad = upper_pad,
+                                        signals = signals,
+                                        var = plot.vartoplot,
+                                        binning = binning,
+                                        bins = histogram_sm.bins[:-1],
+                                        absval = plot.absvalue) 
+
     ##################################
     # data
 
@@ -258,11 +345,26 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
         # overflow
         histogram_data.add_overflow()
 
+        # counts
+        print 30 * '-'
+        print histogram_sm.count_str(name = 'Total SM')
+        print histogram_data.count_str(name = 'Data')
+        total_sm = histogram_sm.integral()
+        total_data = histogram_data.integral()
+        print " > Data / SM  : %5.2f" % ( total_data / total_sm )
+
         maxd = histogram_data.maximum()
         if maxd > maxy : maxy = maxd
 
-        data_x = histogram_data.bin_centers()
+        data_x = np.array(histogram_data.bin_centers())
         data_y = histogram_data.histogram
+        nonzero_idx = data_y > 0
+        #if plot.logy :
+        #    data_y[data_y == 0.] = 1e-1 * histogram_sm.minimum()
+        #else :
+        data_y[data_y == 0.] = -5
+        #data_y = data_y[nonzero_idx]
+        #data_x = data_x[nonzero_idx]
         upper_pad.plot(data_x, data_y, 'ko', label = 'Data')
 
         # draw poisson errors
@@ -272,15 +374,69 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
         data_err = [data_err_low, data_err_high]
         upper_pad.errorbar(data_x, data_y, yerr = data_err, fmt = 'none', color = 'k')
 
+
+        #################################
+        # ratio
+        pred_y = histogram_sm.histogram
+        #pred_y = pred_y[nonzero_idx]
+
+        ratio_y = histogram_data.divide(histogram_sm)
+        #ratio_y = ratio_y[nonzero_idx]
+        ratio_y[ ratio_y == 0. ] = -1
+
+        ratio_x = np.array(histogram_data.bin_centers())
+        #ratio_x = ratio_x[nonzero_idx]
+
+        ratio_data_err_low = -1 * np.ones(len(ratio_y))
+        ratio_data_err_high = -1 * np.ones(len(ratio_y))
+        for idata, d in enumerate(ratio_y) :
+            prediction = pred_y[idata]
+            if ratio_y[idata] == 0.0 or ratio_y[idata] < 0:
+                ratio_data_err_low[idata] = 0
+                ratio_data_err_high[idata] = 0
+            else :
+                ratio_data_err_low[idata] = data_err_low[idata] / prediction
+                ratio_data_err_high[idata] = data_err_high[idata] / prediction
+        lower_pad.plot(ratio_x, ratio_y, 'ko', zorder=1000)
+        yerr = [ratio_data_err_low, ratio_data_err_high]
+        lower_pad.errorbar(ratio_x, ratio_y, yerr = yerr, fmt = 'none', color = 'k') 
+
+        # sm error on ratio band
+        sm_ratio_error = []
+        for ism, sm in enumerate(pred_y) :
+            sm_y_error_ratio = sm_y_error[ism]
+            relative_error = 0.0
+            if sm != 0 :
+                relative_error = float(sm_y_error_ratio / sm)
+            if ratio_y[ism] == 0 :
+                relatve_error = 0
+            sm_ratio_error.append(relative_error)
+        sm_x_error_ratio = [plot.bin_width for a in ratio_x]
+
+        # for the data graph we move the x-center to the center of the bin
+        # so subtract off half the bin-width for the error hatches
+        ratio_stat_error_band = errorbars.error_hatches(
+                [xv - 0.5 * plot.bin_width for xv in ratio_x],
+                np.ones(len(ratio_y)),
+                sm_x_error_ratio,
+                sm_ratio_error,
+                plot.bin_width)
+        lower_pad.add_collection(ratio_stat_error_band)
+
     #################################
-    # signal
+    # legend
+    legend_order = ["Data"]
+    legend_order += ['Total SM']
+    # the draw order of histos is reversed that of the legend order, so reverse
+    legend_order += ordered_labels_bkg[::-1]
+    leg_x, leg_y = make_legend(legend_order, upper_pad)
+
     if len(signals) > 0 :
-        signal_labels, signal_colors = draw_signal_histos(pad = upper_pad,
-                                        signals = signals,
-                                        var = plot.vartoplot,
-                                        binning = binning,
-                                        bins = histogram_sm.bins[:-1],
-                                        absval = plot.absvalue) 
+        make_signal_legend(signal_labels, signal_colors, coords = (leg_x, leg_y), pad = upper_pad)
+    
+    #################################
+    # labels
+    add_labels(upper_pad, region_name = region.displayname)
 
                     
 
