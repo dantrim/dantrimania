@@ -261,4 +261,21 @@ class histogram1d(object) :
 
         return x, y
 
+    def count_str(self, rmlist = [], name = '') :
+        cts, err = self.integral_and_error()
+        raw_cts, raw_err = self.integral_and_error(raw=True)
+        name_to_use = self.name
+        if name != '' :
+            name_to_use = name
+        elif len(rmlist) > 0 :
+            for rm in rmlist :
+                name_to_use = name_to_use.replace(rm,"")
+        yld_str = " > {bname: <10} : {w_yield:>10} +/- {we_yield:>10} (raw: {r_yield:>10} +/- {re_yield:>10})".format(
+                bname = name_to_use,
+                w_yield = round(cts,2),
+                we_yield = round(err,2),
+                r_yield = round(raw_cts,2),
+                re_yield = round(raw_err,2))
+        return yld_str
+
 
