@@ -2,7 +2,7 @@ import sys
 
 import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.samples.region as region
-import dantrimania.python.analysis.utility.plotting.m_py.hist1d as hist1d
+from dantrimania.python.analysis.utility.plotting.plot1d import plot1d
 
 ##################################################################################
 # additional variables / common variables
@@ -23,7 +23,8 @@ h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0234/e_aug31/data/h5/"
 #loaded_samples = []
 #loaded_signals = []
 
-lumi_factor = 36.06
+#lumi_factor = 36.06
+lumi_factor = select_lumi
 
 # backgrounds
 ttbar = sample.Sample("ttbar", "$t\\bar{t}$")
@@ -165,7 +166,7 @@ r = region.Region("wwbbpre", "WW$bb$-pre")
 #r.tcut = "nBJets>=2 && mll>20 && l0_pt>45"
 #r.tcut = "(( %s ) || ( %s )) && %s && nBJets>=2 && mll>20 && mbb>80 && mbb<140" % (isSFOS, isDFOS, trigger)
 #r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && (mbb<80 || mbb>140) && HT2Ratio>0.98 && MT_1_scaled>800" % ( trigger )#,)isSF, isDF) #, trigger)
-r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>80 && mbb<140 && mt2_llbb>80 && mt2_llbb<140 && HT2Ratio>0.7 && dRll<1.0" % ( trigger )#,)isSF, isDF) #, trigger)
+r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % ( trigger )#,)isSF, isDF) #, trigger)
 loaded_regions.append(r)
 
 #############################################################
@@ -211,7 +212,6 @@ nice_names["l0_pt"] = ["Lead lepton $p_{T}$ [GeV]", "GeV"]
 nice_names["l1_pt"] = ["Sub-lead lepton $p_{T}$ [GeV]", "GeV"]
 nice_names["met"] = ["$E_T^{miss}$ [GeV]", "GeV"]
 
-# load the plots 
 for var, bounds in variables.iteritems() :
     if selected_region not in bounds :
         print "ERROR selected region (=%s) is not defined in configured variables" % ( selected_region )
@@ -219,30 +219,23 @@ for var, bounds in variables.iteritems() :
     logy = False
     if selected_region in logy_regions or do_logy :
         logy = True
-    p = hist1d.DoubleRatioCanvas(logy = logy)
-    if "abs(" in var :
-        var = var.replace("abs(", "").replace(")","")
+
+    name_var = var.replace('abs(','').replace(')','').replace('[','').replace(']','')
+    p = plot1d('%s_%s' % (selected_region, name_var), name_var)
+    p.logy = logy
+    if 'abs(' in var :
         p.absvalue = True
-    p.vartoplot = var
+        var = var.replace('abs(','').replace(')','')
     p.bounds = bounds[selected_region]
-    name = var.replace("[","").replace("]","").replace("(","").replace(")","")
-    p.name = name
-    y_label_unit = ""
     if var in nice_names :
         if len(nice_names[var]) == 2 :
-            y_label_unit = nice_names[var][1]
-    y_label_unit = str(bounds[selected_region][0]) + " " + y_label_unit
+            p.units = nice_names[var][1]
     x_label = var
-    y_label = "Events / %s" % y_label_unit
+    y_label = 'Events / %s' % str(bounds[selected_region][0])
+    if p.units != '' :
+        y_label += ' %s' % str(p.units)
     if var in nice_names :
         x_label = nice_names[var][0]
+
     p.labels = [x_label, y_label]
-
-    if selected_region in logy_regions or do_logy :
-        p.logy = True
-
-    p.build()
-
     loaded_plots.append(p)
-
-    
