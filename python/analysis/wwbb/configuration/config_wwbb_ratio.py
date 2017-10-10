@@ -101,7 +101,7 @@ loaded_samples.append(data)
 ##signals
 hh0 = sample.Sample("hhSM", "$hh$ SM ($\\sigma \\times$ 100)")
 hh0.is_signal = True
-hh0.scalefactor = lumi_factor * 0.06 * 100
+hh0.scalefactor = lumi_factor * 0.06 * 100.
 hh0.fillstyle = 0
 hh0.linestyle = '--'
 hh0.color = 'r'
