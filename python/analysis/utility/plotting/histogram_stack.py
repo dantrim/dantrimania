@@ -46,6 +46,10 @@ class histogram_stack(object) :
             self._histogram.fill(histo.data, histo.weights)
 
     @property
+    def histograms(self) :
+        return self._histograms
+
+    @property
     def total_histo(self) :
         return self._histogram
 
@@ -68,7 +72,7 @@ class histogram_stack(object) :
             cts_e = self.counts[name][1]
             cts_raw = self.raw_counts[name][0]
             cts_raw_e = self.raw_counts[name][1]
-            print " > %s : %.2f +/- %.2f (raw: %.2f +/- %.2f)" % (name.ljust(15), \
+            print " > %s : %10.2f +/- %.2f (raw: %10.2f +/- %.2f)" % (name.ljust(15), \
             cts, cts_e, cts_raw, cts_raw_e)
 
     def sort(self, reverse=False, name_list = []) :
@@ -78,10 +82,9 @@ class histogram_stack(object) :
         """
         if len(name_list) == 0 :
             cts = self.counts
-            cts_sorted = dict(sorted(cts.items(), key = operator.itemgetter(0), reverse = not reverse))
-            self._order = [name for name in cts_sorted.keys()]
+            self._order = sorted(cts, key = cts.__getitem__, reverse = not reverse)
             new_histos = []
-            for hname in cts_sorted.keys() :
+            for hname in self._order :
                 for h in self._histograms :
                     if h.name == hname :
                         new_histos.append(h)
