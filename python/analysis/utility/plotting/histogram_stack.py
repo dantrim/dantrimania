@@ -72,8 +72,15 @@ class histogram_stack(object) :
             cts_e = self.counts[name][1]
             cts_raw = self.raw_counts[name][0]
             cts_raw_e = self.raw_counts[name][1]
-            print " > %s : %10.2f +/- %.2f (raw: %10.2f +/- %.2f)" % (name.ljust(15), \
-            cts, cts_e, cts_raw, cts_raw_e)
+            yld_str = " > {bname: <10} : {w_yield:>10} +/- {we_yield:>10} (raw: {r_yield:>10} +/- {re_yield:>10})".format(
+                        bname = name.replace("histo_",""),
+                        w_yield = round(cts,2),
+                        we_yield = round(cts_e,2),
+                        r_yield = round(cts_raw,2),
+                        re_yield = round(cts_raw_e,2))
+            #print " > %s : %10.2f +/- %.2f (raw: %10.2f +/- %.2f)" % (name.replace("histo_","").ljust(15), \
+            #cts, cts_e, cts_raw, cts_raw_e)
+            print yld_str
 
     def sort(self, reverse=False, name_list = []) :
         """sort by weighted yield
