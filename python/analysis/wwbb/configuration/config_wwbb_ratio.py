@@ -1,15 +1,12 @@
 import sys
 
+from dantrimania.python.analysis.utility.plotting.plot1d import plot1d
 import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.samples.region as region
-import dantrimania.python.analysis.utility.plotting.m_py.hist1d as hist1d
 
-##################################################################################
-# additional variables / common variables
-##################################################################################
-additional_variables = ['nBJets', 'nSJets', 'MT_1_scaled', 'mt2_llbb', 'mbb',
-                        'l0_pt', 'l1_pt', 'HT2Ratio', 'dRll', 'dRbb', 'mt2_bb']
-                       # 'nBLMJets', 'nBLSJets', 'nSJets']
+##############################################################################
+# additional variables
+##############################################################################
 
 ##################################################################################
 # sample definition
@@ -150,7 +147,7 @@ trigger_single = "(( year == 2015 && ( (trig_pass2015==1) || (trig_e60_lhmedium=
 r = region.Region("wwbbpre2", "WW$bb$-pre")
 #r.tcut = "%s && nBJets==1 && nBLSJets==2 && nSJets==1 && mll>20 && l0_pt>25 && l1_pt>20 && mbb_bls>80 && mbb_bls<140" % ( trigger )#,)isSF, isDF) #, trigger)
 #r.tcut = "nBJets==2 && mll>20"
-r.tcut = "nBJets==2 && mll>20 && dphi_met_ll<1.4 && dphi_met_ll>-1.4 && l0_pt>15 && l1_pt>10"
+r.tcut = "nBJets==2 && mll>20 && mt2_bb>200"
 #r.tcut = "nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20"
 #r.tcut = "(%s) && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20" % (trigger_single)
 #r.tcut = "(%s) && nBJets==2 && mll>20" % (trigger_single)
@@ -236,38 +233,31 @@ nice_names["l0_pt"] = ["Lead lepton $p_{T}$", "GeV"]
 nice_names["l1_pt"] = ["Sub-lead lepton $p_{T}$", "GeV"]
 nice_names["mt2_bb"] = ["$m_{T2}^{bb}", "GeV"]
 
-# load the plots 
 for var, bounds in variables.iteritems() :
+
     if selected_region not in bounds :
         print "ERROR selected region (=%s) is not defined in configured variables" % ( selected_region )
         sys.exit()
     logy = False
     if selected_region in logy_regions or do_logy :
         logy = True
-    p = hist1d.RatioCanvas(logy = logy)
-    if "abs(" in var :
-        var = var.replace("abs(", "").replace(")","")
+
+    name_var = var.replace('abs(','').replace(')','').replace('[','').replace(']','')
+    p = plot1d('%s_%s' % (selected_region, name_var), name_var)
+    p.normalized = False
+    p.logy = logy
+    if 'abs(' in var :
         p.absvalue = True
-    p.vartoplot = var
+        var = var.replace('abs(', '').replace(')','')
     p.bounds = bounds[selected_region]
-    name = var.replace("[","").replace("]","").replace("(","").replace(")","")
-    p.name = name
-    y_label_unit = ""
     if var in nice_names :
         if len(nice_names[var]) == 2 :
-            y_label_unit = nice_names[var][1]
-    y_label_unit = str(bounds[selected_region][0]) + " " + y_label_unit
+            p.units = nice_names[var][1]
     x_label = var
-    y_label = "Events / %s" % y_label_unit
+    y_label = 'Events / %s' % str(bounds[selected_region][0])
+    if p.units != '' :
+        y_label += ' %s' % str(p.units) 
     if var in nice_names :
         x_label = nice_names[var][0]
     p.labels = [x_label, y_label]
-
-    if selected_region in logy_regions or do_logy :
-        p.logy = True
-
-    p.build_ratio()
-
     loaded_plots.append(p)
-
-    

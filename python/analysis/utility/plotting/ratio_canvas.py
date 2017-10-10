@@ -107,7 +107,7 @@ class ratio_canvas(object) :
         fig = plt.figure(figsize = self.figsize)
         grid = GridSpec(100,100)
         upper_pad = fig.add_subplot(grid[0:75, :])
-        lower_pad = fig.add_subplot(grid[80:100, :])
+        lower_pad = fig.add_subplot(grid[80:100, :])#, sharex = upper_pad)
 
         if self.logy :
             upper_pad.set_yscale('log')
