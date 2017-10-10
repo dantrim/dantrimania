@@ -49,6 +49,14 @@ class histogram_stack(object) :
     def histograms(self) :
         return self._histograms
 
+    def ordered_histograms(self) :
+        out = []
+        for name in self.order :
+            for h in self.histograms :
+                if name not in h.name : continue
+                out.append(h)
+        return out 
+
     @property
     def total_histo(self) :
         return self._histogram

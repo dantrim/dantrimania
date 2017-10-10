@@ -7,7 +7,7 @@ import numpy as np
 
 class double_ratio_canvas(object) :
 
-    def __init(self, name = "", figsize = (7, 10), logy = False) :
+    def __init__(self, name = "", figsize = (7, 10), logy = False) :
         self._name = name
         self._figsize = figsize
         self._logy = logy
@@ -79,7 +79,7 @@ class double_ratio_canvas(object) :
         self._x_bounds = val
 
     @property
-    def y_bounds(self) ;
+    def y_bounds(self) :
         return self._y_bounds
     @y_bounds.setter
     def y_bounds(self, val) :
