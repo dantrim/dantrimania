@@ -270,5 +270,7 @@ for var, bounds in variables.iteritems() :
         y_label += ' %s' % str(p.units) 
     if var in nice_names :
         x_label = nice_names[var][0]
+        if p.units != '' :
+            x_label += ' %s' % str(p.units)
     p.labels = [x_label, y_label]
     loaded_plots.append(p)
