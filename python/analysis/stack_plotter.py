@@ -192,7 +192,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
 
 #############################################################################
-def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
+def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix) :
 
     print 50 * '*'
 
@@ -276,7 +276,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
         multiplier = 1.8
     if plot.logy :
         multiplier = 1e3
-        if len(signals) > 2 :
+        if len(signals) >= 2 :
             multiplier = 1e4
     maxy = multiplier * maxy
     upper_pad.set_ylim(miny, maxy)
@@ -448,7 +448,9 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir) :
     utils.mkdir_p(output_dir)
     if not output_dir.endswith('/') :
         output_dir += '/'
-    save_name = output_dir + "%s_%s.pdf" % ( region.name, plot.vartoplot )
+    if suffix != "" :
+        suffix = "_" + suffix
+    save_name = output_dir + "%s_%s%s.pdf" % ( region.name, plot.vartoplot, suffix )
     print " >>> Saving plot to : %s" % os.path.abspath(save_name)
     canvas.fig.savefig(save_name, bbox_inches = 'tight', dpi = 200)
 
@@ -463,6 +465,7 @@ def main() :
     parser.add_option("-v", "--var", default="", help="Provide as specific variable to plot")
     parser.add_option("--logy", default=False, action="store_true", help="Set plots to have log y-axis")
     parser.add_option("--skip-data", default=False, action="store_true", help="Don't include data in the plots")
+    parser.add_option("--suffix", default="", help = "Filename suffix for output plots")
     parser.add_option("--cache-dir", default="./sample_cache", help="Directory to place/look for the cached samples")
     (options, args) = parser.parse_args()
     config = options.config
@@ -472,6 +475,7 @@ def main() :
     output_dir = options.output
     select_var = options.var
     skip_data = options.skip_data
+    suffix = options.suffix
 
     #
     print "stack_plotter"
@@ -550,8 +554,10 @@ def main() :
     print str(cacher)
     cacher.cache()
 
-    for p in loaded_plots :
-        make_stack_plot(p, region_to_plot, backgrounds, signals, data, output_dir)
+    n_plots = len(loaded_plots)
+    for iplot, p in enumerate(loaded_plots) :
+        print "[%02d/%02d]" % (iplot+1, n_plots)
+        make_stack_plot(p, region_to_plot, backgrounds, signals, data, output_dir, suffix)
 
 #-----------------------------------------------------------------------------
 if __name__ == "__main__" :
