@@ -34,14 +34,14 @@ ttbar.color = "#bc5c61"
 #ttbar.color = "#f6f5f0"
 ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
 loaded_samples.append(ttbar)
-#
-#wt = sample.Sample("Wt", "$Wt$")
-#wt.scalefactor = lumi_factor
-#wt.fillstyle = 0
-#wt.linestyle = '-'
-#wt.color = "#698bae" 
-#wt.load(filelist_dir + "Wt", h5_dir_mc)
-#loaded_samples.append(wt)
+
+wt = sample.Sample("Wt", "$Wt$")
+wt.scalefactor = lumi_factor
+wt.fillstyle = 0
+wt.linestyle = '-'
+wt.color = "#698bae" 
+wt.load(filelist_dir + "Wt", h5_dir_mc)
+loaded_samples.append(wt)
 #
 #ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
 #ztt.scalefactor = lumi_factor
