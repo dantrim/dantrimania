@@ -15,6 +15,8 @@ from dantrimania.python.analysis.utility.plotting.histogram1d import histogram1d
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
 plt = plib.import_pyplot()
 from math import sqrt
+import matplotlib.ticker as ticker
+
 
 import numpy as np
 
@@ -88,7 +90,7 @@ def get_samples(nominal_file = "", up_file = "", down_file = "") :
 
     return samples
 
-def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
+def make_sys_plot(plot, region, samples, output_dir, symmetrize, bkg_name, nice_bkg_name, sys_name, nice_sys_name) :
 
     print 50 * "-"
     print " plotting %s" % plot.vartoplot
@@ -141,9 +143,21 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
 
 
     # pads
-
     upper = plot.upper
+    #upper.tick_params(direction='in', labelleft=True, bottom=True, top=True, right =True, left=True)
     lower = plot.lower
+    for pad in [upper, lower] :
+        tickbins = np.arange(nbins[0], nbins[-1], binwidth) 
+        default_params = {'nbins': 10, 'steps': None, 'tick_values' : (nbins[0], nbins[-1]), 'integer': False, 'symmetric': False, 'prune': None, 'min_n_ticks': 2}
+        pad.xaxis.set_major_locator(ticker.MaxNLocator(**default_params))
+        #pad.xaxis.set_major_locator(ticker.MultipleLocator(binwidth))
+        pad.tick_params(axis = 'both', which = 'both', labelsize = 16, direction = "in",
+                         labelleft=True, bottom = True, top = True, right = True, left = True)
+
+    lower.set_ylabel("$\\frac{\\mathrm{%s \\pm1 \\sigma}}{\\mathrm{Nominal}}$" % nice_sys_name, horizontalalignment = 'right', y = 0.83, fontsize = 20)
+    if sys_name == "JER" :
+        lower.set_ylim(0.94, 1.06)
+        lower.set_yticks( np.arange(0.94, 1.06, 0.02), minor = False)
 #    lower.set_ylim(0.7, 1.3)
 
     # styles
@@ -154,6 +168,8 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
     edge_color_up = "blue"
     edge_color_dn = "red"
     alpha = 0.5
+
+    maxy = -1
 
     # plot nominal
     h_nom, range_nom = np.histogram(nom_histo, bins = nbins, weights = nom_weights)
@@ -168,7 +184,9 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
     tmp = xvals_nom
     xvals_nom = yvals_nom
     yvals_nom = tmp
-    upper.step(xvals_nom, yvals_nom, "k-", lw=linewidth)
+    if max(yvals_nom) > maxy : maxy = max(yvals_nom)
+    upper.hist( nom_histo, weights = nom_weights, bins = nbins, histtype = 'step', color = 'k', ls = '-', lw = linewidth)
+#    upper.step(xvals_nom, yvals_nom, "k-", lw=linewidth)
 
     # plot upper variation
     h_up, range_up = np.histogram(up_histo, bins = nbins, weights = up_weights)
@@ -219,17 +237,29 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
                 rel_delta_low = abs( float(delta_elow) / float(nom_val) )
             rel_delta_sym = 0.5 * (rel_delta_high + rel_delta_low)
 
-
             new_yvals_up.append( yvals_nom[i] + rel_delta_sym * yvals_nom[i] )
             new_yvals_dn.append( yvals_nom[i] - rel_delta_sym * yvals_nom[i] )
             #yvals_up = [(y + rel_delta_sym * y) for y in yvals_nom]
             #yvals_dn = [(y - rel_delta_sym * y) for y in yvals_nom]
+        
         yvals_up = new_yvals_up
         yvals_dn = new_yvals_dn
 
+    if max(yvals_up) > maxy : maxy = max(yvals_up)
+    if max(yvals_dn) > maxy : maxy = max(yvals_dn)
+
+    # adjust the max y value
+    maxy = 1.45 * maxy
+    upper.set_ylim(0, maxy)
+
     #if not symmetrize :
+    up_label = "$+1 \\sigma$"
+    dn_label = "$-1 \\sigma$"
+    if symmetrize :
+        up_label += " (sym)"
+        dn_label += " (sym)"
     upper.fill_between(xvals_up, yvals_nom, yvals_up, lw = linewidth, hatch = hatch,
-                alpha = alpha, facecolor = color_up, edgecolor = edge_color_up) 
+                alpha = alpha, facecolor = color_up, edgecolor = edge_color_up, label = up_label)
     upper.fill_between(xvals_up, yvals_nom, yvals_up, lw = linewidth, hatch = hatch,
                 alpha = 1.0, facecolor = "None", edgecolor = edge_color_up) 
     
@@ -237,10 +267,11 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
     if len(samples) == 3 :
         #if not symmetrize :
         upper.fill_between(xvals_dn, yvals_nom, yvals_dn, lw = linewidth, hatch = hatch,
-               alpha = alpha, facecolor = color_dn, edgecolor = edge_color_dn) 
+               alpha = alpha, facecolor = color_dn, edgecolor = edge_color_dn, label = dn_label)
         upper.fill_between(xvals_dn, yvals_nom, yvals_dn, lw = linewidth, hatch = hatch,
                     alpha = 1.0, facecolor = "None", edgecolor = edge_color_dn) 
            
+
         
     # ratio up variation
     ratio_up = []
@@ -265,17 +296,27 @@ def make_sys_plot(plot, region, samples, output_dir, symmetrize) :
                 ratio_down.append(1.0)
         lower.step(xvals_nom, ratio_down, color_dn, lw = linewidth)
 
+    # ratio unity line
+    x = np.linspace(nbins[0], nbins[-1], 20)
+    y = [1 for val in x]
+    lower.plot(x, y, 'k--', lw = 1, zorder = 0)
+
+    # labels
+    upper.text(0.05, 0.93, 'ATLAS', size = 18, style = 'italic', weight = 'bold', transform = upper.transAxes)
+    upper.text(0.23, 0.93, 'Simulation', size = 18, transform = upper.transAxes)
+    if symmetrize :
+        nice_sys_name += " (sym)"
+    upper.text(0.05, 0.85, '%s - %s' % (nice_sys_name, nice_bkg_name), transform = upper.transAxes, size = 16)
+
+    # legend
+    upper.legend(loc = 'best', frameon = False, numpoints = 1, fontsize = 16)
 
     ######################################################
     # save
     utils.mkdir_p(output_dir)
-    save_name = output_dir + "/sys_comp_%s_%s.pdf" % ( region.name, plot.vartoplot )
+    save_name = output_dir + "/sys_comp_%s_%s_%s_%s.pdf" % ( region.name, plot.vartoplot, bkg_name, sys_name )
     print " >>> saving plot to : %s" % os.path.abspath(save_name)
     plot.fig.savefig(save_name, bbox_inches = "tight", dpi = 200)
-
-
-    
-
 
 def main() :
 
@@ -287,6 +328,8 @@ def main() :
     parser.add_option("--logy", default = False, action = "store_true", help = "Set y-axis to log scale")
     parser.add_option("--sym", default = False, action = "store_true", help = "Symmetrize the y errors")
     parser.add_option("-v", "--var", default = "", help = "Request a specific variable to plot")
+    parser.add_option("--sys", default = "", help = "Provide name for systematic")
+    parser.add_option("--bkg", default = "", help = "Provide name for background")
     (options, args) = parser.parse_args()
     output_dir = options.outputdir
     do_logy = options.logy
@@ -295,13 +338,39 @@ def main() :
     dn_file = options.dn
     request_var = options.var
     sym = options.sym
+    sys_name = options.sys
+    bkg_name = options.bkg
+
+    bkg_name_dict = {}
+    bkg_name_dict['ttbar'] = "$t\\bar{t}$"
+    bkg_name_dict['wt'] = "$Wt$"
+
+    sys_name_dict = {}
+    sys_name_dict['JES1'] = 'JES NP 1'
+    sys_name_dict['JES2'] = 'JES NP 2'
+    sys_name_dict['JES3'] = 'JES NP 3'
+    sys_name_dict['JER'] = 'JER'
+
+    if sys_name == "" or bkg_name == "" :
+        print "Did not provide either sys name or bkg name"
+        sys.exit()
+
+    if sys_name not in sys_name_dict :
+        print "Provided sys name (=%s) not in sys name dict %s" % ( sys_name, sys_name_dict.keys() )
+        sys.exit()
+
+    if bkg_name not in bkg_name_dict :
+        print "Provided bkg name (=%s) not in bkg name dict %s" % ( bkg_name, bkg_name_dict.keys() )
+        sys.exit()
 
     samples = get_samples(nom_file, up_file, dn_file) # [NOM, UP, DN] if 2-sided, [NOM, UP] if 1-sided
+    for s in samples :
+        s.name = s.name + "_%s_%s" % ( bkg_name, sys_name )
 
     # region
     reg = region.Region("wwbb", "WW$bb$")
     #reg.tcut = "l0_pt>20 && l1_pt>10 && nBJets==2 && mbb>100 && mbb<140 && mt2_llbb>100 && mt2_llbb<140 && dRll<0.9"
-    reg.tcut = "l0_pt>20 && l1_pt>10 && nBJets>=2"
+    reg.tcut = "l0_pt>20 && l1_pt>10 && nBJets>=2 && HT2Ratio>0.8"
 
     variables = {}
     variables["met"] = [30, 0, 300]
@@ -313,7 +382,7 @@ def main() :
     variables["j1_pt"] = [10, 20, 200]
     variables["sj0_pt"] = [20, 20, 400]
     variables["sj1_pt"] = [10, 20, 200]
-    variables["nBJets"] = [1, 4, 10]
+    variables["nBJets"] = [1, 0, 10]
     variables["nJets"] = [1, 0, 10]
     variables["nSJets"] = [1, 0, 10]
     variables["HT2Ratio"] = [0.2, 0, 1.0]
@@ -365,7 +434,7 @@ def main() :
         p.logy = do_logy
         p.build_ratio()
 
-        make_sys_plot(p, reg, samples, output_dir, sym)
+        make_sys_plot(p, reg, samples, output_dir, sym, bkg_name, bkg_name_dict[bkg_name], sys_name, sys_name_dict[sys_name])
         
     
 
