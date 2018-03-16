@@ -39,15 +39,25 @@ class Cutflow(object) :
         return self._cut_dict.keys()
 
     def total_tcut(self) :
-        #print self._cut_dict.items()
-        #for key, val in self._cut_dict.items() :
-        #    print "%s  %s" % (key, val)
-        #return ""
-        return " & ".join(self._cut_dict.values())
+        return " && ".join(self._cut_dict.values())
+
+    def tcut_at_idx(self, idx) :
+
+        if idx >= self._n_cuts :
+            return self.total_tcut
+
+        cuts = []
+        total_number_of_cuts = self._n_cuts
+        for icut in xrange(total_number_of_cuts) :
+            if icut > idx :
+                break
+            cuts.append(self.cut_list()[icut])
+        return " && ".join(cuts)
 
     def add_cut(self, name = "", cut_string = "") :
         self._cut_dict[name] = cut_string
         self._n_cuts += 1
+
 
     def Print(self) :
         print " Cutflow (name=%s) : %s" % (self.name, self._cut_dict)

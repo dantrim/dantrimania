@@ -14,6 +14,8 @@ import dantrimania.python.analysis.utility.samples.cutflow as cutflow
 #import dantrimania.python.analysis.utility.plotting.m_py.errorbars as errorbars
 #import dantrimania.python.analysis.utility.utils.plib_utils as plibo
 
+import numpy as np
+
 def get_cutflows() :
 
     out = []
@@ -21,10 +23,38 @@ def get_cutflows() :
     # non-resonant selection
     c = cutflow.Cutflow("hhNonRes", "hhNonRes")
     c.add_cut("lepton_pt", "(l0_pt>20 && l1_pt>20)")
+    c.add_cut("higgs_mbb", "(mbb>100 && mbb<140)")
     out.append(c)
 
     return out
-    
+
+def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
+
+    n_cuts = requested_cutflow.n_cuts
+    for icut in xrange(n_cuts) :
+        print requested_cutflow.tcut_at_idx(icut)
+
+        for bkg in backgrounds :
+
+            bkg_yield = 0.0
+
+            chain = bkg.chain()
+            for ich, ch in enumerate(chain) :
+                weights = ch["eventweight"]
+                weights *= ( bkg.scalefactor * np.ones(len(weights)) )
+
+                idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "ch", requested_cutflow.variable_list)
+                set_idx = "indices = np.array( %s )" % idx_selection
+                exec(set_idx)
+
+                bkg_yield += np.sum(weights[indices])
+
+            print "bkg %s : %.2f" % (bkg.name, bkg_yield)
+
+        #idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "chain", requested_cutflow.variable_list)
+        #set_idx = "indices = np.array( %s )" % idx_selection
+        #exec(set_idx)
+        #weights = ds[indices]
 
 def main() :
     parser = OptionParser()
@@ -54,6 +84,10 @@ def main() :
         sys.exit()
 
     backgrounds, signals, data = sample_utils.categorize_samples(loaded_samples)
+
+    print "backgrounds : %s" % [b.name for b in backgrounds]
+    print "signals     : %s" % [s.name for s in signals]
+    print "data        : %s" % data
 
     available_cutflows = get_cutflows()
     available_regions = [c.name for c in available_cutflows]
@@ -85,7 +119,10 @@ def main() :
     cacher.fields = variables_needed_for_cutflow
     print str(cacher)
     cacher.cache()
-    
+
+    requested_cutflow.variable_list = variables_needed_for_cutflow
+
+    make_cutflow_table(requested_cutflow, backgrounds, signals, data)
 
 #______________________________________________________
 if __name__ == "__main__" :
