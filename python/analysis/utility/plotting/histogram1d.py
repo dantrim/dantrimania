@@ -272,10 +272,10 @@ class histogram1d(object) :
                 name_to_use = name_to_use.replace(rm,"")
         yld_str = " > {bname: <10} : {w_yield:>10} +/- {we_yield:>10} (raw: {r_yield:>10} +/- {re_yield:>10})".format(
                 bname = name_to_use,
-                w_yield = round(cts,2),
-                we_yield = round(err,2),
-                r_yield = round(raw_cts,2),
-                re_yield = round(raw_err,2))
+                w_yield = round(cts,4),
+                we_yield = round(err,4),
+                r_yield = round(raw_cts,4),
+                re_yield = round(raw_err,4))
         return yld_str
 
 

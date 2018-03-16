@@ -387,7 +387,7 @@ def main() :
     variables["nSJets"] = [1, 0, 10]
     variables["HT2Ratio"] = [0.2, 0, 1.0]
     variables["HT2"] = [50, 0, 750]
-    variables["MT_1_scaled"] = [50, 0, 600]
+    variables["MT_1_scaled"] = [50, 0, 1000]
     variables["dRll"] = [0.5, 0, 5]
     variables["mt2_bb"] = [25, 0, 300]
 

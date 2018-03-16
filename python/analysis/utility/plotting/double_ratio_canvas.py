@@ -110,7 +110,7 @@ class double_ratio_canvas(object) :
         lower.set_ylim(0.0, 2.0)
 
         for ax in [upper, middle, lower] :
-            ax.tick_params(axis = 'both', which = 'both', labelsize = 14)
+            ax.tick_params(axis = 'both', which = 'both', labelsize = 14, direction = "in")
             which_grid = 'both'
             if self.logy :
                 which_grid = 'major'

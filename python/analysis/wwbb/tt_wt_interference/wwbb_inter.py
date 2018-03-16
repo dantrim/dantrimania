@@ -14,6 +14,7 @@ import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cache
 from dantrimania.python.analysis.utility.plotting.histogram1d import histogram1d
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
 plt = plib.import_pyplot()
+from math import sqrt
 
 import numpy as np
 
@@ -83,7 +84,7 @@ def get_required_variables(variables, region) :
     out.append("eventweight")
     return out
 
-def make_plot(plot, region, samples, output_dir) :
+def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
 
     print 50 * "-"
     print " plotting %s" % plot.vartoplot
@@ -127,7 +128,7 @@ def make_plot(plot, region, samples, output_dir) :
         elif "single_res" in sample.name :
             shisto = histo
             sweights = weights
-        else :
+        elif "double_single" in sample.name:
             nfhisto = histo
             nfweights = weights
 
@@ -164,13 +165,13 @@ def make_plot(plot, region, samples, output_dir) :
     # plot double + single
     ##########################################################
 
-    y, x, patches = upper.hist(nfhisto, bins = nbins, color = '#72cff8', weights = nfweights,
+    y, x, patches = upper.hist(nfhisto, bins = nbins, color = '#73c2fb', weights = nfweights,
                         label = '$t\\bar{t} + Wtb$',
                         histtype = 'stepfilled',
                         lw = 1,
                         edgecolor = 'k', alpha = 1.0)
 
-    total_nf_y = y[-1]
+    total_nf_y = y
     total_nf_x = x
     maxy = max(y)
 
@@ -180,7 +181,7 @@ def make_plot(plot, region, samples, output_dir) :
                         lw = 1,
                         ls = '--')
 
-    total_f_y = y[-1]
+    total_f_y = y
     total_f_x = x
 
     # scale the axes to fit everything
@@ -200,9 +201,34 @@ def make_plot(plot, region, samples, output_dir) :
     maxy = max_mult * maxy
     upper.set_ylim(plot.ylow, maxy)
 
-    # legend
-    upper.legend(loc='best', frameon = False, fontsize=12, numpoints=1)
 
+    # legend
+    upper.legend(loc='best', frameon = True, fontsize=12, numpoints=1)
+
+    ##############
+    # ratio
+    ratio_x = [x + 0.5 * bw for x in total_f_x[:-1]]
+    ratio_y = total_f_y
+    ratio_y_den = total_nf_y
+    for i in range(len(ratio_y)) :
+        if ratio_y_den[i] == 0 :
+            ratio_y[i] = -10
+            continue
+        ratio_y[i] = float(ratio_y[i] / ratio_y_den[i])
+    lower.set_ylim([0,2])
+    lower.set_ylabel("WWbb / $t \\bar{t}$ + W$t$b", horizontalalignment = 'right', y = 1.2, fontsize = 16)
+    lower.plot(ratio_x, ratio_y, 'ro', zorder=1000, markersize=3)
+
+    ####
+    # labels
+    opts = dict(transform = upper.transAxes)
+    opts.update( dict( va = 'top', ha = 'left' ) )
+    upper.text(0.05, 0.97, "ATLAS", size = 18, style = 'italic', weight = 'bold', **opts)
+    upper.text(0.23, 0.97, "Work In Progress", size = 18, **opts)
+    upper.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, 36.1 fb$^{-1}$', size = 0.75 * 18, **opts)
+    upper.text(0.05, 0.83, sel_string, size = 0.75 * 18, **opts)
+    if sel_string2 != "" :
+        upper.text(0.05, 0.77, "+ %s" % sel_string2, size = 0.75 * 18, **opts)
 
     ##########################################################
     # save
@@ -255,8 +281,15 @@ def get_counts(sum_sample, single_sample, double_sample, region) :
     print "Wtb   (single res)   : %.02f +/- %.02f" % ( single_counts, single_error )
 
     # calc option 1
+    #print "adding acceptance hack"
+    #double_counts = (double_counts / 0.15)
+    #single_counts = (single_counts / 0.27)
+    #sum_counts = (sum_counts / 0.21)
     option1 = ( sum_counts - double_counts )
-    option1 = float(option1) / float(single_counts)
+    error = sqrt( sum_error * sum_error + double_error * double_error )
+    option1_new = float(option1) / float(single_counts)
+    error = option1_new * sqrt( (error/option1) * (error/option1) + (single_error/single_counts) * (single_error/single_counts) )
+    option1 = option1_new
     option1 = (1.0 - option1)
 
     # calc option 2
@@ -264,8 +297,8 @@ def get_counts(sum_sample, single_sample, double_sample, region) :
     option2 = float(option2) / float(sum_counts)
     
     print 25 * '- '
-    print "option1 [ 1 - (WWbb - ttbar) / Wtb ] : %.02f" % option1
-    print "option2 [ WWbb - ttbar - Wtb ]       : %.02f" % option2 
+    print "option1 [ 1 - (WWbb - ttbar) / Wtb ] : %.02f +/- %.02f" % ( option1, abs(error) )
+    #print "option2 [ WWbb - ttbar - Wtb ]       : %.02f" % option2 
     
 
 
@@ -289,35 +322,62 @@ def main() :
 
     # region
     reg = region.Region("wwbb", "WW$bb$")
-#%s && nBJets==2 && mll>20 && mbb>140 && dRll>1.5 && dRll<3.0 && HT2Ratio>0.5 && mt2_bb>150
-    #reg.tcut = "mll>20 && l0_pt>25 && l1_pt>20 && n_bjets==2 && bj0_pt>20 && bj1_pt>20"# && met>200"
-    reg.tcut = "mll>20 && l0_pt>20 && l1_pt>10 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 && met>200"# && mbb>140 && dRll>1.5 && dRll<3.0 && ht2ratio>0.5"# && met>200"
+    reg.tcut = "l0_pt>20 && l1_pt>10 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && ht2ratio>0.8 && dRll<0.9 && mt2_bb>150"# && met>200"# && mbb>140 && dRll>1.5 && dRll<3.0 && ht2ratio>0.5"# && met>200"
+    sel_string = "$2\\ell + 2b +$MET200 $+m_{bb}\\in(100,140)$" 
+    sel_string2 = "$\\Delta R_{\\ell \ell}<1.0$"
 
     # variables
     variables = {}
-    variables["mll"] = [20, 0, 400]
-    variables["met"] = [10, 0, 800]
+    #variables["mll"] = [20, 0, 400]
+    #variables["met"] = [10, 200, 600]
+    #variables["l0_pt"] = [30, 0, 600]
+    #variables["l1_pt"] = [10, 0, 300]
+    #variables["ptll"] = [20, 0, 500]
+    #variables["l0_eta"] = [0.2, -3, 3]
+    #variables["l1_eta"] = [0.2, -3, 3]
+    #variables["bj0_pt"] = [25, 0, 500]
+    #variables["bj1_pt"] = [10, 0, 200]
+    #variables["bj0_eta"] = [0.2, -3, 3]
+    #variables["bj1_eta"] = [0.2, -3, 3]
+    #variables["ht2"] = [30, 0, 1500]
+    #variables["ht2ratio"] = [0.1, 0, 1]
+    #variables["dRll"] = [0.2, 0, 5]
+    #variables["dr_llmet"] = [0.2, 0, 5]
+    #variables["dr_bb"] = [0.2, 0, 5]
+    #variables["ptbb"] = [20, 0, 1000]
+    #variables["dphi_llbb"] = [0.2, -3.2, 3.2]
+    #variables["dphi_llmet_bb"] = [0.2, -3.2, 3.2]
+    #variables["dphi_l0b0"] = [0.2, -3.2, 3.2]
+    #variables["sumpt"] = [40, 0, 2000]
+    #variables["mt2_llbb"] = [20, 0, 1000]
+    #variables["mt2_bb"] = [20, 0, 500]
+    #variables["mbb"] = [40, 0, 1000]
+
+    #inside mbb window + dRll<1.0
+    variables["mll"] = [20, 0, 180]
+    variables["met"] = [20, 200, 450]
     variables["l0_pt"] = [30, 0, 600]
-    variables["l1_pt"] = [10, 0, 300]
-    variables["ptll"] = [20, 0, 500]
-    variables["l0_eta"] = [0.2, -3, 3]
-    variables["l1_eta"] = [0.2, -3, 3]
-    variables["bj0_pt"] = [40, 0, 1000]
-    variables["bj1_pt"] = [10, 0, 300]
-    variables["bj0_eta"] = [0.2, -3, 3]
-    variables["bj1_eta"] = [0.2, -3, 3]
-    variables["ht2"] = [30, 0, 1500]
-    variables["ht2ratio"] = [0.1, 0, 1]
-    variables["dRll"] = [0.2, 0, 5]
-    variables["dr_llmet"] = [0.2, 0, 5]
-    variables["dr_bb"] = [0.2, 0, 5]
-    variables["ptbb"] = [20, 0, 1000]
-    variables["dphi_llbb"] = [0.2, -3.2, 3.2]
-    variables["dphi_llmet_bb"] = [0.2, -3.2, 3.2]
-    variables["dphi_l0b0"] = [0.2, -3.2, 3.2]
+    variables["l1_pt"] = [10, 0, 120]
+    variables["ptll"] = [40, 0, 300]
+    variables["l0_eta"] = [0.6, -3, 3]
+    variables["l1_eta"] = [0.6, -3, 3]
+    variables["bj0_pt"] = [50, 0, 500]
+    variables["bj1_pt"] = [10, 0, 200]
+    variables["bj0_eta"] = [0.6, -3, 3]
+    variables["bj1_eta"] = [0.6, -3, 3]
+    variables["ht2"] = [120, 0, 1200]
+    variables["ht2ratio"] = [0.1, 0.3, 1]
+    variables["dRll"] = [0.1, 0, 1.0]
+    variables["dr_llmet"] = [0.2, 0, 3.5]
+    variables["dr_bb"] = [0.2, 0, 3.5]
+    variables["ptbb"] = [20, 0, 600]
+    variables["dphi_llbb"] = [0.6, -3.2, 3.2]
+    variables["dphi_llmet_bb"] = [0.6, -3.2, 3.2]
+    variables["dphi_l0b0"] = [0.6, -3.2, 3.2]
     variables["sumpt"] = [40, 0, 2000]
-    variables["mt2_llbb"] = [20, 0, 1000]
-    variables["mt2_bb"] = [20, 0, 500]
+    variables["mt2_llbb"] = [15, 80, 350]
+    variables["mt2_bb"] = [40, 0, 400]
+    variables["mbb"] = [5, 100, 140]
 
     if not do_counts :
 
@@ -365,7 +425,7 @@ def main() :
             p.build_ratio()
 
             # make the plot
-            make_plot(p, reg, samples, output_dir)
+            make_plot(p, reg, samples, output_dir, sel_string, sel_string2)
 
     elif do_counts :
         cacher_counts = sample_cacher.SampleCacher("./cache")

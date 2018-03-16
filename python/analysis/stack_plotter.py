@@ -137,6 +137,25 @@ def add_labels(pad, region_name = "") :
 
 
 #############################################################################
+def get_wt_bjet_weights(sub_bjet_pts) :
+
+    weights = np.ones(len(sub_bjet_pts))
+    for ibj, bj in enumerate(sub_bjet_pts) :
+        if bj < 140 :
+            weights[ibj] = 1.0
+        else :
+            weights[ibj] = 0.5
+#        if bj < 160 :
+#            weights[ibj] = 1.0
+#        elif bj>=160 and bj<200 :
+#            weights[ibj] = 0.5
+#        elif bj>=200 and bj<240 :
+#            weights[ibj] = 0.48
+#        elif bj>=240 :
+#            weights[ibj] = 0.1
+    return weights
+
+
 def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins = None, absval = False) :
 
     histograms_signal = []
@@ -151,6 +170,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
             lumis = signal.scalefactor * np.ones(len(sc[var]))
             weights = lumis * sc['eventweight']
+
 
             hist_data = sc[var]
             if absval :
@@ -234,6 +254,14 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
             lumis = bkg.scalefactor * np.ones(len(bc[plot.vartoplot]))
             weights = lumis * bc['eventweight']
 
+            # wt
+#            if "Wt" in bkg.name :
+#                wt_weights = get_wt_bjet_weights(bc['bj1_pt'])
+#                weights = weights * wt_weights
+                #for iw, w in enumerate(weights) :
+                #    weights[iw] = w * wt_weights[iw]
+                #weights = weights * wt_weights
+
             # get data
             hist_data = bc[plot.vartoplot]
             if plot.absvalue :
@@ -279,7 +307,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
         if len(signals) >= 2 :
             multiplier = 1e4
     maxy = multiplier * maxy
-    upper_pad.set_ylim(miny, maxy)
+    #upper_pad.set_ylim(miny, maxy)
 
     # statistical error band
     sm_x_error = np.zeros(len(histogram_sm.y_error())) 
@@ -300,7 +328,8 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
     weights = []
     for name in hstack.order :
         for h in hstack.histograms :
-            if name not in h.name : continue
+            #if name not in h.name : continue
+            if name != h.name.replace("hist_","") : continue
             histos.append(h.data)
             weights.append(h.weights)
     upper_pad.hist( histos, 
@@ -356,7 +385,8 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
         print " > Data / SM  : %5.2f" % ( total_data / total_sm )
 
         maxd = histogram_data.maximum()
-        if maxd > maxy : maxy = maxd
+        if maxd > maxy :
+            maxy = multiplier * maxd
 
         data_x = np.array(histogram_data.bin_centers())
         data_y = histogram_data.histogram
@@ -424,6 +454,9 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
                 sm_ratio_error,
                 plot.bin_width)
         lower_pad.add_collection(ratio_stat_error_band)
+
+    # now set the y-axis now that we have both data and MC taken into account
+    upper_pad.set_ylim(miny, maxy)
 
     #################################
     # legend

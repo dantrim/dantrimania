@@ -185,7 +185,7 @@ loaded_regions.append(r)
 #loaded_regions.append(r)
 #
 r = region.Region("crtt3", "CR-$t\\bar{t}$ (Top)")
-r.tcut = "%s && nBJets>=2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
+r.tcut = "%s && nBJets==2 && mll>20 && l0_pt>25 && l1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<2.0 && HT2Ratio<0.8 && HT2Ratio>0.2" % ( trigger )
 loaded_regions.append(r)
 #
 #r = region.Region("vrdrll", "VR$_{Top}^{dRll}$")

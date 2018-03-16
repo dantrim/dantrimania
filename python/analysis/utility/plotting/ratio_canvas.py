@@ -141,7 +141,8 @@ class ratio_canvas(object) :
         lower_pad.set_yticks([], minor = True)
 
         for ax in [upper_pad, lower_pad] :
-            ax.tick_params(axis = 'both', which = 'both', labelsize = 16)
+            ax.tick_params(axis = 'both', which = 'both', labelsize = 16, direction = "in",
+                        labelleft=True, bottom = True, top = True, right = True, left = True)
             which_grid = 'both'
             if self.logy :
                 which_grid = 'major'
