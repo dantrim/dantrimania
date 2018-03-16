@@ -13,3 +13,5 @@ fi
 
 export PATH=${DANTRIM_ANA}/dantrimania/scripts/:${PATH}
 
+# for tables
+export PYTHONPATH=/home/dantrim/tabulate-0.7.5:${PYTHONPATH}
