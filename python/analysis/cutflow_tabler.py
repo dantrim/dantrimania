@@ -109,6 +109,27 @@ def plot_cutflow(header_row, table_rows, plot_type = "yields") :
         values.append(bkg_values)
         errors.append(bkg_errors)
 
+    if plot_type == "fraction" :
+        n_cuts = len(value_strings[0])
+        total_yields_at_cuts = []
+        fractions = []
+        for icut in xrange(n_cuts) :
+            total_for_cut = 0.0
+            for v in values :
+                total_for_cut += v[icut]
+            total_yields_at_cuts.append(total_for_cut)
+
+        for ibkg, bkg_values in enumerate(values) :
+            bkg_fractions = []
+            for icut, cut_value in enumerate(bkg_values) :
+                bkg_fractions.append(float(cut_value) / total_yields_at_cuts[icut])
+            fractions.append(bkg_fractions)
+
+        values = fractions
+
+        maxy = 1.2
+        miny = 1e-3
+
     maxy = 1e1 * maxy
     miny = 1e-1 * miny
 
@@ -119,6 +140,8 @@ def plot_cutflow(header_row, table_rows, plot_type = "yields") :
     y_axis_label = ""
     if plot_type == "yields" :
         y_axis_label = "Yield"
+    elif plot_type == "fraction" :
+        y_axis_label = "Process Fraction"
     elif "eff" in plot_type :
         if "abs" in plot_type :
             y_axis_label = "Absolute Efficiency (Yield Cut i / Yield Cut 0)"
@@ -172,6 +195,7 @@ def print_cutflow(requested_cutflow, backgrounds) :
 
     if requested_cutflow.make_plots :
         plot_cutflow(header_row, table_rows, "yields")
+        plot_cutflow(header_row, table_rows, "fraction")
 
     header_row[0] = cutflow_name + " - abs eff"
     abs_efficiencies = []
@@ -213,6 +237,12 @@ def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
 
     for bkg in backgrounds :
         bkg.cutflow_result = {} # { cut index : [ yield, stat_err ] }
+
+    for sig in signals :
+        sig.cutflow_result = {}
+
+    if data :
+        data.cutflow_result = {}
 
     for icut in xrange(n_cuts) :
         print requested_cutflow.tcut_at_idx(icut)
