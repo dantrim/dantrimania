@@ -9,6 +9,7 @@ import dantrimania.python.analysis.utility.samples.region as region
 import dantrimania.python.analysis.utility.samples.sample_utils as sample_utils
 import dantrimania.python.analysis.utility.samples.region_utils as region_utils
 import dantrimania.python.analysis.utility.utils.utils as utils
+import dantrimania.python.analysis.utility.plotting.canvas as canvas
 import dantrimania.python.analysis.utility.samples.sample_cacher as sample_cacher
 import dantrimania.python.analysis.utility.samples.cutflow as cutflow
 #import dantrimania.python.analysis.utility.plotting.m_py.errorbars as errorbars
@@ -23,15 +24,26 @@ def get_cutflows() :
     out = []
 
     trigger_cut_str = "(( year == 2015 && trig_tight_2015 == 1 ) || ( year == 2016 && trig_tight_2016 == 1 ))"
+    isSF = "(isEE==1 || isMM==1 )"
+    isDF = "(isDF==1)"
+    dilepton_any = "( %s ) || ( %s ) " % ( isSF, isDF )
 
     # non-resonant selection
     c = cutflow.Cutflow("hhNonRes", "hhNonRes")
-    c.add_cut("lepton_pt", "(l0_pt>20 && l1_pt>20)")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
+    c.add_cut("trigger", "(%s)" % trigger_cut_str)
+    c.add_cut("bjet", "(nBJets==2)")
+    c.add_cut("mll>20", "(mll>20)")
+    c.add_cut("higgs_mt2_llbb", "(mt2_llbb>100 && mt2_llbb<140)")
     c.add_cut("higgs_mbb", "(mbb>100 && mbb<140)")
+    c.add_cut("ht2", "(HT2Ratio>0.8)")
+    c.add_cut("drll", "(dRll<0.9)")
+    c.add_cut("mt2_bb", "(mt2_bb>150)")
     out.append(c)
 
     # ttbar CR
     c = cutflow.Cutflow("crtt", "crtt")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
     c.add_cut("trigger", "(%s)" % trigger_cut_str)
     c.add_cut("bjet", "(nBJets==2)")
     c.add_cut("mll>20", "(mll>20)")
@@ -43,6 +55,7 @@ def get_cutflows() :
 
     # wt CR
     c = cutflow.Cutflow("crwt", "crwt")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
     c.add_cut("trigger", "(%s)" % trigger_cut_str)
     c.add_cut("bjet", "(nBJets==2)")
     c.add_cut("mll>20", "(mll>20)")
@@ -52,6 +65,82 @@ def get_cutflows() :
     out.append(c)
 
     return out
+
+def plot_cutflow(header_row, table_rows, plot_type = "yields") :
+
+    region_name = header_row[0].split()[0]
+    x_labels = [""]
+    x_labels += header_row[1:]
+    n_x = len(x_labels)
+
+    bkg_names = []
+    value_strings = []
+    values = []
+    errors = []
+    maxy = -1
+    miny = 1e9
+    for row in table_rows :
+        bkg_names.append(row[0])
+        value_strings.append(row[1:])
+        yield_and_error_list = row[1:]
+        bkg_values = []
+        bkg_errors = []
+        for x in yield_and_error_list :
+
+            yield_value = 0.0
+            error_value = 0.0
+
+            if "eff" not in plot_type :
+                yield_string = x.strip().split()[0]
+                error_string = x.strip().split()[2]
+
+                yield_value = float(yield_string)
+                error_value = float(error_string)
+            else :
+
+                yield_value = float(x)
+
+
+            if yield_value > maxy : maxy = yield_value 
+            if yield_value < miny : miny = yield_value 
+
+            bkg_values.append(yield_value)
+            bkg_errors.append(error_value)
+        values.append(bkg_values)
+        errors.append(bkg_errors)
+
+    maxy = 1e1 * maxy
+    miny = 1e-1 * miny
+
+    can = canvas.canvas(name = "canvas_%s" % region_name, logy = True)
+    can.x_bounds = [0, n_x]
+
+    x_axis_label = "Cut"
+    y_axis_label = ""
+    if plot_type == "yields" :
+        y_axis_label = "Yield"
+    elif "eff" in plot_type :
+        if "abs" in plot_type :
+            y_axis_label = "Absolute Efficiency (Yield Cut i / Yield Cut 0)"
+        elif "rel" in plot_type :
+            y_axis_label = "Relative Efficiency (Yield Cut i / Yield Cut i-1)"
+
+    can.labels = [x_axis_label, y_axis_label]
+    can.build()
+    can.pad.set_ylim(miny, maxy)
+    can.pad.set_xticklabels(x_labels, rotation = 65)
+
+    xvals_i = np.arange(1, n_x)
+    xvals = []
+    for i in xrange(len(bkg_names)) :
+        xvals.append(xvals_i)
+
+    for i in xrange(len(values)) :
+        can.pad.plot(xvals[0], values[i], linestyle = '-', marker = 'o', label = bkg_names[i])
+    can.pad.legend(loc='best')
+
+    ## save
+    can.fig.savefig("cutflow_plot_%s_%s.pdf" % ( region_name, plot_type ), bbox_inches = "tight", dpi = 200)
 
 def print_cutflow(requested_cutflow, backgrounds) :
 
@@ -81,6 +170,9 @@ def print_cutflow(requested_cutflow, backgrounds) :
 
     print tabulate.tabulate(table_rows, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".2f")
 
+    if requested_cutflow.make_plots :
+        plot_cutflow(header_row, table_rows, "yields")
+
     header_row[0] = cutflow_name + " - abs eff"
     abs_efficiencies = []
     rel_efficiencies = []
@@ -106,13 +198,14 @@ def print_cutflow(requested_cutflow, backgrounds) :
         rel_efficiencies.append(rel_eff_bkg)
 
     print tabulate.tabulate(abs_efficiencies, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".4f")
+    if requested_cutflow.make_plots :
+        plot_cutflow(header_row, abs_efficiencies, "abs_eff")
 
     header_row[0] = cutflow_name + " - rel eff"
     print tabulate.tabulate(rel_efficiencies, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".4f")
 
-            
-            
-    
+    if requested_cutflow.make_plots :
+        plot_cutflow(header_row, rel_efficiencies, "rel_eff")
 
 def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
 
@@ -152,9 +245,11 @@ def main() :
     parser = OptionParser()
     parser.add_option("-r", "--region-name", default = "", help = "Provide a region selection by name")
     parser.add_option("-c", "--config", default = "", help = "Configuration file for plotting")
+    parser.add_option("-p", "--plot", default = False, action = "store_true", help = "Make cutflow plots")
     (options, args) = parser.parse_args()
     config = options.config
     region_name = options.region_name
+    make_plots = options.plot
 
     if not utils.file_exists(config) :
         sys.exit()
@@ -213,6 +308,7 @@ def main() :
     cacher.cache()
 
     requested_cutflow.variable_list = variables_needed_for_cutflow
+    requested_cutflow.make_plots = make_plots
 
     make_cutflow_table(requested_cutflow, backgrounds, signals, data)
 

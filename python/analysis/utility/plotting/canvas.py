@@ -94,7 +94,7 @@ class canvas(object) :
         if not len(self.y_bounds) == 0 :
             pad.set_ylim(self.y_bounds[0], self.y_bounds[1])
 
-        pad.tick_params(axis = 'both', which = 'both', labelsize = 16,, direction = 'in',
+        pad.tick_params(axis = 'both', which = 'both', labelsize = 16, direction = 'in',
                 labelleft = True, bottom = True, top = True, right = True, left = True)
         label_locator_params = {'nbins': 10, 'steps': None, 'tick_values' : (self.x_bounds[0], self.x_bounds[-1]),
                                 'integer': False, 'symmetric': False, 'prune': None, 'min_n_ticks': 2}
@@ -104,7 +104,7 @@ class canvas(object) :
         which_grid = 'both'
         if self.logy :
             which_grid = 'major'
-        pad.grid(color = 'k', which = which_grid, linestyle = '--', lw = 1, alpha = 0.1)
+        pad.grid(color = 'k', which = which_grid, linestyle = '--', lw = 1, alpha = 0.3)
 
         if len(self.labels) != 2 :
             raise ValueError('%s build : axis labels (%s) is wrong size (size=%d, expect=2)' \
