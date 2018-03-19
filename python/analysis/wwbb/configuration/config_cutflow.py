@@ -57,29 +57,29 @@ loaded_samples.append(wt)
 ###wtDS.load(filelist_dir + "singletop_DS", h5_dir_mc)
 ###loaded_samples.append(wtDS)
 ##
-##ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
-##ztt.scalefactor = lumi_factor
-##ztt.fillstyle = 0
-##ztt.linestyle = '-'
-##ztt.color = "#fecf90" 
-##ztt.load(filelist_dir + "zjets_sherpa_tt", h5_dir_mc)
-##loaded_samples.append(ztt)
-##
-##zll = sample.Sample("Zll", "$Z \\rightarrow \\ell \ell$")
-##zll.scalefactor = lumi_factor
-##zll.fillstyle = 0
-##zll.linestyle = '-'
-##zll.color = "#d1b7a5" 
-##zll.load(filelist_dir + "zjets_sherpa_ll", h5_dir_mc)
-##loaded_samples.append(zll)
-##
-##dib = sample.Sample("Diboson", "$VV \\rightarrow \\ell \\ell \\nu \\nu$")
-##dib.scalefactor = lumi_factor
-##dib.fillstyle = 0
-##dib.linestyle = '-'
-##dib.color = "#785e6f" 
-##dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
-##loaded_samples.append(dib)
+ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
+ztt.scalefactor = lumi_factor
+ztt.fillstyle = 0
+ztt.linestyle = '-'
+ztt.color = "#fecf90" 
+ztt.load(filelist_dir + "zjets_sherpa_tt", h5_dir_mc)
+loaded_samples.append(ztt)
+
+zll = sample.Sample("Zll", "$Z \\rightarrow \\ell \ell$")
+zll.scalefactor = lumi_factor
+zll.fillstyle = 0
+zll.linestyle = '-'
+zll.color = "#d1b7a5" 
+zll.load(filelist_dir + "zjets_sherpa_ll", h5_dir_mc)
+loaded_samples.append(zll)
+
+dib = sample.Sample("Diboson", "$VV \\rightarrow \\ell \\ell \\nu \\nu$")
+dib.scalefactor = lumi_factor
+dib.fillstyle = 0
+dib.linestyle = '-'
+dib.color = "#785e6f" 
+dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
+loaded_samples.append(dib)
 ##
 ##wjets = sample.Sample("Wjets", "$W + jets$")
 ##wjets.scalefactor = lumi_factor
