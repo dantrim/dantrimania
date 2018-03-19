@@ -15,16 +15,42 @@ import dantrimania.python.analysis.utility.samples.cutflow as cutflow
 #import dantrimania.python.analysis.utility.utils.plib_utils as plibo
 
 import numpy as np
+from math import sqrt
 
 def get_cutflows() :
 
     out = []
+
+    trigger_cut_str = "(( year == 2015 && trig_tight_2015 == 1 ) || ( year == 2016 && trig_tight_2016 == 1 ))"
 
     # non-resonant selection
     c = cutflow.Cutflow("hhNonRes", "hhNonRes")
     c.add_cut("lepton_pt", "(l0_pt>20 && l1_pt>20)")
     c.add_cut("higgs_mbb", "(mbb>100 && mbb<140)")
     out.append(c)
+
+    # ttbar CR
+    c = cutflow.Cutflow("crtt", "crtt")
+    c.add_cut("trigger", "(%s)" % trigger_cut_str)
+    c.add_cut("bjet", "(nBJets==2)")
+    c.add_cut("mll>20", "(mll>20)")
+    c.add_cut("higgs_mbb", "(mbb>100 && mbb<140)")
+    c.add_cut("higgs_mt2llbb", "(mt2_llbb>100 && mt2_llbb<140)")
+    c.add_cut("drll_window", "(dRll>1.5 && dRll<3.0)")
+    c.add_cut("ht2", "(HT2Ratio>0.4 && HT2Ratio<0.6)")
+    out.append(c)
+
+    # wt CR
+    c = cutflow.Cutflow("crwt", "crwt")
+    c.add_cut("trigger", "(%s)" % trigger_cut_str)
+    c.add_cut("bjet", "(nBJets==2)")
+    c.add_cut("mll>20", "(mll>20)")
+    c.add_cut("mbb", "(mbb>140)")
+    c.add_cut("mt2_bb", "(mt2_bb>150)")
+    c.add_cut("ht2", "(HT2Ratio>0.6 && HT2Ratio<0.8)")
+    out.append(c)
+
+    
 
     return out
 
@@ -37,19 +63,22 @@ def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
         for bkg in backgrounds :
 
             bkg_yield = 0.0
+            bkg_sumw2 = 0.0
 
             chain = bkg.chain()
             for ich, ch in enumerate(chain) :
                 weights = ch["eventweight"]
                 weights *= ( bkg.scalefactor * np.ones(len(weights)) )
+                weights_squared = np.square(weights)
 
                 idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "ch", requested_cutflow.variable_list)
                 set_idx = "indices = np.array( %s )" % idx_selection
                 exec(set_idx)
 
                 bkg_yield += np.sum(weights[indices])
+                bkg_sumw2 += np.sum(weights_squared[indices])
 
-            print "bkg %s : %.2f" % (bkg.name, bkg_yield)
+            print "bkg %s : %.2f +/- %.2f" % (bkg.name, bkg_yield, sqrt(bkg_sumw2))
 
         #idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "chain", requested_cutflow.variable_list)
         #set_idx = "indices = np.array( %s )" % idx_selection
