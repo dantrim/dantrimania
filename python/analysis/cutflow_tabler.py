@@ -64,8 +64,10 @@ def print_cutflow(requested_cutflow, backgrounds) :
         header_row += [cut_names[icut]]
 
     table_rows = []
+    row_counts = []
     for ibkg, bkg in enumerate(backgrounds) :
         bkg_cutflow = []
+        rows = []
         bkg_cutflow.append(bkg.name)
         for icut in xrange(n_cuts) :
             bkg_cut_result = bkg.cutflow_result[icut]
@@ -73,9 +75,43 @@ def print_cutflow(requested_cutflow, backgrounds) :
             cut_err = bkg_cut_result[1]
             cut_result_str = "%.2f +/- %.2f" % (cut_yield, cut_err)
             bkg_cutflow.append(cut_result_str)
+            rows.append(float(cut_yield))
         table_rows.append(bkg_cutflow)
+        row_counts.append(rows)
 
     print tabulate.tabulate(table_rows, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".2f")
+
+    header_row[0] = cutflow_name + " - abs eff"
+    abs_efficiencies = []
+    rel_efficiencies = []
+    for ibkg, bkg in enumerate(backgrounds) :
+        abs_eff_bkg = [bkg.name, 1]
+        rel_eff_bkg = [bkg.name, 1]
+        counts = row_counts[ibkg]
+        for icut in xrange(n_cuts) :
+            if icut == 0 : continue
+
+            abs_num = counts[icut]
+            abs_den = counts[0]
+            abs_eff = abs_num / abs_den
+
+            rel_num = counts[icut]
+            rel_den = counts[icut-1]
+            rel_eff = rel_num / rel_den
+
+            abs_eff_bkg.append(abs_eff)
+            rel_eff_bkg.append(rel_eff)
+
+        abs_efficiencies.append(abs_eff_bkg)
+        rel_efficiencies.append(rel_eff_bkg)
+
+    print tabulate.tabulate(abs_efficiencies, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".4f")
+
+    header_row[0] = cutflow_name + " - rel eff"
+    print tabulate.tabulate(rel_efficiencies, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".4f")
+
+            
+            
     
 
 def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
