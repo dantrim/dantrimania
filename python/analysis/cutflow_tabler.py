@@ -269,6 +269,28 @@ def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
 
             bkg.cutflow_result[icut] = [bkg_yield, sqrt(bkg_sumw2)]
 
+        for sig in signals :
+
+            sig_yield = 0.0
+            sig_sumw2 = 0.0
+
+            chain = sig.chain()
+            for ich, ch in enumerate(chain) :
+                weights = ch["eventweight"]
+                weights *= ( bkg.scalefactor * np.ones(len(weights)) )
+                weights_squared = np.square(weights)
+
+                idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "ch", requested_cutflow.variable_list)
+                set_idx = "indices = np.array( %s )" % idx_selection
+                exec(set_idx)
+
+                sig_yield += np.sum(weights[indices])
+                sig_sumw2 += np.sum(weights_squared[indices])
+
+            sig.cutflow_result[icut] = [sig_yield, sqrt(sig_sumw2)]
+
+    backgrounds += signals
+
     print_cutflow(requested_cutflow, backgrounds)
 
 def main() :

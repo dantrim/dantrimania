@@ -117,14 +117,14 @@ data.load(filelist_dir + "data_n0234", h5_dir_data)
 #loaded_samples.append(data)
 
 #signals
-#hh0 = sample.Sample("hhSM", "$hh$ SM")
-#hh0.is_signal = True
-#hh0.scalefactor = lumi_factor * 0.06# * 100
-#hh0.fillstyle = 0
-#hh0.linestyle = '--'
-#hh0.color = '#fa0f00'
-#hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
-#loaded_samples.append(hh0)
+hh0 = sample.Sample("hhSM", "$hh$ SM")
+hh0.is_signal = True
+hh0.scalefactor = lumi_factor * 0.06# * 100
+hh0.fillstyle = 0
+hh0.linestyle = '--'
+hh0.color = '#fa0f00'
+hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
+loaded_samples.append(hh0)
 #
 #hh3 = sample.Sample("hh600", "X $600$ GeV")
 #hh3.is_signal = True
