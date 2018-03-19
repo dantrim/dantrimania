@@ -64,6 +64,36 @@ def get_cutflows() :
     c.add_cut("ht2", "(HT2Ratio>0.6 && HT2Ratio<0.8)")
     out.append(c)
 
+    # LFV - etau
+    c = cutflow.Cutflow("lfv_etau", "lfv_etau")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
+    c.add_cut("isEM", "(isEM==1 && isME==0)")
+    c.add_cut("l0_pt>45", "(l0_pt>45)")
+    c.add_cut("l1_pt>15", "(l1_pt>15)")
+    c.add_cut("mll_30_150", "(mll>30 && mll<150)")
+    c.add_cut("one_bjet", "(nBJets==1)")
+    out.append(c)
+
+    # LFV - mutau
+    c = cutflow.Cutflow("lfv_mutau", "lfv_mutau")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
+    c.add_cut("isME", "(isEM==0 && isME==0)")
+    c.add_cut("l0_pt>45", "(l0_pt>45)")
+    c.add_cut("l1_pt>15", "(l1_pt>15)")
+    c.add_cut("mll_30_150", "(mll>30 && mll<150)")
+    c.add_cut("one_bjet", "(nBJets==1)")
+    out.append(c)
+
+    # LFV
+    c = cutflow.Cutflow("lfv_any", "lfv_any")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
+    c.add_cut("isME", "(isEM==0 && isME==0)")
+    c.add_cut("l0_pt>45", "(l0_pt>45)")
+    c.add_cut("l1_pt>15", "(l1_pt>15)")
+    c.add_cut("mll_30_150", "(mll>30 && mll<150)")
+    c.add_cut("one_bjet", "(nBJets==1)")
+    out.append(c)
+
     return out
 
 def plot_cutflow(header_row, table_rows, plot_type = "yields") :
@@ -134,7 +164,7 @@ def plot_cutflow(header_row, table_rows, plot_type = "yields") :
     miny = 1e-1 * miny
 
     can = canvas.canvas(name = "canvas_%s" % region_name, logy = True)
-    can.x_bounds = [0, n_x]
+    can.x_bounds = [0, n_x-1]
 
     x_axis_label = "Cut"
     y_axis_label = ""
@@ -151,6 +181,8 @@ def plot_cutflow(header_row, table_rows, plot_type = "yields") :
     can.labels = [x_axis_label, y_axis_label]
     can.build()
     can.pad.set_ylim(miny, maxy)
+    x_tick_vals = np.arange(0, n_x+1, 1)
+    can.pad.set_xticks(x_tick_vals)
     can.pad.set_xticklabels(x_labels, rotation = 65)
 
     xvals_i = np.arange(1, n_x)
