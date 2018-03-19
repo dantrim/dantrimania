@@ -16,6 +16,7 @@ import dantrimania.python.analysis.utility.samples.cutflow as cutflow
 
 import numpy as np
 from math import sqrt
+import tabulate
 
 def get_cutflows() :
 
@@ -50,13 +51,40 @@ def get_cutflows() :
     c.add_cut("ht2", "(HT2Ratio>0.6 && HT2Ratio<0.8)")
     out.append(c)
 
-    
-
     return out
+
+def print_cutflow(requested_cutflow, backgrounds) :
+
+    n_cuts = requested_cutflow.n_cuts
+    cut_names = requested_cutflow.cut_names()
+    cutflow_name = requested_cutflow.name
+
+    header_row = [cutflow_name]
+    for icut in xrange(n_cuts) :
+        header_row += [cut_names[icut]]
+
+    table_rows = []
+    for ibkg, bkg in enumerate(backgrounds) :
+        bkg_cutflow = []
+        bkg_cutflow.append(bkg.name)
+        for icut in xrange(n_cuts) :
+            bkg_cut_result = bkg.cutflow_result[icut]
+            cut_yield = bkg_cut_result[0]
+            cut_err = bkg_cut_result[1]
+            cut_result_str = "%.2f +/- %.2f" % (cut_yield, cut_err)
+            bkg_cutflow.append(cut_result_str)
+        table_rows.append(bkg_cutflow)
+
+    print tabulate.tabulate(table_rows, header_row, tablefmt = "rst", numalign = "right", stralign = "left", floatfmt = ".2f")
+    
 
 def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
 
     n_cuts = requested_cutflow.n_cuts
+
+    for bkg in backgrounds :
+        bkg.cutflow_result = {} # { cut index : [ yield, stat_err ] }
+
     for icut in xrange(n_cuts) :
         print requested_cutflow.tcut_at_idx(icut)
 
@@ -78,12 +106,11 @@ def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
                 bkg_yield += np.sum(weights[indices])
                 bkg_sumw2 += np.sum(weights_squared[indices])
 
-            print "bkg %s : %.2f +/- %.2f" % (bkg.name, bkg_yield, sqrt(bkg_sumw2))
+            #print "bkg %s : %.2f +/- %.2f" % (bkg.name, bkg_yield, sqrt(bkg_sumw2))
 
-        #idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "chain", requested_cutflow.variable_list)
-        #set_idx = "indices = np.array( %s )" % idx_selection
-        #exec(set_idx)
-        #weights = ds[indices]
+            bkg.cutflow_result[icut] = [bkg_yield, sqrt(bkg_sumw2)]
+
+    print_cutflow(requested_cutflow, backgrounds)
 
 def main() :
     parser = OptionParser()

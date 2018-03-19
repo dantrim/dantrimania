@@ -28,27 +28,27 @@ lumi_factor = 36.06
 #lumi_factor = 100
 
 # backgrounds
-###ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 0.96$")
-##ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 0.96$")
-###ttbar = sample.Sample("ttbar", "$t\\bar{t}$ (PP8)")# \\times 0.97$")
-##ttbar.scalefactor = lumi_factor * 0.96# * 1.10# * 0.92
-##ttbar.fillstyle = 0
-##ttbar.linestyle = '-'
-##ttbar.color = "#f6f5f0"
-##ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
-###ttbar.load(filelist_dir + "ttbar_pp8", h5_dir_mc) 
-##loaded_samples.append(ttbar)
-##
-###wt = sample.Sample("WtAMC", "$Wt$ (AMC)")# \\times 0.94$")
-##wt = sample.Sample("Wt", "$Wt \\times 1.13$")# \\times 0.76$ (nom)")
-###wt = sample.Sample("Wt", "$Wt$")# \\times 1.13$")# \\times 0.76$ (nom)")
-##wt.scalefactor = lumi_factor * 1.13
-##wt.fillstyle = 0
-##wt.linestyle = '-'
-##wt.color = "#698bae" #wt.load(filelist_dir + "Wt", h5_dir_mc)
-##wt.load(filelist_dir + "Wt", h5_dir_mc)
-###wt.load(filelist_dir + "WtAMC", h5_dir_mc)
-##loaded_samples.append(wt)
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 0.96$")
+ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 0.96$")
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$ (PP8)")# \\times 0.97$")
+ttbar.scalefactor = lumi_factor# * 0.96# * 1.10# * 0.92
+ttbar.fillstyle = 0
+ttbar.linestyle = '-'
+ttbar.color = "#f6f5f0"
+ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
+#ttbar.load(filelist_dir + "ttbar_pp8", h5_dir_mc) 
+loaded_samples.append(ttbar)
+
+#wt = sample.Sample("WtAMC", "$Wt$ (AMC)")# \\times 0.94$")
+wt = sample.Sample("Wt", "$Wt \\times 1.13$")# \\times 0.76$ (nom)")
+#wt = sample.Sample("Wt", "$Wt$")# \\times 1.13$")# \\times 0.76$ (nom)")
+wt.scalefactor = lumi_factor #* 1.13
+wt.fillstyle = 0
+wt.linestyle = '-'
+wt.color = "#698bae" #wt.load(filelist_dir + "Wt", h5_dir_mc)
+wt.load(filelist_dir + "Wt", h5_dir_mc)
+#wt.load(filelist_dir + "WtAMC", h5_dir_mc)
+loaded_samples.append(wt)
 ###wtDS = sample.Sample("WtDS", "$Wt$ (DS)")
 ###wtDS.scalefactor = lumi_factor
 ###wtDS.fillstyle = 0
