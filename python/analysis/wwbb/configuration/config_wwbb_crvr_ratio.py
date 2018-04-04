@@ -28,67 +28,67 @@ lumi_factor = 36.06
 #lumi_factor = 100
 
 # backgrounds
-###ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 0.96$")
-##ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 0.96$")
-###ttbar = sample.Sample("ttbar", "$t\\bar{t}$ (PP8)")# \\times 0.97$")
-##ttbar.scalefactor = lumi_factor * 0.96# * 1.10# * 0.92
-##ttbar.fillstyle = 0
-##ttbar.linestyle = '-'
-##ttbar.color = "#f6f5f0"
-##ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
-###ttbar.load(filelist_dir + "ttbar_pp8", h5_dir_mc) 
-##loaded_samples.append(ttbar)
-##
-###wt = sample.Sample("WtAMC", "$Wt$ (AMC)")# \\times 0.94$")
-##wt = sample.Sample("Wt", "$Wt \\times 1.13$")# \\times 0.76$ (nom)")
-###wt = sample.Sample("Wt", "$Wt$")# \\times 1.13$")# \\times 0.76$ (nom)")
-##wt.scalefactor = lumi_factor * 1.13
-##wt.fillstyle = 0
-##wt.linestyle = '-'
-##wt.color = "#698bae" #wt.load(filelist_dir + "Wt", h5_dir_mc)
-##wt.load(filelist_dir + "Wt", h5_dir_mc)
-###wt.load(filelist_dir + "WtAMC", h5_dir_mc)
-##loaded_samples.append(wt)
-###wtDS = sample.Sample("WtDS", "$Wt$ (DS)")
-###wtDS.scalefactor = lumi_factor
-###wtDS.fillstyle = 0
-###wtDS.linestyle = '-'
-###wtDS.color = "#698bae"
-###wtDS.load(filelist_dir + "singletop_DS", h5_dir_mc)
-###loaded_samples.append(wtDS)
-##
-##ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
-##ztt.scalefactor = lumi_factor
-##ztt.fillstyle = 0
-##ztt.linestyle = '-'
-##ztt.color = "#fecf90" 
-##ztt.load(filelist_dir + "zjets_sherpa_tt", h5_dir_mc)
-##loaded_samples.append(ztt)
-##
-##zll = sample.Sample("Zll", "$Z \\rightarrow \\ell \ell$")
-##zll.scalefactor = lumi_factor
-##zll.fillstyle = 0
-##zll.linestyle = '-'
-##zll.color = "#d1b7a5" 
-##zll.load(filelist_dir + "zjets_sherpa_ll", h5_dir_mc)
-##loaded_samples.append(zll)
-##
-##dib = sample.Sample("Diboson", "$VV \\rightarrow \\ell \\ell \\nu \\nu$")
-##dib.scalefactor = lumi_factor
-##dib.fillstyle = 0
-##dib.linestyle = '-'
-##dib.color = "#785e6f" 
-##dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
-##loaded_samples.append(dib)
-##
-##wjets = sample.Sample("Wjets", "$W + jets$")
-##wjets.scalefactor = lumi_factor
-##wjets.fillstyle = 0
-##wjets.linestyle = '-'
-##wjets.color = "#daadbb" 
-##wjets.load(filelist_dir + "wjets_sherpa", h5_dir_mc)
-##loaded_samples.append(wjets)
-##
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 0.96$")
+ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times 0.96$")
+#ttbar = sample.Sample("ttbar", "$t\\bar{t}$ (PP8)")# \\times 0.97$")
+ttbar.scalefactor = lumi_factor * 0.96# * 1.10# * 0.92
+ttbar.fillstyle = 0
+ttbar.linestyle = '-'
+ttbar.color = "#f6f5f0"
+ttbar.load(filelist_dir + "ttbar", h5_dir_mc) 
+#ttbar.load(filelist_dir + "ttbar_pp8", h5_dir_mc) 
+loaded_samples.append(ttbar)
+
+#wt = sample.Sample("WtAMC", "$Wt$ (AMC)")# \\times 0.94$")
+wt = sample.Sample("Wt", "$Wt \\times 1.13$")# \\times 0.76$ (nom)")
+#wt = sample.Sample("Wt", "$Wt$")# \\times 1.13$")# \\times 0.76$ (nom)")
+wt.scalefactor = lumi_factor * 1.13
+wt.fillstyle = 0
+wt.linestyle = '-'
+wt.color = "#698bae" #wt.load(filelist_dir + "Wt", h5_dir_mc)
+wt.load(filelist_dir + "Wt", h5_dir_mc)
+#wt.load(filelist_dir + "WtAMC", h5_dir_mc)
+loaded_samples.append(wt)
+#wtDS = sample.Sample("WtDS", "$Wt$ (DS)")
+#wtDS.scalefactor = lumi_factor
+#wtDS.fillstyle = 0
+#wtDS.linestyle = '-'
+#wtDS.color = "#698bae"
+#wtDS.load(filelist_dir + "singletop_DS", h5_dir_mc)
+#loaded_samples.append(wtDS)
+
+ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
+ztt.scalefactor = lumi_factor
+ztt.fillstyle = 0
+ztt.linestyle = '-'
+ztt.color = "#fecf90" 
+ztt.load(filelist_dir + "zjets_sherpa_tt", h5_dir_mc)
+loaded_samples.append(ztt)
+
+zll = sample.Sample("Zll", "$Z \\rightarrow \\ell \ell$")
+zll.scalefactor = lumi_factor
+zll.fillstyle = 0
+zll.linestyle = '-'
+zll.color = "#d1b7a5" 
+zll.load(filelist_dir + "zjets_sherpa_ll", h5_dir_mc)
+loaded_samples.append(zll)
+
+dib = sample.Sample("Diboson", "$VV \\rightarrow \\ell \\ell \\nu \\nu$")
+dib.scalefactor = lumi_factor
+dib.fillstyle = 0
+dib.linestyle = '-'
+dib.color = "#785e6f" 
+dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
+loaded_samples.append(dib)
+
+wjets = sample.Sample("Wjets", "$W + jets$")
+wjets.scalefactor = lumi_factor
+wjets.fillstyle = 0
+wjets.linestyle = '-'
+wjets.color = "#daadbb" 
+wjets.load(filelist_dir + "wjets_sherpa", h5_dir_mc)
+loaded_samples.append(wjets)
+
 ttv = sample.Sample("ttV", "$t\\bar{t} + V$")
 ttv.scalefactor = lumi_factor
 ttv.fillstyle = 0
