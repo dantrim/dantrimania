@@ -28,6 +28,17 @@ def get_cutflows() :
     isDF = "(isDF==1)"
     dilepton_any = "( %s ) || ( %s ) " % ( isSF, isDF )
 
+    # hh base
+    c = cutflow.Cutflow("hhBase", "hhBase")
+    c.add_cut("dilepton", "(%s)" % dilepton_any)
+    c.add_cut("trigger", "(%s)" % trigger_cut_str)
+    c.add_cut("2 bjets", "(nBJets==2)") 
+    c.add_cut("higgs_mt2_llbb", "(mt2_llbb>100 && mt2_llbb<140)")
+    c.add_cut("higgs_mbb", "(mbb>100 && mbb<140)")
+    c.add_cut("HT2Ratio>0.8", "(HT2Ratio>0.8)")
+    c.add_cut("dRll<0.9", "(dRll<0.9)")
+    out.append(c)
+
     # non-resonant selection
     c = cutflow.Cutflow("hhNonRes", "hhNonRes")
     c.add_cut("dilepton", "(%s)" % dilepton_any)
@@ -77,7 +88,7 @@ def get_cutflows() :
     # LFV - mutau
     c = cutflow.Cutflow("lfv_mutau", "lfv_mutau")
     c.add_cut("dilepton", "(%s)" % dilepton_any)
-    c.add_cut("isME", "(isEM==0 && isME==0)")
+    c.add_cut("isME", "(isEM==0 && isME==1)")
     c.add_cut("l0_pt>45", "(l0_pt>45)")
     c.add_cut("l1_pt>15", "(l1_pt>15)")
     c.add_cut("mll_30_150", "(mll>30 && mll<150)")
@@ -87,7 +98,7 @@ def get_cutflows() :
     # LFV
     c = cutflow.Cutflow("lfv_any", "lfv_any")
     c.add_cut("dilepton", "(%s)" % dilepton_any)
-    c.add_cut("isME", "(isEM==0 && isME==0)")
+    c.add_cut("isDF", "(isEM==1 || isME==1)")
     c.add_cut("l0_pt>45", "(l0_pt>45)")
     c.add_cut("l1_pt>15", "(l1_pt>15)")
     c.add_cut("mll_30_150", "(mll>30 && mll<150)")
@@ -321,9 +332,36 @@ def make_cutflow_table(requested_cutflow, backgrounds, signals, data) :
 
             sig.cutflow_result[icut] = [sig_yield, sqrt(sig_sumw2)]
 
+        if data :
+
+            data_yield = 0.0
+            data_sumw2 = 0.0
+
+            chain = data.chain()
+
+            for ich, ch in enumerate(chain) :
+                weights = ch["eventweight"]
+                weights *= ( np.ones(len(weights)) )
+                weights_squared = np.square(weights)
+
+                idx_selection = sample_utils.index_selection_string(requested_cutflow.tcut_at_idx(icut), "ch", requested_cutflow.variable_list)
+                set_idx = "indices = np.array( %s )" % idx_selection
+                exec(set_idx)
+
+                data_yield += np.sum(weights[indices])
+                data_sumw2 += np.sum(weights_squared[indices])
+
+            data.cutflow_result[icut] = [data_yield, sqrt(data_sumw2)]
+
+            
+
     backgrounds += signals
 
     print_cutflow(requested_cutflow, backgrounds)
+
+    if data :
+        requested_cutflow.make_plots = False
+        print_cutflow(requested_cutflow, [data])
 
 def main() :
     parser = OptionParser()
