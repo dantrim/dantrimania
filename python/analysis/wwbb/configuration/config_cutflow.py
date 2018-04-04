@@ -57,6 +57,15 @@ loaded_samples.append(wt)
 ###wtDS.load(filelist_dir + "singletop_DS", h5_dir_mc)
 ###loaded_samples.append(wtDS)
 ##
+
+#st = sample.Sample("ST", "Single Top")
+#st.scalefactor = lumi_factor
+#st.fillstyle = 0
+#st.linestyle = '-'
+#st.color = "#e75853"
+#st.load(filelist_dir + "singletop_nonWt", h5_dir_mc)
+#loaded_samples.append(st)
+
 ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
 ztt.scalefactor = lumi_factor
 ztt.fillstyle = 0
@@ -80,15 +89,15 @@ dib.linestyle = '-'
 dib.color = "#785e6f" 
 dib.load(filelist_dir + "diboson_sherpa", h5_dir_mc)
 loaded_samples.append(dib)
-##
-##wjets = sample.Sample("Wjets", "$W + jets$")
-##wjets.scalefactor = lumi_factor
-##wjets.fillstyle = 0
-##wjets.linestyle = '-'
-##wjets.color = "#daadbb" 
-##wjets.load(filelist_dir + "wjets_sherpa", h5_dir_mc)
-##loaded_samples.append(wjets)
-##
+
+#wjets = sample.Sample("Wjets", "$W + jets$")
+#wjets.scalefactor = lumi_factor
+#wjets.fillstyle = 0
+#wjets.linestyle = '-'
+#wjets.color = "#daadbb" 
+#wjets.load(filelist_dir + "wjets_sherpa", h5_dir_mc)
+#loaded_samples.append(wjets)
+
 ttv = sample.Sample("ttV", "$t\\bar{t} + V$")
 ttv.scalefactor = lumi_factor
 ttv.fillstyle = 0
@@ -114,7 +123,7 @@ data.fillstyle = 0
 data.linestyle = '-'
 data.color = 'k'
 data.load(filelist_dir + "data_n0234", h5_dir_data)
-#loaded_samples.append(data)
+loaded_samples.append(data)
 
 #signals
 hh0 = sample.Sample("hhSM", "$hh$ SM")
@@ -125,25 +134,25 @@ hh0.linestyle = '--'
 hh0.color = '#fa0f00'
 hh0.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '342053')
 loaded_samples.append(hh0)
-#
-#hh3 = sample.Sample("hh600", "X $600$ GeV")
-#hh3.is_signal = True
-#hh3.scale_factor = lumi_factor * 20
-#hh3.fillstyle = 0
-#hh3.linestyle = "--"
-#hh3.color = '#ff5900'
-#hh3.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = "343772")
-#loaded_samples.append(hh3)
-#
-#hh1 = sample.Sample("hh800", "X $800$ GeV")
-#hh1.is_signal = True
-#hh1.scalefactor = lumi_factor * 20
-#hh1.fillstyle = 0
-#hh1.linestyle = '--'
-#hh1.color = '#ffb900'
-#hh1.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '343775')
-#loaded_samples.append(hh1)
-#
+
+hh3 = sample.Sample("hh600", "X $600$ GeV")
+hh3.is_signal = True
+hh3.scale_factor = lumi_factor * 20
+hh3.fillstyle = 0
+hh3.linestyle = "--"
+hh3.color = '#ff5900'
+hh3.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = "343772")
+loaded_samples.append(hh3)
+
+hh1 = sample.Sample("hh800", "X $800$ GeV")
+hh1.is_signal = True
+hh1.scalefactor = lumi_factor * 20
+hh1.fillstyle = 0
+hh1.linestyle = '--'
+hh1.color = '#ffb900'
+hh1.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = '343775')
+loaded_samples.append(hh1)
+
 signal_mass = 1000
 dsid_dict = {}
 masses="""343764.260
@@ -175,14 +184,14 @@ for f in masses.split() :
     dsid = x[0]
     dsid_dict[int(mass)] = dsid
 
-hh2 = sample.Sample("hh%d"%signal_mass, "X $%d$ GeV" % signal_mass)
-hh2.is_signal = True
-hh2.scalefactor = lumi_factor #* 20
-hh2.fillstyle = 0
-hh2.linestyle = '--'
-hh2.color = '#0cf4ea'
-hh2.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = dsid_dict[signal_mass])
-loaded_samples.append(hh2)
+#hh2 = sample.Sample("hh%d"%signal_mass, "X $%d$ GeV" % signal_mass)
+#hh2.is_signal = True
+#hh2.scalefactor = lumi_factor #* 20
+#hh2.fillstyle = 0
+#hh2.linestyle = '--'
+#hh2.color = '#0cf4ea'
+#hh2.load(filelist_dir + "wwbb_susy2", h5_dir_mc, dsid_select = dsid_dict[signal_mass])
+#loaded_samples.append(hh2)
 
 #############################################################
 # region definitions
