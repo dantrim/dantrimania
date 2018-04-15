@@ -173,8 +173,12 @@ class Sample(object) :
             if dsid_select == "" :
                 sample_dsids.append(dsid)
             else :
-                if int(dsid_select) == int(dsid) :
-                    sample_dsids.append(dsid)
+                dsids_to_select = dsid_select.split(",")
+                for d in dsids_to_select :
+                    if int(d) == int(dsid) :
+                        sample_dsids.append(dsid)
+                #if int(dsid_select) == int(dsid) :
+                #    sample_dsids.append(dsid)
             
 
         sample_files = []
