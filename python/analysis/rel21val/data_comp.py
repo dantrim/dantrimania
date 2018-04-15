@@ -20,8 +20,11 @@ import dantrimania.python.analysis.utility.samples.region as region
 import numpy as np
 from math import sqrt
 
+from matplotlib.lines import Line2D
+
 filedir_r20 = "/data/uclhc/uci/user/dantrim/ntuples/n0234/m_apr12_rel21val/data/h5/"
 filedir_r21 = "/data/uclhc/uci/user/dantrim/ntuples/n0301/data/h5/"
+lumi_table = "/data/uclhc/uci/user/dantrim/n0301val/lumi_tables/lumi_table_all.txt"
 
 class Options :
     def __init__(self) :
@@ -80,7 +83,18 @@ def get_samples(name, filedir, options) :
     s.color = colors[name]
     s.load(filelist_dir, filedir, run_string)
 
-    return s, 0
+    sample_lumi = 0.0
+
+    lumi_lines = [l.strip() for l in open(lumi_table).readlines()]
+    for r in runs_to_consider :
+        for ll in lumi_lines :
+            lr = ll.split()
+            if lr[0] == r :
+                sample_lumi += float(lr[1])
+
+    s.lumi = sample_lumi
+
+    return s, sample_lumi
 
 
 def make_comp_plot(r20sample, r21sample, vname, vbounds, opts) :
@@ -117,6 +131,8 @@ def make_comp_plot(r20sample, r21sample, vname, vbounds, opts) :
         h.add_overflow()
         histos.append(h)
 
+        print "name = %s : histogram = %s" % (s.name, h.histogram)
+
     # plotting
     rc = ratio_canvas("ratio_canvas_%s" % vname)
     if opts.do_logy :
@@ -151,6 +167,30 @@ def make_comp_plot(r20sample, r21sample, vname, vbounds, opts) :
 
     maxy = multiplier * maxy
     rc.upper_pad.set_ylim(miny, maxy)
+
+    # legend
+    handles, labels = rc.upper_pad.get_legend_handles_labels()
+    new_handles = [Line2D([], [], c = s.color) for s in samples]
+    labels = ["Release 20", "Release 21"]
+    rc.upper_pad.legend(handles = new_handles, labels = labels, loc = 'best', frameon = False, fontsize = 12, numpoints = 1)
+
+    # labels
+    size = 18
+    text = 'ATLAS'
+    legopts = dict(transform = rc.upper_pad.transAxes)
+    legopts.update( dict(va = 'top', ha = 'left') )
+    rc.upper_pad.text(0.05, 0.97, text, size = size, style = 'italic', weight = 'bold', **legopts)
+
+    rc.upper_pad.text(0.23, 0.97, 'Internal', size = size, **legopts)
+
+    lumi = samples[0].lumi
+    unit = "pb"
+
+    if lumi > 1000. :
+        lumi = lumi / 1000.
+        unit = "fb"
+
+    rc.upper_pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %.2f %s$^{-1}$' % (lumi,unit), size = 0.75 * size, **legopts)
 
     # error bars
     errors =  []
