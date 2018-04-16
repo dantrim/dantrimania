@@ -55,14 +55,28 @@ def get_variables(region) :
     var["e0_trackEta"] =                    {"zee": [0.1, -2.8, 2.8] }
     var["e1_trackEta"] =                    {"zee": [0.1, -2.8, 2.8] }
 
+    var["mu0_idTrackPt"] =                  {"zee": [2, 0, 200] }
+    var["mu1_idTrackPt"] =                  {"zee": [2, 0, 200] }
+    var["mu0_idTrackEta"] =                 {"zee": [0.1, -3, 3] }
+    var["mu1_idTrackEta"] =                 {"zee": [0.1, -3, 3] }
+    var["mu0_idTrackPhi"] =                 {"zee": [0.1, -3.2, 3.2] }
+    var["mu1_idTrackPhi"] =                 {"zee": [0.1, -3.2, 3.2] }
+    var["mu0_msTrackPt"] =                  {"zee": [2, 0, 200] }
+    var["mu1_msTrackPt"] =                  {"zee": [2, 0, 200] }
+    var["mu0_msTrackEta"] =                 {"zee": [0.1, -3, 3] }
+    var["mu1_msTrackEta"] =                 {"zee": [0.1, -3, 3] }
+    var["mu0_msTrackPhi"] =                 {"zee": [0.1, -3.2, 3.2] }
+    var["mu1_msTrackPhi"] =                 {"zee": [0.1, -3.2, 3.2] }
+
+
     var["l0_etconetopo20"] =                {"zee": [0.2, -5, 8] }
     var["l1_etconetopo20"] =                {"zee": [0.2, -5, 8] }
     var["l0_etconetopo30"] =                {"zee": [0.2, -5, 8] }
     var["l1_etconetopo30"] =                {"zee": [0.2, -5, 8] }
-    var["l0_ptvarcone20"] =                 {"zee": [0.1, 0, 5]}
-    var["l1_ptvarcone20"] =                 {"zee": [0.1, 0, 5]}
-    var["l0_ptvarcone30"] =                 {"zee": [0.1, 0, 10]}
-    var["l1_ptvarcone30"] =                 {"zee": [0.1, 0, 10]}
+    var["l0_ptvarcone20"] =                 {"zee": [0.1, 0.7, 5]}
+    var["l1_ptvarcone20"] =                 {"zee": [0.1, 0.7, 5]}
+    var["l0_ptvarcone30"] =                 {"zee": [0.1, 0.7, 10]}
+    var["l1_ptvarcone30"] =                 {"zee": [0.1, 0.7, 10]}
     
 
     var["l0_pt"] =                          {"zee" : [2, 20, 120] }
@@ -88,14 +102,66 @@ def get_variables(region) :
     var["met_muo_et"] =                     {"zee": [2, 0, 200] }
     var["met_muo_phi"] =                    {"zee": [0.1, -3.2, 3.2] }
     var["met_muo_sumet"] =                  {"zee": [2, 0, 200] }
-    var["met_soft_et"] =                    {"zee": [2, 0, 200] }
+    var["met_soft_et"] =                    {"zee": [2, 0, 60] }
     var["met_soft_phi"] =                   {"zee": [0.1, -3.2, 3.2] }
     var["met_soft_sumet"] =                 {"zee": [2, 0, 200] }
 
+    var["mT_full"] =                        {"zee": [2, 0, 150] }
 
     var["nJets"] =                          {"zee" : [1, 0, 15] }
     var["nBJets"] =                         {"zee" : [1, 0, 8] }
     var["nSJets"] =                         {"zee" : [1, 0, 8] }
+
+    var["j0_pt"] =                          {"zee" : [2, 0, 300] }
+    var["j0_eta"] =                         {"zee" : [0.1, -3, 3] }
+    var["j0_phi"] =                         {"zee" : [0.1, -3.2, 3.2] }
+    var["j1_pt"] =                          {"zee" : [2, 0, 300] }
+    var["j1_eta"] =                         {"zee" : [0.1, -3, 3] }
+    var["j1_phi"] =                         {"zee" : [0.1, -3.2, 3.2] }
+    var["sj0_pt"] =                         {"zee" : [2, 0, 300] }
+    var["sj0_eta"] =                        {"zee" : [0.1, -3, 3] }
+    var["sj0_phi"] =                        {"zee" : [0.1, -3.2, 3.2] }
+    var["sj1_pt"] =                         {"zee" : [2, 0, 300] }
+    var["sj1_eta"] =                        {"zee" : [0.1, -3, 3] }
+    var["sj1_phi"] =                        {"zee" : [0.1, -3.2, 3.2] }
+    var["bj0_pt"] =                         {"zee" : [2, 0, 300] }
+    var["bj0_eta"] =                        {"zee" : [0.1, -3, 3] }
+    var["bj0_phi"] =                        {"zee" : [0.1, -3.2, 3.2] }
+    var["bj1_pt"] =                         {"zee" : [2, 0, 300] }
+    var["bj1_eta"] =                        {"zee" : [0.1, -3, 3] }
+    var["bj1_phi"] =                        {"zee" : [0.1, -3.2, 3.2] }
+
+    var["j0_jvt"] =                         {"zee" : [0.05, 0, 1] }
+    var["j0_nTracks"] =                     {"zee" : [1, 0, 30] }
+    var["j0_mv2c10"] =                      {"zee" : [0.05, -1, 1] }
+    var["j0_emfrac"] =                      {"zee" : [0.05, 0, 1] }
+    var["sj0_jvt"] =                        {"zee" : [0.05, 0, 1] }
+    var["sj0_nTracks"] =                    {"zee" : [1, 0, 30] }
+    var["sj0_mv2c10"] =                     {"zee" : [0.05, -1, 1] }
+    var["sj0_emfrac"] =                     {"zee" : [0.05, 0, 1] }
+    var["bj0_jvt"] =                        {"zee" : [0.05, 0, 1] }
+    var["bj0_nTracks"] =                    {"zee" : [1, 0, 30] }
+    var["bj0_mv2c10"] =                     {"zee" : [0.05, -1, 1] }
+    var["bj0_emfrac"] =                     {"zee" : [0.05, 0, 1] }
+
+    var["dphi_j0_ll"] =                     {"zee" : [0.1, -3.2, 3.2] }
+    var["dphi_j0_l0"] =                     {"zee" : [0.1, -3.2, 3.2] }
+    var["dphi_sj0_ll"] =                    {"zee" : [0.1, -3.2, 3.2] }
+    var["dphi_sj0_l0"] =                    {"zee" : [0.1, -3.2, 3.2] }
+    var["dphi_bj0_ll"] =                    {"zee" : [0.1, -3.2, 3.2] }
+    var["dphi_bj0_l0"] =                    {"zee" : [0.1, -3.2, 3.2] }
+
+    var["mt2"] =                            {"zee" : [2, 0, 200] }
+    var["meff"] =                           {"zee" : [5, 0, 600] }
+    var["cosThetaB"] =                      {"zee" : [0.05, -1, 1] }
+    var["mbb"] =                            {"zee" : [5, 0, 400] }
+    var["dRbb"] =                           {"zee" : [0.05, 0, 6] }
+    var["HT2Ratio"] =                       {"zee" : [0.05, 0, 1] }
+    var["mt2_bb"] =                         {"zee" : [2, 0, 200] }
+    var["DPB"] =                            {"zee" : [0.05, 0, 1] }
+    var["GAM"] =                            {"zee" : [0.05, 0, 1] }
+    var["RPT"] =                            {"zee" : [0.05, 0, 1] }
+
 
     out = {}
     for v in var :
@@ -107,22 +173,51 @@ def get_regions() :
 
     regions = []
 
-    r = region.Region("zee0j", "$Z\rightarrow ee$ Selection (0J)")
+    r = region.Region("zee0j", "$Z\\rightarrow ee$ Selection (0J)")
     r.tcut = "nJets==0 && nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
     regions.append(r)
 
-    r = region.Region("zee", "$Z\rightarrow ee$ Selection (>=0J)")
+    r = region.Region("zee", "$Z\\rightarrow ee$ Selection (>=0J)")
     r.tcut = "nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
     regions.append(r)
     
-    r = region.Region("zmm0j", "$Z\rightarrow \\mu\\mu$ Selection (0J)")
+    r = region.Region("zmm0j", "$Z\\rightarrow \\mu\\mu$ Selection (0J)")
     r.tcut = "nJets==0 && nLeptons==2 && nMuons==2 && mll>80 && mll<100"
     regions.append(r)
 
-    r = region.Region("zmm", "$Z\rightarrow \\mu\\mu$ Selection (>=0J)")
+    r = region.Region("zmm", "$Z\\rightarrow \\mu\\mu$ Selection (>=0J)")
     r.tcut = "nLeptons==2 && nMuons==2 && mll>80 && mll<100"
     regions.append(r)
+
+    r = region.Region("zee_balance", "$Z\\rightarrow ee$ Balance (==1J)")
+    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nElectrons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0) && (trig_pass2016update==1 || trig_pass2015==1)"
+    regions.append(r)
+
+    r = region.Region("zmm_balance", "$Z\\rightarrow \\mu\\mu$ Balance (==1J)")
+    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nMuons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0) && (trig_pass2016update==1 || trig_pass2015==1)"
+    regions.append(r)
     
+    r = region.Region("wriche", "$W$ (e)")
+    r.tcut = "nLeptons==1 &&  l0_pt>25 && nElectrons==1 && met>25"
+    regions.append(r)
+
+    r = region.Region("wrichm", "$W$ ($\\mu$)")
+    r.tcut = "nLeptons==1 && l0_pt>25 && nMuons==1 && met>25"
+    regions.append(r)
+
+    r = region.Region("diLBee", "$2e, 2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && nBJets>=2"
+    regions.append(r)
+
+    r = region.Region("diLBmm", "$2\\mu, 2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && nBJets>=2"
+    regions.append(r)
+
+    r = region.Region("diLBem", "$e+\\mu, 2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==1 && nElectrons==1 && nBJets>=2"
+    regions.append(r)
+
+
     return regions
 
 def get_samples(name, filedir, options) :
@@ -212,6 +307,9 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
 
     print_yields = True
 
+    n_vars_to_plot = len(variable_dict)
+    var_idx = 1
+
     for varname, varbounds in variable_dict.iteritems() :
 
         histos = []
@@ -230,6 +328,12 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
         rc = ratio_canvas("ratio_canvas_%s" % varname)
         if opts.do_logy :
             rc.logy = True
+        #log_vars = ["jvt"]
+        #for lv in log_vars :
+        #    if lv in varname :
+        #        opts.do_logy = True
+        #        rc.logy = True
+        
         rc.labels = [varname, 'Entries']
         rc.rlabel = 'R21 / R20'
         rc.build()
@@ -254,13 +358,13 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
 
         maxy = -1
         miny = 0
-        multiplier = 1.4
+        multiplier = 1.55
         for h in histos :
             if h.maximum() > maxy :
                 maxy = h.maximum()
         if opts.do_logy :
             miny = 1e-2
-            multiplier = 1e2
+            multiplier = 1e3
 
         maxy = multiplier * maxy
         rc.upper_pad.set_ylim(miny, maxy)
@@ -289,9 +393,10 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
     
         rc.upper_pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %.2f %s$^{-1}$' % (lumi,unit), size = 0.75 * size, **legopts)
 
-        rc.upper_pad.text(0.05, 0.86, 'R20 : %.2f' % yield_r20, size = 0.6 * size, **legopts)
-        rc.upper_pad.text(0.05, 0.82, 'R21 : %.2f' % yield_r21, size = 0.6 * size, **legopts)
-        rc.upper_pad.text(0.05, 0.78, '$\\rightarrow$ R21/R20 : %.2f' % (yield_ratio), size = 0.6 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.84, '%s' % region.displayname, size = 0.63 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.79, 'R20 : %.2f' % yield_r20, size = 0.6 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.75, 'R21 : %.2f' % yield_r21, size = 0.6 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.71, '$\\rightarrow$ R21/R20 : %.2f' % (yield_ratio), size = 0.6 * size, **legopts)
 
         # error bars
         errors =  []
@@ -410,8 +515,10 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
         if opts.suffix != "" :
             suffix = "_" + opts.suffix
         save_name = outdir + "%s_%s.pdf" % (plots_dict[varname].name, suffix)
-        print " >>> Saving plot to : %s" % os.path.abspath(save_name)
+        print " >>> [%02d/%02d] Saving plot to : %s" % (var_idx, n_vars_to_plot, os.path.abspath(save_name))
         rc.fig.savefig(save_name, bbox_inches = 'tight', dpi = 200)
+
+        var_idx += 1
                                 
 
 
@@ -648,7 +755,7 @@ def main() :
     required_vars += variables_from_region
     required_vars += extra_vars
 
-    cacher = sample_cacher.SampleCacher("./") 
+    cacher = sample_cacher.SampleCacher("./selection") 
     cacher.samples = [samples_r20, samples_r21]
     cacher.region = region_to_use
     cacher.fields = required_vars
