@@ -210,13 +210,22 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
         labels.append(s.name)
         colors.append(s.color)
 
+    print_yields = True
+
     for varname, varbounds in variable_dict.iteritems() :
 
         histos = []
         for isample, sample in enumerate(samples) :
             histos.append(histo_dict[varname][isample])
-        for h in histos :
-            h.add_overflow()
+
+        #for h in histos :
+        #    h.add_overflow()
+
+        yield_r20, yield_error_r20 = histos[0].integral_and_error()
+        yield_r21, yield_error_r21 = histos[1].integral_and_error()
+        yield_ratio = 0
+        if yield_r20 != 0 :
+            yield_ratio = yield_r21 / yield_r20
 
         rc = ratio_canvas("ratio_canvas_%s" % varname)
         if opts.do_logy :
@@ -236,6 +245,12 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
                             stacked = False,
                             histtype = 'step',
                             lw = 1)
+
+        if print_yields and yield_r20 !=0 :
+            print_yields = False
+            print "R20 : %.2f +/- %.2f" % (yield_r20, yield_error_r20)
+            print "R21 : %.2f +/- %.2f" % (yield_r21, yield_error_r21)
+            print "R21/R20 : %.2f" % (yield_r21 / yield_r20)
 
         maxy = -1
         miny = 0
@@ -273,6 +288,10 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
             unit = "fb"
     
         rc.upper_pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %.2f %s$^{-1}$' % (lumi,unit), size = 0.75 * size, **legopts)
+
+        rc.upper_pad.text(0.05, 0.86, 'R20 : %.2f' % yield_r20, size = 0.6 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.82, 'R21 : %.2f' % yield_r21, size = 0.6 * size, **legopts)
+        rc.upper_pad.text(0.05, 0.78, '$\\rightarrow$ R21/R20 : %.2f' % (yield_ratio), size = 0.6 * size, **legopts)
 
         # error bars
         errors =  []
