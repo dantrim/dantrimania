@@ -34,75 +34,72 @@ def get_variables(region) :
 
     var = {}
 
-    var["nVtx"] = {"zee" : [1, 0, 35] }
-    var["avgMu"] = {"zee" : [1, 0, 40] }
+    region_to_use = "zee"
 
-    var["l0_d0"] = {"zee" : [0.001, -0.07, 0.07] }
-    var["l1_d0"] = {"zee" : [0.001, -0.07, 0.07] }
-    var["l0_d0sig"] = {"zee" : [0.1, -3, 3] }
-    var["l1_d0sig"] = {"zee" : [0.1, -3, 3] }
-    var["l0_z0sinTheta"] = {"zee" : [0.01, -0.2, 0.2] }
-    var["l1_z0sinTheta"] = {"zee" : [0.01, -0.2, 0.2] }
+    var["nVtx"] =                           {"zee" : [1, 0, 35] }
+    var["avgMu"] =                          {"zee" : [1, 0, 40] }
 
-    var["e0_clusE"] = {"zee": [1, 0, 250] }
-    var["e1_clusE"] = {"zee": [1, 0, 200] }
-    var["e0_clusEtaBE"] = {"zee": [0.1, -2.8, 2.8] }
-    var["e1_clusEtaBE"] = {"zee": [0.1, -2.8, 2.8] }
-    var["e0_trackPt"] = {"zee": [1, 0, 200] }
-    var["e1_trackPt"] = {"zee": [1, 0, 150] }
-    var["e0_trackEta"] = {"zee": [0.1, -2.8, 2.8] }
-    var["e1_trackEta"] = {"zee": [0.1, -2.8, 2.8] }
+    var["l0_d0"] =                          {"zee" : [0.001, -0.07, 0.07] }
+    var["l1_d0"] =                          {"zee" : [0.001, -0.07, 0.07] }
+    var["l0_d0sig"] =                       {"zee" : [0.1, -3, 3] }
+    var["l1_d0sig"] =                       {"zee" : [0.1, -3, 3] }
+    var["l0_z0sinTheta"] =                  {"zee" : [0.01, -0.2, 0.2] }
+    var["l1_z0sinTheta"] =                  {"zee" : [0.01, -0.2, 0.2] }
 
-    var["l0_etconetopo20"] = {"zee": [0.2, -5, 8] }
-    var["l1_etconetopo20"] = {"zee": [0.2, -5, 8] }
-    var["l0_etconetopo30"] = {"zee": [0.2, -5, 8] }
-    var["l1_etconetopo30"] = {"zee": [0.2, -5, 8] }
-    var["l0_ptvarcone20"] = {"zee": [0.1, 0, 5]}
-    var["l1_ptvarcone20"] = {"zee": [0.1, 0, 5]}
-    var["l0_ptvarcone30"] = {"zee": [0.1, 0, 10]}
-    var["l1_ptvarcone30"] = {"zee": [0.1, 0, 10]}
+    var["e0_clusE"] =                       {"zee": [1, 0, 250] }
+    var["e1_clusE"] =                       {"zee": [1, 0, 200] }
+    var["e0_clusEtaBE"] =                   {"zee": [0.1, -2.8, 2.8] }
+    var["e1_clusEtaBE"] =                   {"zee": [0.1, -2.8, 2.8] }
+    var["e0_trackPt"] =                     {"zee": [1, 0, 200] }
+    var["e1_trackPt"] =                     {"zee": [1, 0, 150] }
+    var["e0_trackEta"] =                    {"zee": [0.1, -2.8, 2.8] }
+    var["e1_trackEta"] =                    {"zee": [0.1, -2.8, 2.8] }
+
+    var["l0_etconetopo20"] =                {"zee": [0.2, -5, 8] }
+    var["l1_etconetopo20"] =                {"zee": [0.2, -5, 8] }
+    var["l0_etconetopo30"] =                {"zee": [0.2, -5, 8] }
+    var["l1_etconetopo30"] =                {"zee": [0.2, -5, 8] }
+    var["l0_ptvarcone20"] =                 {"zee": [0.1, 0, 5]}
+    var["l1_ptvarcone20"] =                 {"zee": [0.1, 0, 5]}
+    var["l0_ptvarcone30"] =                 {"zee": [0.1, 0, 10]}
+    var["l1_ptvarcone30"] =                 {"zee": [0.1, 0, 10]}
     
 
-    var["l0_pt"] = {"zee" : [2, 20, 120] }
-    var["l1_pt"] = {"zee" : [2, 20, 120] }
-    var["l0_eta"] = {"zee" : [0.1, -2.8, 2.8] }
-    var["l1_eta"] = {"zee" : [0.1, -2.8, 2.8] }
-    var["mll"] =   {"zee" : [1, 50, 130] }
-    var["pTll"] = {"zee" : [5, 0, 200] }
-    var["dphi_ll"] = {"zee" : [0.1, -3.5, 3.5] }
-    var["dRll"] = {"zee" :[0.05, 0, 5] }
-    var["deta_ll"] = {"zee" : [0.2, -4, 4] }
+    var["l0_pt"] =                          {"zee" : [2, 20, 120] }
+    var["l1_pt"] =                          {"zee" : [2, 20, 120] }
+    var["l0_eta"] =                         {"zee" : [0.1, -2.8, 2.8] }
+    var["l1_eta"] =                         {"zee" : [0.1, -2.8, 2.8] }
+    var["mll"] =                            {"zee" : [1, 50, 130] }
+    var["pTll"] =                           {"zee" : [5, 0, 200] }
+    var["dphi_ll"] =                        {"zee" : [0.1, -3.5, 3.5] }
+    var["dRll"] =                           {"zee" :[0.05, 0, 5] }
+    var["deta_ll"] =                        {"zee" : [0.2, -4, 4] }
 
-    var["met"] = {"zee" : [2, 0, 150] }
-    var["metPhi"] = {"zee": [0.1, -3.5, 3.5]}
-    var["metTST"] = {"zee": [2, 0, 75] }
-    var["dphi_met_ll"] = {"zee": [0.1, -3.2, 3.2] }
-    var["met_ele_et"] = {"zee": [2, 0, 200] }
-    var["met_ele_phi"] = {"zee": [0.1, -3.2, 3.2] }
-    var["met_ele_sumet"] = {"zee": [2, 0, 200] }
-    var["met_jet_et"] = {"zee": [2, 0, 200] }
-    var["met_jet_phi"] = {"zee": [0.1, -3.2, 3.2] }
-    var["met_jet_sumet"] = {"zee": [2, 0, 200] }
-    var["met_muo_et"] = {"zee": [2, 0, 200] }
-    var["met_muo_phi"] = {"zee": [0.1, -3.2, 3.2] }
-    var["met_muo_sumet"] = {"zee": [2, 0, 200] }
-    var["met_soft_et"] = {"zee": [2, 0, 200] }
-    var["met_soft_phi"] = {"zee": [0.1, -3.2, 3.2] }
-    var["met_soft_sumet"] = {"zee": [2, 0, 200] }
+    var["met"] =                            {"zee" : [2, 0, 150] }
+    var["metPhi"] =                         {"zee": [0.1, -3.5, 3.5]}
+    var["metTST"] =                         {"zee": [2, 0, 75] }
+    var["dphi_met_ll"] =                    {"zee": [0.1, -3.2, 3.2] }
+    var["met_ele_et"] =                     {"zee": [2, 0, 200] }
+    var["met_ele_phi"] =                    {"zee": [0.1, -3.2, 3.2] }
+    var["met_ele_sumet"] =                  {"zee": [2, 0, 200] }
+    var["met_jet_et"] =                     {"zee": [2, 0, 200] }
+    var["met_jet_phi"] =                    {"zee": [0.1, -3.2, 3.2] }
+    var["met_jet_sumet"] =                  {"zee": [2, 0, 200] }
+    var["met_muo_et"] =                     {"zee": [2, 0, 200] }
+    var["met_muo_phi"] =                    {"zee": [0.1, -3.2, 3.2] }
+    var["met_muo_sumet"] =                  {"zee": [2, 0, 200] }
+    var["met_soft_et"] =                    {"zee": [2, 0, 200] }
+    var["met_soft_phi"] =                   {"zee": [0.1, -3.2, 3.2] }
+    var["met_soft_sumet"] =                 {"zee": [2, 0, 200] }
 
 
-    var["nJets"] = {"zee" : [1, 0, 15] }
-    var["nBJets"] = {"zee" : [1, 0, 8] }
-    var["nSJets"] = {"zee" : [1, 0, 8] }
-
-    for v in var :
-        if region not in var[v] :
-            print "get_variables    ERROR variable (=%s) not defined for region (=%s)" % (v, region)
-            sys.exit()
+    var["nJets"] =                          {"zee" : [1, 0, 15] }
+    var["nBJets"] =                         {"zee" : [1, 0, 8] }
+    var["nSJets"] =                         {"zee" : [1, 0, 8] }
 
     out = {}
     for v in var :
-        out[v] = var[v][region]
+        out[v] = var[v][region_to_use]
 
     return out
 
@@ -110,15 +107,27 @@ def get_regions() :
 
     regions = []
 
-    r = region.Region("zee", "$Z\rightarrow ee$ selection")
-    r.tcut = "nJets==0 && l0_pt>25 && l1_pt>20 && nLeptons==2 && nElectrons==2"
+    r = region.Region("zee0j", "$Z\rightarrow ee$ Selection (0J)")
+    r.tcut = "nJets==0 && nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
+    regions.append(r)
+
+    r = region.Region("zee", "$Z\rightarrow ee$ Selection (>=0J)")
+    r.tcut = "nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
+    regions.append(r)
+    
+    r = region.Region("zmm0j", "$Z\rightarrow \\mu\\mu$ Selection (0J)")
+    r.tcut = "nJets==0 && nLeptons==2 && nMuons==2 && mll>80 && mll<100"
+    regions.append(r)
+
+    r = region.Region("zmm", "$Z\rightarrow \\mu\\mu$ Selection (>=0J)")
+    r.tcut = "nLeptons==2 && nMuons==2 && mll>80 && mll<100"
     regions.append(r)
     
     return regions
 
 def get_samples(name, filedir, options) :
 
-    filelist_dir = "/data/uclhc/uci/user/dantrim/n0301val/susynt-read/filelists/n0301_data/"
+    filelist_dir = "/data/uclhc/uci/user/dantrim/n0301val/susynt-read/filelists_mwt2/n0301_data/"
 
     runs_to_consider = []
     lines = open(options.runslist).readlines()
@@ -155,7 +164,7 @@ def get_samples(name, filedir, options) :
 
 
 #def make_comp_plot(r20sample, r21sample, vname, vbounds, opts) :
-def make_comp_plot(r20sample, r21sample, variable_dict, opts) :
+def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
 
     # make the plot object
   #  p = plot1d("comp_r20_r21_%s_%s" % (opts.region,vname), vname)
@@ -310,15 +319,19 @@ def make_comp_plot(r20sample, r21sample, variable_dict, opts) :
         with np.errstate(divide='ignore', invalid='ignore') :
 
             rel_e20_low = np.true_divide( e20_low, r20_values )
+            rel_e20_low[r20_values==0] = 0
             rel_e20_low[ ~ np.isfinite(rel_e20_low) ] = 0
 
             rel_e21_low = np.true_divide( e21_low, r21_values )
+            rel_e21_low[r21_values==0] = 0
             rel_e21_low[ ~ np.isfinite(rel_e21_low) ] = 0
 
             rel_e20_high = np.true_divide( e20_high, r20_values )
+            rel_e20_high[r20_values==0] = 0
             rel_e20_high[ ~ np.isfinite(rel_e20_high) ] = 0
 
             rel_e21_high = np.true_divide( e21_high, r21_values )
+            rel_e21_high[r21_values==0] = 0
             rel_e21_high[ ~ np.isfinite(rel_e21_high) ] = 0
 
         e_high = ratio_yvalues * np.sqrt( np.power(rel_e20_high, 2) + np.power(rel_e21_high, 2) )
@@ -624,7 +637,7 @@ def main() :
     cacher.cache()
 
     n_plots = len(variables)
-    make_comp_plot(samples_r20, samples_r21, variables, opts)
+    make_comp_plot(samples_r20, samples_r21, variables, region_to_use, opts)
 #    for iplot, v in enumerate(variables) :
 #        print 55 * "-"
 #        print "[%02d/%02d] %s" % (iplot+1, n_plots, v)
