@@ -135,6 +135,15 @@ class SampleCacher(object) :
 
     def add_process_to_cache(self, process_group, sample, treename) :
         relevant_vars = self.fields
+
+        if "data" in sample.name :
+            tmp = []
+            for rv in relevant_vars :
+                if "multi" in rv : continue
+                tmp.append(rv)
+            relevant_vars = tmp
+        
+
         relevant_vars = list(set(relevant_vars))
     
         field_select_str = ",".join("'%s'" % v for v in relevant_vars)

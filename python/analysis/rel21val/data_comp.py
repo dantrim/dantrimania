@@ -201,6 +201,10 @@ def get_regions() :
     r.tcut = "nLeptons==1 &&  l0_pt>25 && nElectrons==1 && met>25"
     regions.append(r)
 
+    r = region.Region("wricheClusEtaCut", "$W$ (e), Cluster $\\eta$$ cut")
+    r.tcut = "nLeptons==1 &&  nElectrons==1 && met>25 && (e0_clusEtaBE>0.2 || e0_clusEtaBE<-0.2)"
+    regions.append(r)
+
     r = region.Region("wrichm", "$W$ ($\\mu$)")
     r.tcut = "nLeptons==1 && l0_pt>25 && nMuons==1 && met>25"
     regions.append(r)
@@ -217,12 +221,38 @@ def get_regions() :
     r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==1 && nElectrons==1 && nBJets>=2"
     regions.append(r)
 
+    r = region.Region("dil_ee_zveto", "$ee$, $Z-$veto")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1)"
+    regions.append(r)
+
+    r = region.Region("dil_mm_zveto", "$\\mu\\mu$, $Z-$veto")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1)"
+    regions.append(r)
+
+    r = region.Region("dil_df", "$e\\mu + \\mue$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==1 && nMuons==1 && (trig_pass2016update==1 || trig_pass2015==1)"
+    regions.append(r)
+
+    r = region.Region("dil_ee_zveto_b", "$ee$, $Z-$veto, $2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
+    regions.append(r)
+
+    r = region.Region("dil_mm_zveto_b", "$\\mu\\mu$, $Z-$veto, $2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
+    regions.append(r)
+
+    r = region.Region("dil_df_b", "$e\\mu + \\mue$, $2b$")
+    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==1 && nMuons==1 && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
+    regions.append(r)
+    
+    
+
 
     return regions
 
 def get_samples(name, filedir, options) :
 
-    filelist_dir = "/data/uclhc/uci/user/dantrim/n0301val/susynt-read/filelists_mwt2/n0301_data/"
+    filelist_dir = "/data/uclhc/uci/user/dantrim/n0301val/susynt-read/filelists/n0301_data/"
 
     runs_to_consider = []
     lines = open(options.runslist).readlines()

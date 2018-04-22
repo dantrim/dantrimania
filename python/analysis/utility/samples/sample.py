@@ -129,7 +129,7 @@ class Sample(object) :
         self._loaded_h5_files.append(filename)
 
     # load the sample
-    def load(self, filelist_directory, h5_dir, dsid_select = "") :
+    def load(self, filelist_directory, h5_dir, dsid_select = "", tags = [] ) :
 
         if not h5_dir.endswith("/") :
             h5_dir += "/"
@@ -153,10 +153,14 @@ class Sample(object) :
             sys.exit()
 
         sample_dsids = []
+        is_data = False
         for txt in filelists :
-            is_data = False
             dsid = ""
+
             first_split = "mc15_13TeV."
+            if "mc16_13TeV." in txt :
+                first_split = "mc16_13TeV."
+
             if "data15" in txt or "data16" in txt or "data17" in txt :
                 is_data = True
                 if "data15" in txt :
@@ -165,10 +169,11 @@ class Sample(object) :
                     first_split = "data16_13TeV."
                 elif "data17" in txt :
                     first_split = "data17_13TeV."
+
             dsid = txt.split(first_split)[1]
             dsid = dsid.split(".")[0]
             if is_data :
-                dsid = dsid[2:] # remove first 00
+                dsid = dsid[2:] # remove first 00 from run number
 
             if dsid_select == "" :
                 sample_dsids.append(dsid)
@@ -182,17 +187,45 @@ class Sample(object) :
             
 
         sample_files = []
-        for dsid in sample_dsids :
-            for f in all_files :
-                if dsid in f :
-                    sample_files.append(f)
-                    break
+
+        if not is_data and len(tags) > 0 :
+            for tag in tags :
+                for dsid in sample_dsids :
+                    for f in all_files :
+                        if dsid in f and tag in f :
+                            sample_files.append(f)
+
+        else :
+            for dsid in sample_dsids :
+                for f in all_files :
+                    if dsid in f :
+                        sample_files.append(f)
+                        break
 
         if len(sample_files) == 0 :
             print "ERROR [sample %s load] No loaded sample files (filelist = %s, H5 dir = %s)" % ( self._name, filelist_directory, h5_dir )
             sys.exit()
 
         if len(sample_files) != len(sample_dsids) :
+
+            #if len(sample_files) == 2 and "mc16" in sample_files[0] :
+            #    mc16a_versions = []
+            #    mc16d_versions = []
+            #    for sf in sample_files :
+            #        if "mc16a" in sf : mc16a_versions.append(sf)
+            #        elif "mc16d" in sf : mc16d_versions.append(sf)
+
+            #    samples_ok = True
+            #    if len(mc16a_versions) != 1 :
+            #        samples_ok = False
+            #        print "WARNING [samples %s load] There is not ==1 MC16A version of the file found (# found=%d)" % (self._name, len(mc16a_versions))
+            #    if len(mc16d_versions) != 1 :
+            #        samples_ok = False
+            #        print "WARNING [samples %s load] There is not ==1 MC16D version of the file found (# found=%d)" % (self._name, len(mc16d_versions))
+
+            #    if not samples_ok :
+            #        sys.exit()
+
             print "WARNING [samples %s load] Number of files found (=%d) not equal to number of sample dsids (=%d)" % ( self._name, len(sample_files), len(sample_dsids) )
             n_f = len(sample_files)
             n_d = len(sample_dsids)

@@ -9,9 +9,13 @@ from optparse import OptionParser
 xrd_scope = "root://${ATLAS_XROOTD_CACHE}/"
 
 analysis_release = "AnalysisBase,21.2.19,slc6"
+analysis_release = "AnalysisBase,21.2.24,slc6"
 
-out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301/mc/h5_test/"
-log_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301/mc/h5_test/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/mc/h5/"
+log_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/mc/h5/"
+
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/data/test/"
+log_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/data/test/"
 
 def get_outfilename(filename) :
 
@@ -80,7 +84,6 @@ def main() :
 
     n_files_to_convert = len(xrd_files)
 
-
     for isample, sample in enumerate(xrd_files) :
         script_name = "submit_condor_h5_converter.condor"
         exec_name = "run_h5_converter.sh"
@@ -116,6 +119,7 @@ def build_condor_script(script_name, exec_name) :
 +uc=false
 executable = %s
 arguments = $ENV(ARGS)
++SingularityImage = "/cvmfs/singularity.opensciencegrid.org/atlas/analysisbase:21.2.4"
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 use_x509userproxy = True

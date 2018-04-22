@@ -56,6 +56,13 @@ def get_required_variables(plots, region) :
 
     # we always need the eventweight, which will not show up in the tcut
     variables.append("eventweight")
+    variables.append("eventweightNoPRW")
+    variables.append("eventweightbtag")
+    variables.append("eventweightbtagNoPRW")
+    variables.append("eventweight_multi")
+    variables.append("eventweightNoPRW_multi")
+    variables.append("eventweightbtag_multi")
+    variables.append("eventweightBtagJvt_multi")
 
     # TODO when loading systematics we need to store the weight leafs
 
@@ -128,7 +135,7 @@ def add_labels(pad, region_name = "") :
     pad.text(0.23, 0.97, what_kind, size = size, **opts)
 
     # lumi stuff
-    lumi = "36.1"
+    lumi = "78.2"
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
@@ -169,7 +176,9 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
         for isc, sc in enumerate(chain) :
 
             lumis = signal.scalefactor * np.ones(len(sc[var]))
-            weights = lumis * sc['eventweight']
+#            weights = lumis * sc['eventweight']
+            weights = lumis * sc['eventweight_multi']
+#            weights = lumis * sc['eventweightBtagJvt_multi']
 
 
             hist_data = sc[var]
@@ -252,7 +261,9 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
 
             # get weights
             lumis = bkg.scalefactor * np.ones(len(bc[plot.vartoplot]))
-            weights = lumis * bc['eventweight']
+            weights = lumis * bc['eventweightNoPRW']
+#            weights = lumis * bc['eventweight_multi']
+            #weights = lumis * bc['eventweightBtagJvt_multi']
 
             # wt
 #            if "Wt" in bkg.name :
