@@ -17,6 +17,12 @@ log_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/mc/h5/"
 out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/data/test/"
 log_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0301_slim/data/test/"
 
+out_dir = "/data/uclhc/uci/user/dantrim/n0302val/test_conver/"
+log_dir = "/data/uclhc/uci/user/dantrim/n0302val/test_conver/"
+
+out_dir = "/data/uclhc/uci/user/dantrim/n0302val/convert_old/"
+log_dir = "/data/uclhc/uci/user/dantrim/n0302val/convert_old/"
+
 def get_outfilename(filename) :
 
     out = filename.split("/")[-1]
@@ -133,36 +139,78 @@ queue
 def build_job_executable(exec_name, release) :
 
     f = open(exec_name, 'w')
+
+
     script = """#!/bin/bash
+
 infilename=${1}
 outfilename=${2}
 while (( "$#" )); do
     shift
 done
 
-echo "hostname:"
-hostname
-echo "whoami:"
-whoami
-
-echo "infilename = ${infilename}"
+echo "infilename  = ${infilename}"
 echo "outfilename = ${outfilename}"
 
-work_dir=${PWD}
-echo "work_dir: ${work_dir}"
+
+
+export PATH=/data/uclhc/uci/user/dantrim/n0302val/dantrimania/scripts/:${PATH}
+echo "PATH:"
+echo $PATH
 
 export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
 source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
 
 lsetup fax
-lsetup "asetup %s"
 
+echo "calling: source /home/dantrim/dantrim_setup_scripts/setup_h5.sh"
+source /home/dantrim/dantrim_setup_scripts/setup_h5.sh
 
-echo "calling: ttree2hdf5 ${infilename} -o ${outfilename}"
-ttree2hdf5 ${infilename} -o ${outfilename}
+echo 'calling: lsetup "root 6.04.16-x86_64-slc6-gcc49-opt --skipConfirm"'
+lsetup "root 6.04.16-x86_64-slc6-gcc49-opt --skipConfirm"
 
+echo "setting up LCG python: lcgenv -p LCG_86 x86_64-slc6-gcc49-opt Python"
+lsetup "lcgenv -p LCG_86 x86_64-slc6-gcc49-opt Python"
 
-""" % release
+echo "type h5converter:"
+type h5converter
+
+echo "calling: h5converter ${infilename}"
+h5converter ${infilename}
+
+echo "done"
+"""
+
+#    script = """#!/bin/bash
+#infilename=${1}
+#outfilename=${2}
+#while (( "$#" )); do
+#    shift
+#done
+#
+#echo "hostname:"
+#hostname
+#echo "whoami:"
+#whoami
+#
+#echo "infilename = ${infilename}"
+#echo "outfilename = ${outfilename}"
+#
+#work_dir=${PWD}
+#echo "work_dir: ${work_dir}"
+#
+#export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+#source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh
+#
+#lsetup fax
+#lsetup "asetup %s"
+#
+#
+#echo "calling: ttree2hdf5 ${infilename} -o ${outfilename}"
+#ttree2hdf5 ${infilename} -o ${outfilename}
+#
+#
+#""" % release
 
     f.write(script)
     f.close()
