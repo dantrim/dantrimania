@@ -250,7 +250,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 varname = plot.vartoplot
                 plot_data = c[varname]
                 lumis = bkg.scalefactor * np.ones(len(plot_data))
-                weights = lumis * c['eventweightNoPRW']
+                weights = lumis * c['eventweightNoPRW']#_multi'] #NoPRW']
                 if plot.absvalue :
                     plot_data = np.absolute(plot_data)
 
@@ -301,6 +301,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             # overflow
             hdata.add_overflow()
             histograms_data[plot.vartoplot] = hdata
+
 
     ###########################
     # start drawing
@@ -376,6 +377,13 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                         edgecolor = 'k',
                         alpha = 1.0)
 
+        # print some yields
+        sm_total_yield = histo_total.integral()
+        print 30 * "*"
+        print histo_total.count_str(name = 'Total SM')
+        data_yield =  -1
+
+
         # draw error band
         upper_pad.add_collection(stat_error_band)
 
@@ -398,6 +406,14 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             data_err_high = data_err_high - data_y
             data_err = [data_err_low, data_err_high]
             upper_pad.errorbar(data_x, data_y, yerr = data_err, fmt = 'none', color = 'k')
+
+            data_yield = hdata.integral()
+
+
+
+        if data_yield >= 0 :
+            print hdata.count_str(name = 'Data')
+            print " > Data / SM : %5.2f" % ( data_yield / sm_total_yield )
 
 
         # ratio
