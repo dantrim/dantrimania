@@ -9,6 +9,7 @@ import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.utils.utils as utils
 
 import h5py
+import h5py_cache
 import numpy as np
 
 class SampleCacher(object) :
@@ -148,8 +149,36 @@ class SampleCacher(object) :
     
         field_select_str = ",".join("'%s'" % v for v in relevant_vars)
         sub_file_no = 0
+
+        out_ds = None
+        dataset_created = False
+
+#        for ifile, file in enumerate(sample.h5_files) :
+#            print "FILE %d = %s" % (ifile, file)
+#            with h5py_cache.File(file, 'r', chunk_cache_mem_size=10 * 1024**2, libver='latest') as sample_file :
+#            #with h5py.File(file, 'r+', libver='latest') as sample_file :
+#                set_ds = "ds = sample_file['%s'][ %s ]" % ( treename, field_select_str )
+#                exec(set_ds)
+#                indices_select_str = self.index_selection_string()
+#                set_idx = "indices = np.array( %s )" % indices_select_str
+#                exec(set_idx)
+#                ds = ds[indices]
+#                sub_dataset_name = "dataset_%d" % sub_file_no
+##                if ifile == 0 :
+#                if ds.size == 0 : continue
+#                if not dataset_created :
+#                    if ds.size > 0 :
+#                        out_ds = process_group.create_dataset(sub_dataset_name, shape=ds.shape, dtype=ds.dtype, data = ds, maxshape=(None,))
+#                        dataset_created = True
+#                else :
+#                    out_ds.resize( (ds.size + out_ds.size, )) 
+#                    out_ds[-ds.size:] = ds
+
+
         for file in sample.h5_files :
-            with h5py.File(file, 'r') as sample_file :
+            print "adding sub_file_no = %d" % sub_file_no
+            #with h5py.File(file, 'r', libver='latest') as sample_file :
+            with h5py_cache.File(file, 'r', chunk_cache_mem_size=1024**3) as sample_file :
                 set_ds = "ds = sample_file['%s'][ %s ]" % ( treename, field_select_str )
                 exec(set_ds)
                 #print "len before %d "% len(ds)
@@ -157,13 +186,14 @@ class SampleCacher(object) :
                 #print indices_select_str
                 set_idx = "indices = np.array( %s )" % indices_select_str
                 exec(set_idx)
-                selected_dataset = ds[indices]
+                ds = ds[indices]
                 #print "len after %d" % len(selected_dataset)
                 sub_dataset_name = "dataset_%d" % sub_file_no
-                out_ds = process_group.create_dataset(sub_dataset_name, shape=selected_dataset.shape, dtype=selected_dataset.dtype)
-                out_ds[:] = selected_dataset
-                sub_file_no += 1
+                out_ds = process_group.create_dataset(sub_dataset_name, shape=ds.shape, dtype=ds.dtype, data = ds)
+                #out_ds = process_group.create_dataset(sub_dataset_name, shape=selected_dataset.shape, dtype=selected_dataset.dtype, data = selected_dataset)
+                #out_ds[:] = selected_dataset
                 
+                sub_file_no += 1
 
     def cache(self, treename = "superNt") :
         """ main cache functionality here """

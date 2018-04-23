@@ -161,13 +161,13 @@ class Sample(object) :
             if "mc16_13TeV." in txt :
                 first_split = "mc16_13TeV."
 
-            if "data15" in txt or "data16" in txt or "data17" in txt :
+            if "data15_13TeV" in txt or "data16_13TeV" in txt or "data17_13TeV" in txt :
                 is_data = True
-                if "data15" in txt :
+                if "data15_13TeV" in txt :
                     first_split = "data15_13TeV."
-                elif "data16" in txt :
+                elif "data16_13TeV" in txt :
                     first_split = "data16_13TeV."
-                elif "data17" in txt :
+                elif "data17_13TeV" in txt :
                     first_split = "data17_13TeV."
 
             dsid = txt.split(first_split)[1]
@@ -267,6 +267,7 @@ class Sample(object) :
     def chain(self) :
         chunksize = 100000
         self.entries = 0
+
         with h5py.File(self.selection_file, 'r') as f :
             process_group = f[self.selection_group]
             for dsname in process_group :
