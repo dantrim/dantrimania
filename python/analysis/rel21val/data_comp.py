@@ -23,7 +23,8 @@ from math import sqrt
 from matplotlib.lines import Line2D
 
 filedir_r20 = "/data/uclhc/uci/user/dantrim/ntuples/n0234/m_apr12_rel21val/data/h5/"
-filedir_r21 = "/data/uclhc/uci/user/dantrim/ntuples/n0301/data/h5/"
+filedir_r20 = "/data/uclhc/uci/user/dantrim/ntuples/n0234/n_apr22_rel21val/h5/"
+filedir_r21 = "/data/uclhc/uci/user/dantrim/ntuples/n0302/data/h5/"
 lumi_table = "/data/uclhc/uci/user/dantrim/n0301val/lumi_tables/lumi_table_all.txt"
 
 class Options :
@@ -173,76 +174,40 @@ def get_regions() :
 
     regions = []
 
-    r = region.Region("zee0j", "$Z\\rightarrow ee$ Selection (0J)")
-    r.tcut = "nJets==0 && nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
+    r = region.Region("zee0j", "$ee$ selection (0J)")
+    r.tcut = "nJets==0 && nLeptons==2 && nElectrons==2 && l0_pt>25 && l1_pt>20 && mll>20"
     regions.append(r)
 
-    r = region.Region("zee", "$Z\\rightarrow ee$ Selection (>=0J)")
-    r.tcut = "nLeptons==2 && nElectrons==2 && mll>80 && mll<100"
+    r = region.Region("zee", "$ee$ selection")
+    r.tcut = "nLeptons==2 && nElectrons==2 && l0_pt>25 && l1_pt>20 && mll>20"
     regions.append(r)
     
-    r = region.Region("zmm0j", "$Z\\rightarrow \\mu\\mu$ Selection (0J)")
-    r.tcut = "nJets==0 && nLeptons==2 && nMuons==2 && mll>80 && mll<100"
+    r = region.Region("zmm0j", "$\\mu \\mu$ selection (0J)")
+    r.tcut = "nJets==0 && nLeptons==2 && nMuons==2 && l0_pt>25 && l1_pt>20 && mll>20"
     regions.append(r)
 
-    r = region.Region("zmm", "$Z\\rightarrow \\mu\\mu$ Selection (>=0J)")
-    r.tcut = "nLeptons==2 && nMuons==2 && mll>80 && mll<100"
+    r = region.Region("zmm", "$\\mu \\mu$ selection")
+    r.tcut = "nLeptons==2 && nMuons==2 && l0_pt>25 && l1_pt>20 && mll>20"
+    regions.append(r)
+
+    r = region.Region("top_like", "$>=1b-$jet, $e \\mu+\\mu e$")
+    r.tcut = "nLeptons==2 && nElectrons==1 && nMuons==1 && l0_pt>25 && l1_pt>20 && nBJets>=1"
+    regions.append(r)
+
+    r = region.Region("dfval", "$e \\mu+\\mu e$-selection")
+    r.tcut = "nLeptons==2 && nElectrons==1 && nMuons==1 && l0_pt>25 && l1_pt>20"
+    regions.append(r)
+
+    r = region.Region("df_bveto", "$e\\mu + \\mu e$, b-veto")
+    r.tcut = "nLeptons==2 && nLeptons==2 && nElectrons==1 && nMuons==1 && l0_pt>25 && l1_pt>25 && mll>20 && nBJets==0"
     regions.append(r)
 
     r = region.Region("zee_balance", "$Z\\rightarrow ee$ Balance (==1J)")
-    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nElectrons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0) && (trig_pass2016update==1 || trig_pass2015==1)"
+    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nElectrons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0)"
     regions.append(r)
 
     r = region.Region("zmm_balance", "$Z\\rightarrow \\mu\\mu$ Balance (==1J)")
-    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nMuons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0) && (trig_pass2016update==1 || trig_pass2015==1)"
-    regions.append(r)
-    
-    r = region.Region("wriche", "$W$ (e)")
-    r.tcut = "nLeptons==1 &&  l0_pt>25 && nElectrons==1 && met>25"
-    regions.append(r)
-
-    r = region.Region("wricheClusEtaCut", "$W$ (e), Cluster $\\eta$$ cut")
-    r.tcut = "nLeptons==1 &&  nElectrons==1 && met>25 && (e0_clusEtaBE>0.2 || e0_clusEtaBE<-0.2)"
-    regions.append(r)
-
-    r = region.Region("wrichm", "$W$ ($\\mu$)")
-    r.tcut = "nLeptons==1 && l0_pt>25 && nMuons==1 && met>25"
-    regions.append(r)
-
-    r = region.Region("diLBee", "$2e, 2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && nBJets>=2"
-    regions.append(r)
-
-    r = region.Region("diLBmm", "$2\\mu, 2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && nBJets>=2"
-    regions.append(r)
-
-    r = region.Region("diLBem", "$e+\\mu, 2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==1 && nElectrons==1 && nBJets>=2"
-    regions.append(r)
-
-    r = region.Region("dil_ee_zveto", "$ee$, $Z-$veto")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1)"
-    regions.append(r)
-
-    r = region.Region("dil_mm_zveto", "$\\mu\\mu$, $Z-$veto")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1)"
-    regions.append(r)
-
-    r = region.Region("dil_df", "$e\\mu + \\mue$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==1 && nMuons==1 && (trig_pass2016update==1 || trig_pass2015==1)"
-    regions.append(r)
-
-    r = region.Region("dil_ee_zveto_b", "$ee$, $Z-$veto, $2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
-    regions.append(r)
-
-    r = region.Region("dil_mm_zveto_b", "$\\mu\\mu$, $Z-$veto, $2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nMuons==2 && (mll<80 || mll>100) && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
-    regions.append(r)
-
-    r = region.Region("dil_df_b", "$e\\mu + \\mue$, $2b$")
-    r.tcut = "nLeptons==2 && l0_pt>25 && l1_pt>15 && nElectrons==1 && nMuons==1 && (trig_pass2016update==1 || trig_pass2015==1) && nBJets==2"
+    r.tcut = "nLeptons==2 && nBJets==0 && nJets==1 && j0_pt>25 && nMuons==2 && mll>80 && mll<100 && (dphi_j0_ll>3.0 || dphi_j0_ll<-3.0)"
     regions.append(r)
     
     
@@ -330,6 +295,12 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
         for ic, c in enumerate(chain) :
             for varname, varbounds in variable_dict.iteritems() :
                 data = c[varname]
+                #if varname == "l0_d0sig" :
+                #    charge_data = c["l0_q"]
+                #    data = data * charge_data
+                #elif varname == "l1_d0sig" :
+                #    charge_data = c["l1_q"]
+                #    data = data * charge_data
                 histo_dict[varname][isample].fill(data)
 
         labels.append(s.name)
@@ -427,6 +398,21 @@ def make_comp_plot(r20sample, r21sample, variable_dict, region, opts) :
         rc.upper_pad.text(0.05, 0.79, 'R20 : %.2f' % yield_r20, size = 0.6 * size, **legopts)
         rc.upper_pad.text(0.05, 0.75, 'R21 : %.2f' % yield_r21, size = 0.6 * size, **legopts)
         rc.upper_pad.text(0.05, 0.71, '$\\rightarrow$ R21/R20 : %.2f' % (yield_ratio), size = 0.6 * size, **legopts)
+
+        #rc.upper_pad.text(0.6, 0.71, "Lepton $d_0^{sig} \\times Q$", size = size, **legopts)
+
+        if "mll" in varname or "d0" in varname :
+            r21_mean = histos[1].mean()
+            r21_std = histos[1].std()
+
+            r20_mean = histos[0].mean()
+            r20_std = histos[0].std()
+
+            r20_mean_str = "%.4f \\pm %.4f" % (r20_mean, r20_std)
+            r21_mean_str = "%.4f \\pm %.4f" % (r21_mean, r21_std)
+
+            rc.upper_pad.text(0.5, 0.79, 'R20 : (mean, sigma) = (%.4f, %.4f)' % (r20_mean, r20_std), size = 0.4 * size, **legopts)
+            rc.upper_pad.text(0.5, 0.75, 'R21 : (mean, sigma) = (%.4f, %.4f)' % (r21_mean, r21_std), size = 0.4 * size, **legopts)
 
         # error bars
         errors =  []
@@ -780,12 +766,12 @@ def main() :
     for v in variables :
         if v not in variables_from_region :
             variables_from_region.append(v)
-    extra_vars = ["isMC"] #, "run", "lumi_block", "year"]
+    extra_vars = ["isMC", "l0_q", "l1_q"] #, "run", "lumi_block", "year"]
     required_vars = []
     required_vars += variables_from_region
     required_vars += extra_vars
 
-    cacher = sample_cacher.SampleCacher("./selection") 
+    cacher = sample_cacher.SampleCacher("./selection_datadata") 
     cacher.samples = [samples_r20, samples_r21]
     cacher.region = region_to_use
     cacher.fields = required_vars
