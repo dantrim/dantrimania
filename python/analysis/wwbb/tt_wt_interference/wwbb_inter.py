@@ -16,6 +16,7 @@ import dantrimania.python.analysis.utility.utils.plib_utils as plib
 plt = plib.import_pyplot()
 from math import sqrt
 
+from matplotlib.lines import Line2D
 import numpy as np
 
 def get_samples() :
@@ -84,6 +85,24 @@ def get_required_variables(variables, region) :
     out.append("eventweight")
     return out
 
+def draw_ratio_error_bars(h_den, h_num, pad, color) :
+
+    yvalues = h_num.divide(h_den)
+    xvalues = np.array(h_den.bin_centers())
+    yvalues [ yvalues == 0 ] = -10
+
+    err_num = np.array(h_num.y_error())
+    vals_num = h_num.histogram
+    err_num = np.divide(err_num, vals_num)
+
+    err_den = np.array(h_den.y_error())
+    vals_den = h_den.histogram
+    err_den = np.divide(err_den, vals_den)
+
+    ratio_errors = yvalues * np.sqrt( err_num ** 2 + err_den ** 2)
+
+    pad.errorbar(xvalues, yvalues, yerr = ratio_errors, fmt = 'none', color = color)
+
 def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
 
     print 50 * "-"
@@ -103,10 +122,19 @@ def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
     shistos = []
     sweights = []
 
+    histos_for_errorbars = {}
+
+    # pads
+    upper = plot.upper
+    lower = plot.lower
+
+
     for isample, sample in enumerate(samples) :
 
         histo = []
         weights = []
+
+        h = histogram1d("histo_%d" % isample, binning = [bw, xlow, xhigh])
 
         chain = sample.chain()
         for isc, sc in enumerate(chain) :
@@ -117,28 +145,36 @@ def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
             w = lumis * sc['eventweight'] 
             weights += list(w)
 
+            data = sc[plot.vartoplot]
+
             if plot.absvalue :
-                histo += list(np.absolute(sc[plot.vartoplot]))
-            else :
-                histo += list(sc[plot.vartoplot])
+                data = np.absolute(data)
+            histo += list(data)
+
+            data = np.clip(data, nbins[0],  nbins[-1])
+
+            h.fill(data, w)
 
         if "sum" in sample.name :
             fhisto = histo
             fweights = weights
+            fhisto = np.clip(fhisto, nbins[0], nbins[-1])
+            histos_for_errorbars["fhisto"] = h
+            draw_histo_errors(h, "#d81b39", upper)
         elif "single_res" in sample.name :
             shisto = histo
             sweights = weights
+            shisto = np.clip(shisto, nbins[0], nbins[-1])
+            histos_for_errorbars["shisto"] = h
+            draw_histo_errors(h, "k", upper)
         elif "double_single" in sample.name:
             nfhisto = histo
             nfweights = weights
+            nfhisto = np.clip(nfhisto, nbins[0], nbins[-1])
+            histos_for_errorbars["nfhisto"] = h
+            draw_histo_errors(h, "b", upper)
 
-    # pads
-    upper = plot.upper
-    lower = plot.lower
 
-    nfhisto = np.clip(nfhisto, nbins[0], nbins[-1])
-    fhisto = np.clip(fhisto, nbins[0], nbins[-1])
-    shisto = np.clip(shisto, nbins[0], nbins[-1])
 
     fcounts = 0.0
     nfcounts = 0.0
@@ -195,15 +231,34 @@ def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
     total_s_y = y[-1]
     total_s_x = x
 
+    miny = 0
     max_mult = 1.5
     if plot.logy :
-        max_mult = 10000
+        max_mult = 1e2
+        miny = 1e-2
     maxy = max_mult * maxy
-    upper.set_ylim(plot.ylow, maxy)
+    upper.set_ylim(miny, maxy)
 
 
     # legend
-    upper.legend(loc='best', frameon = True, fontsize=12, numpoints=1)
+    colors = {}
+    handles, labels = upper.get_legend_handles_labels()
+    order = ["$WWbb$ LO", "$t\\bar{t} + Wtb$", "Wtb"]
+    colororder = ["#d81b39", "#73c2fb", "k"]
+    new_handles = []
+    new_labels = []
+    for iorder, ordername in enumerate(order) :
+        for ilabel, label in enumerate(labels) :
+            if ordername != label : continue
+            new_labels.append(label)
+            if "WWbb" in ordername :
+                new_handles.append(Line2D([], [], c = colororder[iorder]))
+            elif "+ Wtb" in ordername :
+                new_handles.append(Line2D([], [], c = colororder[iorder]))
+            elif "Wtb" in ordername and "+" not in ordername :
+                new_handles.append(Line2D([], [], c = colororder[iorder], ls = '--'))
+
+    upper.legend(handles = new_handles, labels = new_labels, loc = 'best', frameon = False, fontsize = 12, numpoints = 1)
 
     ##############
     # ratio
@@ -218,6 +273,13 @@ def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
     lower.set_ylim([0,2])
     lower.set_ylabel("WWbb / $t \\bar{t}$ + W$t$b", horizontalalignment = 'right', y = 1.2, fontsize = 16)
     lower.plot(ratio_x, ratio_y, 'ro', zorder=1000, markersize=3)
+
+    draw_ratio_error_bars(histos_for_errorbars['nfhisto'], histos_for_errorbars['fhisto'], lower, 'r')
+
+    # line
+    line_x = [xlow, xhigh]
+    line_y = [1, 1]
+    lower.plot(line_x, line_y, 'r--', zorder = 0)
 
     ####
     # labels
@@ -240,6 +302,13 @@ def make_plot(plot, region, samples, output_dir, sel_string, sel_string2) :
     print " >>> saving plot to : %s" % os.path.abspath(save_name)
     plot.fig.savefig(save_name, bbox_inches = 'tight', dpi=200)
 
+def draw_histo_errors(histogram, color, pad) :
+
+    yvals = histogram.histogram
+    xvals = histogram.bin_centers()
+    yerr = histogram.y_error()
+    pad.errorbar(xvals, yvals, yerr = yerr, fmt = 'none', color = color)
+    
 def get_counts(sum_sample, single_sample, double_sample, region) :
 
     xlow = 0
@@ -322,9 +391,10 @@ def main() :
 
     # region
     reg = region.Region("wwbb", "WW$bb$")
-    reg.tcut = "l0_pt>20 && l1_pt>10 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && ht2ratio>0.8 && dRll<0.9 && mt2_bb>150"# && met>200"# && mbb>140 && dRll>1.5 && dRll<3.0 && ht2ratio>0.5"# && met>200"
+    reg.tcut = "l0_pt>20 && l1_pt>10 && n_bjets==2 && bj0_pt>20 && bj1_pt>20 && mbb>100 && mbb<140" #&& mt2_llbb>90 && mt2_llbb<140 && ht2ratio>0.8 && dRll<0.9 && mt2_bb>150"# && met>200"# && mbb>140 && dRll>1.5 && dRll<3.0 && ht2ratio>0.5"# && met>200"
     sel_string = "$2\\ell + 2b +$MET200 $+m_{bb}\\in(100,140)$" 
-    sel_string2 = "$\\Delta R_{\\ell \ell}<1.0$"
+    sel_string2 = ""
+    #sel_string2 = "$\\Delta R_{\\ell \ell}<1.0$"
 
     # variables
     variables = {}
@@ -353,30 +423,30 @@ def main() :
     #variables["mt2_bb"] = [20, 0, 500]
     #variables["mbb"] = [40, 0, 1000]
 
-    #inside mbb window + dRll<1.0
-    variables["mll"] = [20, 0, 180]
-    variables["met"] = [20, 200, 450]
-    variables["l0_pt"] = [30, 0, 600]
-    variables["l1_pt"] = [10, 0, 120]
-    variables["ptll"] = [40, 0, 300]
+    #inside mbb window 
+    variables["mll"] = [40, 0, 800]
+    variables["met"] = [20, 200, 700]
+    variables["l0_pt"] = [50, 0, 800]
+    variables["l1_pt"] = [10, 0, 250]
+    variables["ptll"] = [40, 0, 600]
     variables["l0_eta"] = [0.6, -3, 3]
     variables["l1_eta"] = [0.6, -3, 3]
-    variables["bj0_pt"] = [50, 0, 500]
-    variables["bj1_pt"] = [10, 0, 200]
-    variables["bj0_eta"] = [0.6, -3, 3]
-    variables["bj1_eta"] = [0.6, -3, 3]
+    variables["bj0_pt"] = [50, 0, 800]
+    variables["bj1_pt"] = [20, 0, 200]
+    variables["bj0_eta"] = [0.5, -3, 3]
+    variables["bj1_eta"] = [0.5, -3, 3]
     variables["ht2"] = [120, 0, 1200]
-    variables["ht2ratio"] = [0.1, 0.3, 1]
-    variables["dRll"] = [0.1, 0, 1.0]
-    variables["dr_llmet"] = [0.2, 0, 3.5]
-    variables["dr_bb"] = [0.2, 0, 3.5]
+    variables["ht2ratio"] = [0.1, 0.0, 1]
+    variables["dRll"] = [0.5, 0, 5.0]
+    variables["dr_llmet"] = [0.5, 0, 5]
+    variables["dr_bb"] = [0.5, 0, 6]
     variables["ptbb"] = [20, 0, 600]
     variables["dphi_llbb"] = [0.6, -3.2, 3.2]
     variables["dphi_llmet_bb"] = [0.6, -3.2, 3.2]
     variables["dphi_l0b0"] = [0.6, -3.2, 3.2]
-    variables["sumpt"] = [40, 0, 2000]
-    variables["mt2_llbb"] = [15, 80, 350]
-    variables["mt2_bb"] = [40, 0, 400]
+    variables["sumpt"] = [80, 0, 2000]
+    variables["mt2_llbb"] = [40, 80, 1000]
+    variables["mt2_bb"] = [40, 0, 600]
     variables["mbb"] = [5, 100, 140]
 
     if not do_counts :
@@ -401,7 +471,12 @@ def main() :
         print str(cacher)
         cacher.cache("truth")
 
+        n_var = len(variables)
+        n_at = 1
+
         for var, bounds in variables.iteritems() :
+            print "[%02d/%02d] %s" % (n_at, n_var, var)
+            n_at += 1
             p = hist1d.RatioCanvas(logy = do_logy)
             if "abs(" in var :
                 var = var.replace("abs(","").replace(")", "")

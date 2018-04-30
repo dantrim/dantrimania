@@ -14,6 +14,8 @@ import dantrimania.python.analysis.utility.plotting.m_py.errorbars as errorbars
 import dantrimania.python.analysis.utility.utils.plib_utils as plib
 from dantrimania.python.analysis.utility.plotting.plot1d import plot1d
 
+from matplotlib.lines import Line2D
+
 # new
 from dantrimania.python.analysis.utility.plotting.histogram1d import histogram1d
 from dantrimania.python.analysis.utility.plotting.histogram_stack import histogram_stack
@@ -75,6 +77,26 @@ def get_required_variables(variables, region) :
     out.append("eventweight")
     return out
 
+def draw_ratio_error_bars(h_den, h_num, pad, color) :
+
+
+    yvalues = h_num.divide(h_den)
+    xvalues = np.array(h_den.bin_centers())
+    yvalues [ yvalues == 0 ] = -10
+
+    err_num = np.array(h_num.y_error())
+    vals_num = h_num.histogram
+    err_num = np.divide(err_num, vals_num)
+
+    err_den = np.array(h_den.y_error())
+    vals_den = h_den.histogram
+    err_den = np.divide(err_den, vals_den)
+
+    ratio_errors = yvalues * np.sqrt( err_num ** 2 + err_den ** 2)
+
+    pad.errorbar(xvalues, yvalues, yerr = ratio_errors, fmt = 'none', color = color)
+    
+
 def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, wtb_sample) :
 
     canvas = ratio_canvas("ratio_canvas_%s" % plot.name)
@@ -92,10 +114,17 @@ def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, 
     bin_width = plot.bin_width
     binning = plot.bounds
 
+    #ticks = list(np.arange(xlow, xhigh + bin_width, bin_width))
+#    ticks = ticks[::2]
+#    upper_pad.set_xticks(ticks)
+#    lower_pad.set_xticks(ticks)
+
     histos = []
     weights = []
     labels = []
     colors = []
+
+    color_hdict = {}
 
     
     maxy = 0.0
@@ -114,6 +143,7 @@ def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, 
             h.fill(data, weights)
         labels.append(sample.displayname)
         colors.append(sample.color)
+        color_hdict[h.name] = sample.color
         h.add_overflow() 
         if h.maximum() > maxy : maxy = h.maximum()
         histos.append(h)
@@ -122,9 +152,11 @@ def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, 
         print "Counts %s    : %.02f +/- %.02f" % ( sample.name, integral, error )
 
     miny = 0.0
+    multiplier = 1.65
     if plot.logy :
         miny = 1e-2
-    maxy = 1.65 * maxy
+        multiplier = 1e2
+    maxy = multiplier * maxy
     upper_pad.set_ylim(miny, maxy)
 
     weights = [h.weights for h in histos]
@@ -140,27 +172,54 @@ def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, 
                     lw = 2,
                     )
 
+    yerrors = []
+    for ih, h in enumerate(histos) :
+        yvals = h.histogram
+        xvals = h.bin_centers()
+        yerr = h.y_error()
+        yerrors.append(yerr)
+        upper_pad.errorbar(xvals, yvals, yerr = yerr, fmt = 'none', color = colors[ih])
+
     # ratio of DR/DS
     lower_pad.set_ylabel("X / DR", horizontalalignment = 'right', y = 0.83, fontsize = 18)
     lower_pad.set_ylim([0,2])
     dr_histogram = None
     ds_histogram = None
     wtb_histogram = None
-    for s in histos :
+    for isample, s in enumerate(histos) :
         if "DR" in s.name :
             dr_histogram = s
         elif "DS" in s.name :
             ds_histogram = s
         elif "Wtb" in s.name :
             wtb_histogram = s
+
     ratio_y = ds_histogram.divide(dr_histogram)
     ratio_x = np.array(dr_histogram.bin_centers())
     lower_pad.plot(ratio_x, ratio_y, linestyle = 'None', marker = 'o', markersize = 6, color = ds_sample.color, zorder=1000)
     ratio_y = wtb_histogram.divide(dr_histogram)
     lower_pad.plot(ratio_x, ratio_y, linestyle = 'None', marker = 'o', markersize = 6, color = wtb_sample.color, zorder = 1000)
 
+    draw_ratio_error_bars(dr_histogram, ds_histogram, lower_pad, color_hdict[ds_histogram.name])
+    draw_ratio_error_bars(dr_histogram, wtb_histogram, lower_pad, color_hdict[wtb_histogram.name])
+
     # legend
-    upper_pad.legend(loc = "best", frameon = True, fontsize = 12, numpoints = 1)
+    handles, labels = upper_pad.get_legend_handles_labels()
+    order = ["DR", "DS", "Wtb"]
+    new_handles = []
+    new_labels = []
+    for ordername in order :
+        for ilabel, label in enumerate(labels) :
+            if ordername not in label : continue
+            new_labels.append(label)
+            if ordername == "DR" :
+                new_handles.append(Line2D([],[], c = color_hdict[dr_histogram.name]))
+            elif ordername == "DS" :
+                new_handles.append(Line2D([],[], c = color_hdict[ds_histogram.name]))
+            else :
+                new_handles.append(Line2D([],[], c = color_hdict[wtb_histogram.name]))
+        
+    upper_pad.legend(handles = new_handles, labels = new_labels, loc = "best", frameon = False, fontsize = 12, numpoints = 1)
 
     # labels
     opts = dict(transform = upper_pad.transAxes)
@@ -170,6 +229,11 @@ def make_dr_ds_plot(plot, region, output_dir, sel_string, dr_sample, ds_sample, 
     upper_pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, 36.1 fb$^{-1}$', size = 0.75 * 18, **opts)
     upper_pad.text(0.05, 0.83, sel_string, size = 0.75 * 18, **opts)
     
+
+    # line
+    line_y = [1.0, 1.0]
+    line_x = [xlow, xhigh]
+    lower_pad.plot(line_x, line_y, 'r--', lw = 1, zorder = 0)
     
 
     ########
@@ -223,9 +287,9 @@ def main() :
     variables["dphi_llbb"] = [0.4, -3.2, 3.2]
     variables["dphi_llmet_bb"] = [0.4, -3.2, 3.2]
     variables["dphi_l0b0"] = [0.4, -3.2, 3.2]
-    variables["sumpt"] = [40, 0, 800]
-    variables["mt2_llbb"] = [40, 0, 800]
-    variables["mbb"] = [40, 0, 1000]
+    variables["sumpt"] = [100, 0, 2000]
+    variables["mt2_llbb"] = [40, 0, 1200]
+    variables["mbb"] = [60, 0, 1000]
     variables["mt2_bb"] = [20, 0, 600]
 
     # ok go
@@ -246,7 +310,12 @@ def main() :
     print str(cacher)
     cacher.cache("truth")
 
+    n_var = len(variables)
+    n_at = 1
+
     for var, bounds in variables.iteritems() :
+        print "[%02d/%02d] %s" % (n_at, n_var, var)
+        n_at += 1
         okname = var.replace("abs(","").replace(")","").replace("[","").replace("]","")
         p = plot1d("%s_%s" % (reg.name, okname), okname)
         p.normalized = False
