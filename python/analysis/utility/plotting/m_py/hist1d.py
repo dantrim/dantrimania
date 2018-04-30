@@ -230,7 +230,8 @@ class RatioCanvas(hist1d) :
         #lower.set_yticklabels([0.0, 0.5, 1.0, 1.5, 2.0])
 
         for ax in [upper, lower] :
-            ax.tick_params(axis='both', which='both', labelsize=16)
+            ax.tick_params(axis='both', which='both', labelsize=16, direction='in',
+                labelleft = True, bottom = True, top = True, right = True, left = True)
             which_grid = 'both'
             if self.logy :
                 which_grid= 'major'
