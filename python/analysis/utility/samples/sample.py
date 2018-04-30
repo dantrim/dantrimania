@@ -265,10 +265,10 @@ class Sample(object) :
         self._selection_group = val
 
     def chain(self) :
-        chunksize = 100000
+        chunksize = 10000000
         self.entries = 0
 
-        with h5py.File(self.selection_file, 'r') as f :
+        with h5py.File(self.selection_file, 'r', libver='latest') as f :
             process_group = f[self.selection_group]
             for dsname in process_group :
                 ds = process_group[dsname]

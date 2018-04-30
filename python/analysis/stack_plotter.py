@@ -57,12 +57,15 @@ def get_required_variables(plots, region) :
     # we always need the eventweight, which will not show up in the tcut
     variables.append("eventweight")
     variables.append("eventweightNoPRW")
+    variables.append("l0_q")
     variables.append("eventweightbtag")
     variables.append("eventweightbtagNoPRW")
+    variables.append("eventweightBtagJvt")
     variables.append("eventweight_multi")
     variables.append("eventweightNoPRW_multi")
     variables.append("eventweightbtag_multi")
     variables.append("eventweightBtagJvt_multi")
+    variables.append("pupw_period")
 
     # TODO when loading systematics we need to store the weight leafs
 
@@ -81,6 +84,8 @@ def make_legend(ordered_labels, pad) :
                 new_handles.append(handles[il])
 
     leg_x, leg_y = 0.5, 0.75
+    if len(ordered_labels) > 10 :
+        leg_y = 0.95 * leg_y
     pad.legend(new_handles,
                 new_labels,
                 loc = (leg_x, leg_y),
@@ -135,11 +140,14 @@ def add_labels(pad, region_name = "") :
     pad.text(0.23, 0.97, what_kind, size = size, **opts)
 
     # lumi stuff
-    lumi = "78.2"
+    #lumi = "76.4"
+    #lumi = "36.2"
+    lumi = "35.6"
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
     pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
+    pad.text(0.047, 0.8, "mc16a only", size = 0.75 * size, **opts)
 
 
 
@@ -191,7 +199,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
         colors_sig.append(signal.color)
 
         # overflow
-        h.add_overflow()
+        #h.add_overflow()
 
         histograms_signal.append(h)
 
@@ -229,7 +237,6 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 
     n_plots = len(plots)
 
-
     for iplot, plot in enumerate(plots) :
         histos_for_plot = {}
         for bkg in backgrounds :
@@ -245,21 +252,34 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         colors_bkg[bkg.name] = bkg.color
 
         chain = bkg.chain()
+        weight_str = 'eventweight'
+        if 'top' in region.name or 'tt' in region.name or 'wt' in region.name :
+            weight_str += 'btag'
+
         for ic, c in enumerate(chain) :
+
+            ev_weight = c[weight_str]
+            # since we are not combingin mc16a + mc16d, divide out the period weight
+            period_weights = c['pupw_period']
+            ev_weight = np.divide(ev_weight, period_weights)
+
             for iplot, plot in enumerate(plots) :
                 varname = plot.vartoplot
                 plot_data = c[varname]
+                #if varname == "l0_d0sig" :
+                #    charge_data = c["l0_q"]
+                #    plot_data = plot_data * charge_data
                 lumis = bkg.scalefactor * np.ones(len(plot_data))
-                weights = lumis * c['eventweightNoPRW']#_multi'] #NoPRW']
+                weights = lumis * ev_weight #c['eventweightNoPRW']#_multi'] #NoPRW']
                 if plot.absvalue :
                     plot_data = np.absolute(plot_data)
 
                 histograms_bkg[varname][bkg.name].fill(plot_data, weights)
 
     # add overflow
-    for plot in plots :
-        for bkg in backgrounds :
-            histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
+    #for plot in plots :
+    #    for bkg in backgrounds :
+    #        histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
 
 
     histogram_stacks = {}
@@ -295,11 +315,15 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             chain = data.chain()
             for idc, dc in enumerate(chain) :
                 plot_data = dc[plot.vartoplot]
+                #if plot.vartoplot == "l0_d0sig" :
+                #    print "adding CHARGE to data"
+                #    charge_data = dc["l0_q"]
+                #    plot_data = plot_data * charge_data
                 if plot.absvalue :
                     plot_data = np.absolute(plot_data)
                 hdata.fill(plot_data)
             # overflow
-            hdata.add_overflow()
+            #hdata.add_overflow()
             histograms_data[plot.vartoplot] = hdata
 
 
@@ -307,6 +331,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
     # start drawing
     n_plots = len(plots)
 
+    print_yields = True
     for iplot, plot in enumerate(plots) :
 
         print "[%02d/%02d] %s" % (iplot+1, n_plots, plot.vartoplot)
@@ -324,6 +349,21 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         xhigh = plot.x_high
         bin_width = plot.bin_width
         binning = plot.bounds
+
+        ticks = list(np.arange(xlow, xhigh + bin_width, bin_width))
+        if len(ticks) > 10 :
+            ticks = ticks[::2]
+        #if ticks[-1] != xhigh :
+        #    last = ticks[-1]
+        #    new_last = last + 2*bin_width
+        #    xhigh = new_last
+        #    plot.x_high = xhigh
+        #    ticks.append(new_last)
+    
+
+        upper_pad.set_xticks(ticks)
+        lower_pad.set_xticks(ticks)
+#        lower_pad.set_xticklabels([str(x) for x in ticks])
 
         stack = histogram_stacks[plot.vartoplot]
 
@@ -356,7 +396,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         sm_line = histo_total.bounding_line()
 
         # counts
-        stack.print_counts()
+        if print_yields :
+            stack.print_counts()
 
         # draw backgrounds
         histos = []
@@ -378,9 +419,10 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                         alpha = 1.0)
 
         # print some yields
-        sm_total_yield = histo_total.integral()
-        print 30 * "*"
-        print histo_total.count_str(name = 'Total SM')
+        if print_yields :
+            sm_total_yield = histo_total.integral()
+            print 30 * "*"
+            print histo_total.count_str(name = 'Total SM')
         data_yield =  -1
 
 
@@ -411,7 +453,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 
 
 
-        if data_yield >= 0 :
+        if data_yield >= 0 and print_yields :
+            print_yields = False
             print hdata.count_str(name = 'Data')
             print " > Data / SM : %5.2f" % ( data_yield / sm_total_yield )
 
@@ -835,9 +878,11 @@ def main() :
             sys.exit()
     tmp_plots = []
     if select_var != "" :
-        for p in loaded_plots :
-            if p.vartoplot == select_var :
-                tmp_plots.append(p)
+        select_vars = select_var.split(",")
+        for sv in select_vars :
+            for p in loaded_plots :
+                if p.vartoplot == sv :
+                    tmp_plots.append(p)
         loaded_plots = tmp_plots
 
     if skip_data :
@@ -858,6 +903,8 @@ def main() :
     cacher.cache()
 
     n_plots = len(loaded_plots)
+    #for p in loaded_plots :
+    #    make_stack_plots([p], region_to_plot, backgrounds, signals, data, output_dir, suffix)
     make_stack_plots(loaded_plots, region_to_plot, backgrounds, signals, data, output_dir, suffix)
 
 #    for iplot, p in enumerate(loaded_plots) :
