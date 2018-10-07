@@ -161,7 +161,7 @@ class Sample(object) :
             if "mc16_13TeV." in txt :
                 first_split = "mc16_13TeV."
 
-            if "data15_13TeV" in txt or "data16_13TeV" in txt or "data17_13TeV" in txt :
+            if "data15_13TeV" in txt or "data16_13TeV" in txt or "data17_13TeV" in txt or "data18_13TeV" in txt :
                 is_data = True
                 if "data15_13TeV" in txt :
                     first_split = "data15_13TeV."
@@ -169,6 +169,8 @@ class Sample(object) :
                     first_split = "data16_13TeV."
                 elif "data17_13TeV" in txt :
                     first_split = "data17_13TeV."
+                elif "data18_13TeV" in txt :
+                    first_split = "data18_13TeV."
 
             dsid = txt.split(first_split)[1]
             dsid = dsid.split(".")[0]

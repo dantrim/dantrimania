@@ -128,9 +128,11 @@ class histogram1d(object) :
         if self._empty :
             return np.array([])
         else :
-            self._histogram, _ = np.histogram(self._data, bins = self.bins, weights = self._weights)
-            self._raw_histogram, _ = np.histogram(self._data, bins = self.bins, weights = np.ones(len(self._data)))
-            self._sumw2_histogram, _ = np.histogram(self._data, bins = self.bins, weights = self._weights2)
+
+            hrange = (self.bins[0], self.bins[-1])
+            self._histogram, _ = np.histogram(self._data, bins = self.bins, range = hrange, weights = self._weights)
+            self._raw_histogram, _ = np.histogram(self._data, bins = self.bins, range = hrange, weights = np.ones(len(self._data)))
+            self._sumw2_histogram, _ = np.histogram(self._data, bins = self.bins, range = hrange, weights = self._weights2)
             return self._histogram
 
     def maximum(self) :

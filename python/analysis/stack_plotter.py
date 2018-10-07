@@ -141,13 +141,16 @@ def add_labels(pad, region_name = "") :
 
     # lumi stuff
     #lumi = "76.4"
-    #lumi = "36.2"
+    #lumi = "36.1"
+    #lumi = "43.58"
+    #lumi = "76.9"
     lumi = "35.6"
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
     pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
-    pad.text(0.047, 0.8, "mc16a only", size = 0.75 * size, **opts)
+    pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
+    #pad.text(0.047, 0.78, "mc16a + mc16d", size = 0.75 * size, **opts)
 
 
 
@@ -252,14 +255,19 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         colors_bkg[bkg.name] = bkg.color
 
         chain = bkg.chain()
-        weight_str = 'eventweight'
-        if 'top' in region.name or 'tt' in region.name or 'wt' in region.name :
-            weight_str += 'btag'
+        weight_str = 'eventweightBtagJvt'#_multi'
+       #weight_str = 'eventweightBtagJvt'
+#        weight_str = 'eventweightNoPRW'
+#        weight_str = 'eventweight_multi'
+#        weight_str = 'eventweightBtagJvt_multi'
+        #if 'top' in region.name or 'tt' in region.name or 'wt' in region.name :
+        #    weight_str += 'btag'
 
         for ic, c in enumerate(chain) :
 
             ev_weight = c[weight_str]
             # since we are not combingin mc16a + mc16d, divide out the period weight
+#            print "INFO NOT dividing out the PRW period weights"
             period_weights = c['pupw_period']
             ev_weight = np.divide(ev_weight, period_weights)
 
@@ -277,9 +285,9 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 histograms_bkg[varname][bkg.name].fill(plot_data, weights)
 
     # add overflow
-    #for plot in plots :
-    #    for bkg in backgrounds :
-    #        histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
+    for plot in plots :
+        for bkg in backgrounds :
+            histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
 
 
     histogram_stacks = {}
@@ -323,7 +331,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     plot_data = np.absolute(plot_data)
                 hdata.fill(plot_data)
             # overflow
-            #hdata.add_overflow()
+            hdata.add_overflow()
             histograms_data[plot.vartoplot] = hdata
 
 
@@ -563,8 +571,8 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
 
             # get weights
             lumis = bkg.scalefactor * np.ones(len(bc[plot.vartoplot]))
-            weights = lumis * bc['eventweightNoPRW']
-#            weights = lumis * bc['eventweight_multi']
+#            weights = lumis * bc['eventweightNoPRW']
+            weights = lumis * bc['eventweight_multi']
             #weights = lumis * bc['eventweightBtagJvt_multi']
 
             # wt
