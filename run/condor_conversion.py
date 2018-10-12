@@ -8,7 +8,8 @@ import argparse
 
 xrd_scope = 'root://${ATLAS_XROOTD_CACHE}/'
 analysis_release = 'AnalysisBase,21.2.45'
-out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0303/b_oct7/data/h5/'
+#out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0303/b_oct7/mc16d/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0303/c_oct8/data17/h5/'
 
 def get_outfilename(filename) :
 
@@ -130,10 +131,10 @@ def main() :
         tags = args.tag.split(',')
         tmp = []
         for f in files_to_convert :
-            keep_file = True
+            keep_file = False
             for tag in tags :
-                if tag not in f :
-                    keep_file = False
+                if tag in f :
+                    keep_file = True
             if keep_file :
                 tmp.append(f)
         files_to_convert = tmp
