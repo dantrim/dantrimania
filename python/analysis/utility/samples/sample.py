@@ -208,7 +208,13 @@ class Sample(object) :
             print "ERROR [sample %s load] No loaded sample files (filelist = %s, H5 dir = %s)" % ( self._name, filelist_directory, h5_dir )
             sys.exit()
 
-        if len(sample_files) != len(sample_dsids) :
+        multiplier = 1.0
+        if tags :
+            multiplier *= len(tags)
+        n_got = len(sample_files)
+        n_exp = len(sample_dsids) * multiplier
+
+        if n_got != n_exp :
 
             #if len(sample_files) == 2 and "mc16" in sample_files[0] :
             #    mc16a_versions = []
@@ -228,9 +234,7 @@ class Sample(object) :
             #    if not samples_ok :
             #        sys.exit()
 
-            print "WARNING [samples %s load] Number of files found (=%d) not equal to number of sample dsids (=%d)" % ( self._name, len(sample_files), len(sample_dsids) )
-            n_f = len(sample_files)
-            n_d = len(sample_dsids)
+            print "WARNING [samples %s load] Number of files found (=%d) not equal to number of sample dsids (=%d)" % ( self._name, n_got, n_exp )
             #choice = raw_input(" >>> Print files and dsids and EXIT? [y/n] ")
             #if choice.lower() == 'y' :
             #    print "Loaded files:"

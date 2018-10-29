@@ -11,24 +11,33 @@ import dantrimania.python.analysis.utility.samples.region as region
 ##################################################################################
 # sample definition
 ##################################################################################
-filelist_dir = "/data/uclhc/uci/user/dantrim/n0301val/susynt-read/filelists/"
-filelist_dir_data = "/data/uclhc/uci/user/dantrim/n0302val/susynt-read/filelists/"
-
-h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0302/b_apr25/mc/h5/"
-h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0302/b_apr25/data/h5/"
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0303/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0303/data/h5/"
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0303/b_oct7/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0303/b_oct7/data/h5/"
+filelist_dir = "/data/uclhc/uci/user/dantrim/n0303val/susynt-read/filelists/"
+filelist_dir_data = "/data/uclhc/uci/user/dantrim/n0303val/susynt-read/filelists/"
 
 #loaded_samples = []
 #loaded_signals = []
 
+#tags = ["mc16a", "mc16d"]
+tags = ["mc16a", "mc16d"] 
+tags = ["mc16a"]
+#tags = ["mc16d"]
+#tags = ["mc16a"]
+
 lumi_factor = 36.2
+#lumi_factor = 74.92
+#lumi_factor = 42.32
 
 # backgrounds
-ttbar = sample.Sample("ttbar", "$t\\bar{t}")# \\times 0.96$")
+ttbar = sample.Sample("ttbar", "$t\\bar{t}$")# \\times 0.96$")
 ttbar.scalefactor = lumi_factor #* 0.96
 ttbar.fillstyle = 0
 ttbar.linestyle = '-'
 ttbar.color = "#3f88c5"
-ttbar.load(filelist_dir + "ttbar", h5_dir_mc, tags = ["mc16a"]) 
+ttbar.load(filelist_dir + "ttbar_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(ttbar)
 
 wt = sample.Sample("Wt", "$Wt$") # \\times 0.50$")
@@ -36,7 +45,7 @@ wt.scalefactor = lumi_factor #* 0.50
 wt.fillstyle = 0
 wt.linestyle = '-'
 wt.color = "#e94f37"
-wt.load(filelist_dir + "singletop", h5_dir_mc, tags = ["mc16a"])
+wt.load(filelist_dir + "WtPP8_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(wt)
 
 ztt = sample.Sample("Ztt", "$Z \\rightarrow \\tau \\tau$")
@@ -44,7 +53,7 @@ ztt.scalefactor = lumi_factor
 ztt.fillstyle = 0
 ztt.linestyle = '-'
 ztt.color = "#44bba4"
-ztt.load(filelist_dir + "zjets_tt", h5_dir_mc, tags = ["mc16a"])
+ztt.load(filelist_dir + "zjets_sherpa_ztt_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(ztt)
 
 zee = sample.Sample("Zee", "$Z \\rightarrow e e$")
@@ -52,7 +61,7 @@ zee.scalefactor = lumi_factor
 zee.fillstyle = 0
 zee.linestyle = '-'
 zee.color = "#52796f"
-zee.load(filelist_dir + "zjets_ee", h5_dir_mc, tags = ["mc16a"])
+zee.load(filelist_dir + "zjets_sherpa_zee_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(zee)
 
 zmm = sample.Sample("Zmm", "$Z \\rightarrow \\mu \\mu$")
@@ -60,7 +69,7 @@ zmm.scalefactor = lumi_factor
 zmm.fillstyle = 0
 zmm.linestyle = '-'
 zmm.color = "#84a98c"
-zmm.load(filelist_dir + "zjets_mm", h5_dir_mc, tags = ["mc16a"])
+zmm.load(filelist_dir + "zjets_sherpa_zmm_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(zmm)
 
 dib = sample.Sample("Diboson", "$VV$")
@@ -68,7 +77,7 @@ dib.scalefactor = lumi_factor
 dib.fillstyle = 0
 dib.linestyle = '-'
 dib.color = "#f6f7eb"
-dib.load(filelist_dir + "diboson", h5_dir_mc, tags = ["mc16a"])
+dib.load(filelist_dir + "diboson_sherpa_ll_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(dib)
 
 wjets = sample.Sample("Wjets", "$W + jets$")
@@ -76,23 +85,23 @@ wjets.scalefactor = lumi_factor
 wjets.fillstyle = 0
 wjets.linestyle = '-'
 wjets.color = "#726e97"
-wjets.load(filelist_dir + "wjets", h5_dir_mc, tags = ["mc16a"])
+wjets.load(filelist_dir + "wjets_sherpa_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(wjets)
 
-ttv = sample.Sample("ttV", "$t\\bar{t} + V$")
+ttv = sample.Sample("ttXtest9", "$t\\bar{t} + X$")
 ttv.scalefactor = lumi_factor
 ttv.fillstyle = 0
 ttv.linestyle = '-'
 ttv.color = "#353531"
-ttv.load(filelist_dir + "ttV", h5_dir_mc, tags = ["mc16a"] )
-loaded_samples.append(ttv)
+ttv.load(filelist_dir + "ttX_mc16a", h5_dir_mc) #, tags = ["mc16a"] )
+#loaded_samples.append(ttv)
 
 dy = sample.Sample("DY", "Drell-Yan")
 dy.scalefactor = lumi_factor
 dy.fillstyle = 0
 dy.linestyle = '-'
 dy.color = "#ff9505"
-dy.load(filelist_dir + "drellyan", h5_dir_mc, tags = ["mc16a"])
+dy.load(filelist_dir + "drellyan_sherpa_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(dy)
 
 ## data
@@ -102,7 +111,7 @@ data.scalefactor = 1.0
 data.fillstyle = 0
 data.linestyle = '-'
 data.color = 'k'
-data.load(filelist_dir_data + "n0302_data1516", h5_dir_data)
+data.load(filelist_dir_data + "n0303_data1516", h5_dir_data)
 loaded_samples.append(data)
 
 #signals
@@ -187,7 +196,7 @@ isDF = "(nElectrons==1 && nMuons==1)"
 #isDFOS = "(nLeptons == 2 && nElectrons == 1 && nMuons == 1 && l0_pt > 25 && l1_pt > 20)" # && (l0_q * l1_q) < 0"
 trigger = "(( year == 2015 && trig_pass2015 == 1 ) || ( year == 2016 && trig_pass2016update == 1 ))"
 trigger_single = "(( year == 2015 && ( (trig_pass2015==1) || (trig_e60_lhmedium==1 || trig_mu20_iloose_L1MU15))) || ( year == 2016 && ( (trig_pass2016update==1) || (trig_e60_lhmedium_nod0==1 || trig_mu26_ivarmedium==1))))"
-trigger = "(( year == 2015 && trig_tight_2015dil == 1 ) || ( year == 2016 && trig_tight_2016dil == 1 ))"
+#trigger = "(( year == 2015 && trig_tight_2015dil == 1 ) || ( year == 2016 && trig_tight_2016dil == 1 ))"
 
 #trigger = "(( year == 2015 && trig_tight_2015 == 1 ) || ( year == 2016 && trig_tight_2016 == 1 ) || ( year == 2017 && trig_tight_2017rand == 1))"
 
@@ -209,6 +218,7 @@ loaded_regions.append(r)
 ## CR ttbar
 r = region.Region("crtt", "CR-$t\\bar{t}$")
 r.tcut = "%s && nBJets==2 && mll>20  && mbb>100 && mbb<140 && mt2_llbb>100 && mt2_llbb<140 && dRll>1.5 && dRll<3.0 && HT2Ratio>0.4 && HT2Ratio<0.6" % ( trigger )
+#r.tcut = "nBJets==2 && mll>20  && mbb>100 && mbb<140 && mt2_llbb>100 && mt2_llbb<140 && dRll>1.5 && dRll<3.0 && HT2Ratio>0.4 && HT2Ratio<0.6"
 #r.tcut = "%s && nBJets==2 && mll>20  && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll>0.9 && dRll<1.5 && HT2Ratio>0.6 && HT2Ratio<0.8" % ( trigger )
 
 #r.tcut = "%s && nBJets==2 && mll>20  && mbb>100 && mbb<140 && mt2_llbb>90 && mt2_llbb<140 && dRll<0.9 && HT2Ratio>0.6 && HT2Ratio<0.8" % ( trigger )
@@ -234,12 +244,8 @@ loaded_regions.append(r)
 #loaded_regions.append(r)
 
 r = region.Region("crwt", "CR-$Wt$")
-#r.tcut = "%s && nBJets==2 && mll>20" % trigger #&& mbb>140 && mt2_bb>100 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
-#r.tcut = "%s && nBJets==2 && mll>20" % trigger #&& mbb>140 && mt2_bb>100 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
-#r.tcut = "%s && nBJets==2 && mll>20 && mbb>140 && mt2_bb>100 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
-r.tcut = "%s && nBJets==2 && mll>20 && mbb>140 && mt2_bb>150 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
-#r.tcut = "%s && nBJets==2 && mll>20 && mbb>140 && mt2_bb>150 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
-#r.tcut = "%s && nBJets==2 && mll>20 && mbb>140 && mt2_bb>120 && HT2Ratio>0.8 && dRll<1.5" % (trigger)
+#r.tcut = "%s && nBJets==2 && mll>20 && mbb>140 && mt2_bb>135 && HT2Ratio>0.6 && HT2Ratio<0.8" % (trigger)
+r.tcut = "nBJets==2 && mll>20 && mbb>140 && mt2_bb>135 && HT2Ratio>0.6 && HT2Ratio<0.8"
 loaded_regions.append(r)
 
 r = region.Region("vrwt", "VR-$Wt$")

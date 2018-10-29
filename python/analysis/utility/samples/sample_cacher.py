@@ -9,7 +9,7 @@ import dantrimania.python.analysis.utility.samples.sample as sample
 import dantrimania.python.analysis.utility.utils.utils as utils
 
 import h5py
-import h5py_cache
+#import h5py_cache
 import numpy as np
 
 import time
@@ -138,8 +138,6 @@ class SampleCacher(object) :
 
     def add_process_to_cache(self, process_group, sample, treename) :
         relevant_vars = self.fields
-
-        
 
         if "data" in sample.name :
             tmp = []

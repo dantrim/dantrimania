@@ -144,13 +144,18 @@ def add_labels(pad, region_name = "") :
     #lumi = "36.1"
     #lumi = "43.58"
     #lumi = "76.9"
-    lumi = "35.6"
+
+    #lumi = "32.2"
+    #lumi = "41.95"
+    lumi = "74.2"
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
     pad.text(0.047, 0.83, region_name, size = 0.75 * size, **opts)
-    pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
-    #pad.text(0.047, 0.78, "mc16a + mc16d", size = 0.75 * size, **opts)
+    #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
+    #pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
+    #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
+    pad.text(0.047, 0.76, "mc16a+d", size = 0.75 * size, **opts)
 
 
 
@@ -177,18 +182,21 @@ def get_wt_bjet_weights(sub_bjet_pts) :
 def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins = None, absval = False) :
 
     histograms_signal = []
-    colors_sig = [] 
-    labels_sig = [] 
+    colors_sig = []
+    labels_sig = []
 
     for signal in signals :
-        h = histogram1d("signal_histo_%s" % signal.name, binning = binning) 
+        h = histogram1d("signal_histo_%s" % signal.name, binning = binning)
 
         chain = signal.chain()
         for isc, sc in enumerate(chain) :
 
             lumis = signal.scalefactor * np.ones(len(sc[var]))
-#            weights = lumis * sc['eventweight']
-            weights = lumis * sc['eventweight_multi']
+#            weights = lumis * sc['eventweight_multi']
+            weight_str = 'eventweightBtagJvt'
+#            weights = lumis * sc[weight_str]
+#            weights = lumis * sc['eventweight_multi']
+#            weights = lumis * sc['eventweightNoPRW']
 #            weights = lumis * sc['eventweightBtagJvt_multi']
 
 
@@ -219,7 +227,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
                 histtype = 'step',
                 lw = 1.5,
                 zorder = 1e5)
-                
+
 
     print 15 * '- '
     for isignal, histo in enumerate(histograms_signal) :
@@ -255,9 +263,14 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         colors_bkg[bkg.name] = bkg.color
 
         chain = bkg.chain()
-        weight_str = 'eventweightBtagJvt'#_multi'
-       #weight_str = 'eventweightBtagJvt'
-#        weight_str = 'eventweightNoPRW'
+        weight_str = 'eventweightBtagJvt_multi'
+
+        if 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
+            weight_str = 'eventweightBtagJvt'
+        #weight_str = 'eventweightNoPRW'
+        #weight_str = 'eventweightBtagJvt'
+#        weight_str = 'eventweightBtagJvt'
+#        weight_str = 'eventweightNoPRW_multi'
 #        weight_str = 'eventweight_multi'
 #        weight_str = 'eventweightBtagJvt_multi'
         #if 'top' in region.name or 'tt' in region.name or 'wt' in region.name :
@@ -265,11 +278,22 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 
         for ic, c in enumerate(chain) :
 
+            if 'S2L' in region.name and ('cr' in region.name or 'vr' in region.name) :
+                cos = c["cosThetaB"]
+                dpb = c["DPB_vSS"]
+                if 'cr' in region.name :
+                    idx = (dpb < (0.9 * np.abs(cos) + 1.6))
+                elif 'vr' in region.name :
+                    idx = (dpb > (0.9 * np.abs(cos) + 1.6))
+                c = c[idx]
+
             ev_weight = c[weight_str]
-            # since we are not combingin mc16a + mc16d, divide out the period weight
-#            print "INFO NOT dividing out the PRW period weights"
-            period_weights = c['pupw_period']
-            ev_weight = np.divide(ev_weight, period_weights)
+            if ('_multi' not in weight_str and 'NoPRW' not in weight_str)  or 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
+                # since we are not combingin mc16a + mc16d, divide out the period weight
+                print "INFO dividing out the PRW period weights"
+                period_weights = c['pupw_period']
+                ev_weight = np.divide(ev_weight, period_weights)
+
 
             for iplot, plot in enumerate(plots) :
                 varname = plot.vartoplot
@@ -277,6 +301,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 #if varname == "l0_d0sig" :
                 #    charge_data = c["l0_q"]
                 #    plot_data = plot_data * charge_data
+
                 lumis = bkg.scalefactor * np.ones(len(plot_data))
                 weights = lumis * ev_weight #c['eventweightNoPRW']#_multi'] #NoPRW']
                 if plot.absvalue :
@@ -291,8 +316,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 
 
     histogram_stacks = {}
-    ordered_labels_bkg = {} 
-    ordered_colors_bkg = {} 
+    ordered_labels_bkg = {}
+    ordered_colors_bkg = {}
 
     # build the stacks
     for plot in plots :
@@ -322,11 +347,23 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             hdata = histogram1d("histo_data_%s" % plot.vartoplot, binning = plot.bounds)
             chain = data.chain()
             for idc, dc in enumerate(chain) :
+
+                if 'S2L' in region.name and ('cr' in region.name or 'vr' in region.name) :
+
+                    cos = dc["cosThetaB"]
+                    dpb = dc["DPB_vSS"]
+                    if 'cr' in region.name :
+                        idx = (dpb < (0.9 * np.abs(cos) + 1.6))
+                    elif 'vr' in region.name :
+                        idx = (dpb > (0.9 * np.abs(cos) + 1.6))
+                    dc = dc[idx]
+
                 plot_data = dc[plot.vartoplot]
                 #if plot.vartoplot == "l0_d0sig" :
                 #    print "adding CHARGE to data"
                 #    charge_data = dc["l0_q"]
                 #    plot_data = plot_data * charge_data
+
                 if plot.absvalue :
                     plot_data = np.absolute(plot_data)
                 hdata.fill(plot_data)
@@ -367,7 +404,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         #    xhigh = new_last
         #    plot.x_high = xhigh
         #    ticks.append(new_last)
-    
+
 
         upper_pad.set_xticks(ticks)
         lower_pad.set_xticks(ticks)
@@ -525,7 +562,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             output_dir += '/'
         if suffix != "" :
             suffix = "_" + suffix
-        save_name = output_dir + "%s_%s%s.pdf" % ( region.name, plot.vartoplot, suffix)
+        save_name = output_dir + "%s_%s%s.png" % ( region.name, plot.vartoplot, suffix)
         print " >>> Saving plot to : %s" % os.path.abspath(save_name)
         canvas.fig.savefig(save_name, bbox_inches = 'tight', dpi = 200)
 
@@ -558,7 +595,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
     # group together the histogram objects for backgrounds
     histograms_bkg = []
 
-    labels_bkg = {} 
+    labels_bkg = {}
     colors_bkg = {}
 
     for ibkg, bkg in enumerate(backgrounds) :
@@ -631,10 +668,10 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
     #upper_pad.set_ylim(miny, maxy)
 
     # statistical error band
-    sm_x_error = np.zeros(len(histogram_sm.y_error())) 
+    sm_x_error = np.zeros(len(histogram_sm.y_error()))
     sm_y_error = histogram_sm.y_error()
     stat_error_band = errorbars.error_hatches(histogram_sm.bins[:-1], histogram_sm.histogram, \
-                                sm_x_error, sm_y_error, plot.bin_width) 
+                                sm_x_error, sm_y_error, plot.bin_width)
 
     # total sm line
     sm_line = histogram_sm.bounding_line()
@@ -653,8 +690,8 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
             if name != h.name.replace("hist_","") : continue
             histos.append(h.data)
             weights.append(h.weights)
-    upper_pad.hist( histos, 
-                    weights = weights, 
+    upper_pad.hist( histos,
+                    weights = weights,
                     bins = plot.binning,
                     color = ordered_colors_bkg,
                     label = ordered_labels_bkg,
@@ -666,7 +703,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
 
     # draw error band
     upper_pad.add_collection(stat_error_band)
-    
+
 
     # draw total sm
     upper_pad.plot(sm_line[0], sm_line[1], ls = '-', color = 'k', label = 'Total SM', lw = 2)
@@ -679,7 +716,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
                                         var = plot.vartoplot,
                                         binning = binning,
                                         bins = histogram_sm.bins,
-                                        absval = plot.absvalue) 
+                                        absval = plot.absvalue)
 
     ##################################
     # data
@@ -752,7 +789,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
                 ratio_data_err_high[idata] = data_err_high[idata] / prediction
         lower_pad.plot(ratio_x, ratio_y, 'ko', zorder=1000)
         yerr = [ratio_data_err_low, ratio_data_err_high]
-        lower_pad.errorbar(ratio_x, ratio_y, yerr = yerr, fmt = 'none', color = 'k') 
+        lower_pad.errorbar(ratio_x, ratio_y, yerr = yerr, fmt = 'none', color = 'k')
 
         # sm error on ratio band
         sm_ratio_error = []
@@ -789,12 +826,12 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
 
     if len(signals) > 0 :
         make_signal_legend(signal_labels, signal_colors, coords = (leg_x, leg_y), pad = upper_pad)
-    
+
     #################################
     # labels
     add_labels(upper_pad, region_name = region.displayname)
 
-                    
+
 
 
     ##################################
@@ -896,7 +933,7 @@ def main() :
     if skip_data :
         del data
         data = None
-            
+
 
     # cache
     cacher = sample_cacher.SampleCacher(cache_dir)
