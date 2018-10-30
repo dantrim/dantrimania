@@ -147,7 +147,8 @@ def add_labels(pad, region_name = "") :
 
     #lumi = "32.2"
     #lumi = "41.95"
-    lumi = "74.2"
+    #lumi = "74.2"
+    lumi = '36.2'
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
@@ -155,7 +156,7 @@ def add_labels(pad, region_name = "") :
     #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
     #pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
     #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
-    pad.text(0.047, 0.76, "mc16a+d", size = 0.75 * size, **opts)
+    pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
 
 
 
@@ -210,7 +211,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
         colors_sig.append(signal.color)
 
         # overflow
-        #h.add_overflow()
+        h.add_overflow()
 
         histograms_signal.append(h)
 
@@ -263,7 +264,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         colors_bkg[bkg.name] = bkg.color
 
         chain = bkg.chain()
-        weight_str = 'eventweightBtagJvt_multi'
+        weight_str = 'eventweightBtagJvt'#_multi'
 
         if 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
             weight_str = 'eventweightBtagJvt'

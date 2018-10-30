@@ -7,9 +7,8 @@ import subprocess
 import argparse
 
 xrd_scope = 'root://${ATLAS_XROOTD_CACHE}/'
-analysis_release = 'AnalysisBase,21.2.45'
-#out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0303/b_oct7/mc16d/h5/'
-out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0303/c_oct8/data17/h5/'
+analysis_release = 'AnalysisBase,21.2.49'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/data/h5/'
 
 def get_outfilename(filename) :
 
