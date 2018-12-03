@@ -66,6 +66,12 @@ def get_required_variables(plots, region) :
     variables.append("eventweightbtag_multi")
     variables.append("eventweightBtagJvt_multi")
     variables.append("pupw_period")
+    variables.append("mt2_bb")
+    variables.append("NN_d_hh")
+    variables.append("isEE")
+    variables.append("isMM")
+    variables.append("isSF")
+    variables.append("isDF")
 
     # TODO when loading systematics we need to store the weight leafs
 
@@ -149,6 +155,8 @@ def add_labels(pad, region_name = "") :
     #lumi = "41.95"
     #lumi = "74.2"
     lumi = '36.2'
+    #lumi = '80'
+    #lumi = '76.6'
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
     # region
@@ -156,7 +164,7 @@ def add_labels(pad, region_name = "") :
     #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
     #pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
     #pad.text(0.047, 0.76, "mc16d", size = 0.75 * size, **opts)
-    pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
+#    pad.text(0.047, 0.76, "mc16a", size = 0.75 * size, **opts)
 
 
 
@@ -195,17 +203,26 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
             lumis = signal.scalefactor * np.ones(len(sc[var]))
 #            weights = lumis * sc['eventweight_multi']
             weight_str = 'eventweightBtagJvt'
+            weight_str = 'eventweightbtag'
 #            weights = lumis * sc[weight_str]
 #            weights = lumis * sc['eventweight_multi']
 #            weights = lumis * sc['eventweightNoPRW']
 #            weights = lumis * sc['eventweightBtagJvt_multi']
 
+            ev_weight = sc[weight_str]
+            if ('_multi' not in weight_str and 'NoPRW' not in weight_str) : #  or 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
+                # since we are not combingin mc16a + mc16d, divide out the period weight
+                print "INFO dividing out the PRW period weights for signal"
+                period_weights = sc['pupw_period']
+                ev_weight = np.divide(ev_weight, period_weights)
+
+            ev_weight = lumis * ev_weight
 
             hist_data = sc[var]
             if absval :
                 hist_data = np.absolute(hist_data)
 
-            h.fill(hist_data, weights)
+            h.fill(hist_data, ev_weight)
 
         labels_sig.append("SIG" + signal.displayname)
         colors_sig.append(signal.color)
@@ -247,6 +264,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
     labels_bkg = {}
     colors_bkg = {}
 
+    print "LEN SIGNALS %d" % len(signals)
+
     n_plots = len(plots)
 
     for iplot, plot in enumerate(plots) :
@@ -264,10 +283,11 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         colors_bkg[bkg.name] = bkg.color
 
         chain = bkg.chain()
-        weight_str = 'eventweightBtagJvt'#_multi'
+        weight_str = 'eventweightBtagJvt' #_multi'
+        weight_str = 'eventweightbtag'
 
-        if 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
-            weight_str = 'eventweightBtagJvt'
+        #if 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
+        #    weight_str = 'eventweightBtagJvt'
         #weight_str = 'eventweightNoPRW'
         #weight_str = 'eventweightBtagJvt'
 #        weight_str = 'eventweightBtagJvt'
@@ -288,8 +308,19 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     idx = (dpb > (0.9 * np.abs(cos) + 1.6))
                 c = c[idx]
 
+            if region.name == "sr_test" :
+                dhh = c['NN_d_hh']
+                mtbb = c['mt2_bb']
+                is_ee = c['isEE']
+                is_mm = c['isMM']
+                is_df = c['isDF']
+                idx = (dhh > -10) & (mtbb > 65) & (dhh < 200)
+                #idx = (dhh > 6.2) & (mtbb > 65)# & (is_ee == 1)
+                c = c[idx]
+
             ev_weight = c[weight_str]
-            if ('_multi' not in weight_str and 'NoPRW' not in weight_str)  or 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
+            #print "WARNING Commented out dividing out of period weights"
+            if ('_multi' not in weight_str and 'NoPRW' not in weight_str) : #  or 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
                 # since we are not combingin mc16a + mc16d, divide out the period weight
                 print "INFO dividing out the PRW period weights"
                 period_weights = c['pupw_period']
@@ -339,6 +370,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             ordered_labels_bkg[plot.vartoplot].append(labels_bkg[name])
             ordered_colors_bkg[plot.vartoplot].append(colors_bkg[name])
 
+
     ############################
     # data
     histograms_data = {}
@@ -357,6 +389,16 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                         idx = (dpb < (0.9 * np.abs(cos) + 1.6))
                     elif 'vr' in region.name :
                         idx = (dpb > (0.9 * np.abs(cos) + 1.6))
+                    dc = dc[idx]
+
+                if 'nn' in region.name and "cr" not in region.name and 'NN_d_h' in plot.vartoplot or 'NN_p_h' in plot.vartoplot :
+                    print 'WARNING Blinding data in d_hh>0 region!'
+                    idx = dc['NN_d_hh'] < 0
+                    dc = dc[idx]
+
+                if 'nm1' in region.name and 'NN_d_h' in plot.vartoplot or 'NN_p_h' in plot.vartoplot :
+                    print 'BLINDING DATA'
+                    idx = dc['NN_d_hh'] < 0
                     dc = dc[idx]
 
                 plot_data = dc[plot.vartoplot]
@@ -504,6 +546,17 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             print hdata.count_str(name = 'Data')
             print " > Data / SM : %5.2f" % ( data_yield / sm_total_yield )
 
+        #################################
+        # signal
+        if len(signals) > 0 :
+            print "Plotting signals..."
+            signal_labels, signal_colors = draw_signal_histos(pad = upper_pad,
+                                            signals = signals,
+                                            var = plot.vartoplot,
+                                            binning = binning,
+                                            bins = histo_total.bins,
+                                            absval = plot.absvalue)
+    
 
         # ratio
         pred_y = histo_total.histogram
@@ -553,6 +606,9 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         legend_order += ordered_labels_bkg[plot.vartoplot][::-1]
         leg_x, leg_y = make_legend(legend_order, upper_pad)
 
+        if len(signals) > 0 :
+            make_signal_legend(signal_labels, signal_colors, coords = (leg_x, leg_y), pad = upper_pad)
+
         # labels
         add_labels(upper_pad, region_name = region.displayname)
 
@@ -572,6 +628,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix) :
 
     print 50 * '*'
+
+    print " > N signals %d" % len(signals)
 
     # canvas
     canvas = ratio_canvas("ratio_canvas_%s" % plot.name)
@@ -712,6 +770,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
     #################################
     # signal
     if len(signals) > 0 :
+        print "Plotting signals..."
         signal_labels, signal_colors = draw_signal_histos(pad = upper_pad,
                                         signals = signals,
                                         var = plot.vartoplot,
@@ -908,6 +967,8 @@ def main() :
 
     #backgrounds, signals, data = categorize_samples(loaded_samples)
     backgrounds, signals, data = sample_utils.categorize_samples(loaded_samples)
+
+    print "Loading %d signal samples" % len(signals)
 
     region_to_plot = None
     for r in loaded_regions :

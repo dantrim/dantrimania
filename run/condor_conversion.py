@@ -9,6 +9,11 @@ import argparse
 xrd_scope = 'root://${ATLAS_XROOTD_CACHE}/'
 analysis_release = 'AnalysisBase,21.2.49'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/data/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/mc/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/b_nov11/data/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/b_nov11/mc_retry/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/c_nov12/data/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0234/w_nov19_missing_higgs/mc/h5/'
 
 def get_outfilename(filename) :
 

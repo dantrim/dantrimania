@@ -92,3 +92,18 @@ def index_selection_string(selection_str, chain_name, varlist) :
         tcut = tcut.replace(")%s" % l, ") %s" % l)
 
     return tcut
+
+class SimpleSample :
+    def __init__(self, name = "", filename = "", color = "") :
+        self.name = name
+        self.filename = filename
+        self.color = color
+
+def chunk_generator(h5_dataset, chunksize = 100000) :
+    for x in range(0, h5_dataset.size, chunksize) :
+        yield h5_dataset[x:x+chunksize]
+
+def get_valid_idx(input_array) :
+    lo = input_array > -np.inf
+    hi = input_array < np.inf
+    return lo & hi
