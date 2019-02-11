@@ -7,13 +7,23 @@ import subprocess
 import argparse
 
 xrd_scope = 'root://${ATLAS_XROOTD_CACHE}/'
-analysis_release = 'AnalysisBase,21.2.49'
+analysis_release = 'AnalysisBase,21.2.55'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/data/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/mc/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/b_nov11/data/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/b_nov11/mc_retry/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/c_nov12/data/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0234/w_nov19_missing_higgs/mc/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0306/a_dec2/mc/mc16a_nom/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0306/a_dec2/data/h5/'
+out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0306/a_dec2/mc/mc16e_sys/h5/'
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/b_dec12/data/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/b_dec12/mc/mc16a/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/c_dec20/mc/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/c_dec20/data/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/c_dec20/data_retry/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/data/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/mc/mc16e/h5/"
 
 def get_outfilename(filename) :
 

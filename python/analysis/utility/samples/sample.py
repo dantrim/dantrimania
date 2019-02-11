@@ -131,6 +131,7 @@ class Sample(object) :
     # load the sample
     def load(self, filelist_directory, h5_dir, dsid_select = "", tags = [] ) :
 
+
         if not h5_dir.endswith("/") :
             h5_dir += "/"
         if not os.path.isdir(h5_dir) :
@@ -153,6 +154,7 @@ class Sample(object) :
             sys.exit()
 
         sample_dsids = []
+        expected_sample_lists = []
         is_data = False
         for txt in filelists :
             dsid = ""
@@ -179,11 +181,13 @@ class Sample(object) :
 
             if dsid_select == "" :
                 sample_dsids.append(dsid)
+                expected_sample_lists.append(txt)
             else :
                 dsids_to_select = dsid_select.split(",")
                 for d in dsids_to_select :
                     if int(d) == int(dsid) :
                         sample_dsids.append(dsid)
+                        expected_sample_lists.append(txt)
                 #if int(dsid_select) == int(dsid) :
                 #    sample_dsids.append(dsid)
             
@@ -194,7 +198,8 @@ class Sample(object) :
             for tag in tags :
                 for dsid in sample_dsids :
                     for f in all_files :
-                        if dsid in f and tag in f :
+                        filename_for_tag = f.split("/")[-1]
+                        if dsid in filename_for_tag and tag in filename_for_tag :
                             sample_files.append(f)
 
         else :
@@ -203,6 +208,11 @@ class Sample(object) :
                     if dsid in f :
                         sample_files.append(f)
                         break
+
+        sample_files = list(set(sample_files))
+        if 'Wt' in self._name :
+            for isf, sf in enumerate(sample_files) :
+                print 'Loading sample [%02d/%02d] %s > %s' % (isf+1, len(sample_files), self._name, sf)
 
         if len(sample_files) == 0 :
             print "ERROR [sample %s load] No loaded sample files (filelist = %s, H5 dir = %s)" % ( self._name, filelist_directory, h5_dir )
@@ -235,6 +245,30 @@ class Sample(object) :
             #        sys.exit()
 
             print "WARNING [samples %s load] Number of files found (=%d) not equal to number of sample dsids (=%d)" % ( self._name, n_got, n_exp )
+            print "We are missing:"
+            if not is_data :
+                missing_d = []
+                for d in sample_dsids :
+                    found = False
+                    for s in sample_files :
+                        if str(d) in s :
+                            found = True
+                            break
+                    if not found :
+                        missing_d.append(d)
+                missing_s = []
+                for d in missing_d :
+                    for s in expected_sample_lists :
+                        if str(d) in s :
+                            missing_s.append(s.strip().split('/')[-1])
+                            break
+                for s in missing_s :
+                    print '  > %s' % s
+
+            if n_got > n_exp :
+                print 'ERROR [samples %s load] Got more samples (=%d) than we expected (=%d), this is not supposed to happen' % ( self._name, n_got, n_exp )
+                sys.exit()
+    
             #choice = raw_input(" >>> Print files and dsids and EXIT? [y/n] ")
             #if choice.lower() == 'y' :
             #    print "Loaded files:"
