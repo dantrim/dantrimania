@@ -1,0 +1,45 @@
+Error in <TGClient::TGClient>: can't open display "localhost:12.0", switching to batch mode...
+ In case you run from a remote ssh session, reconnect with ssh -Y
+sherpa loaded sample with 28 files
+mg5 loaded sample with 48 files
+============================================================
+ > sr : nBJets>=2 && mll>20 && mll<60 && mbb>110 && mbb<140 && NN_d_hh>5
+get_selection_yields : sherpa
+ > [01/28]
+ > [07/28]
+ > [13/28]
+ > [19/28]
+ > [25/28]
+sherpa : 0.123 +/- 0.010 (rel. error [%]: 8.351) (raw counts: 14)
+get_selection_yields : mg5
+ > [01/48]
+ > [07/48]
+ > [13/48]
+ > [19/48]
+ > [25/48]
+ > [31/48]
+ > [37/48]
+ > [43/48]
+mg5 : 0.156 +/- 0.019 (rel. error [%]: 11.980) (raw counts: 0)
+Relative difference:  0.271
+============================================================
+ > cr : nBJets>=2 && mll>70 && mll<115 && mbb>110 && mbb<140 && NN_d_hh>0
+get_selection_yields : sherpa
+ > [01/28]
+ > [07/28]
+ > [13/28]
+ > [19/28]
+ > [25/28]
+sherpa : 12.431 +/- 0.113 (rel. error [%]: 0.911) (raw counts: 1011)
+get_selection_yields : mg5
+ > [01/48]
+ > [07/48]
+ > [13/48]
+ > [19/48]
+ > [25/48]
+ > [31/48]
+ > [37/48]
+ > [43/48]
+mg5 : 17.538 +/- 0.204 (rel. error [%]: 1.165) (raw counts: 0)
+Relative difference:  0.411
+TF uncertainty: 0.099 +/- 0.108

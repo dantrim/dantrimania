@@ -1,0 +1,32 @@
+{
+    "name" : "ttbar",
+    "samples" : [
+        {
+        "variation" : "nominal",
+        "treename" : "TTbar_CENTRAL",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/config_feb7_2019_02_07/HFT_TTbar_CENTRAL_mc16a_Feb7.root",
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/config_feb7_2019_02_07/HFT_TTbar_CENTRAL_mc16d_Feb7.root",
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/config_feb7_2019_02_07/HFT_TTbar_CENTRAL_mc16e_Feb7.root"
+        ]
+        },
+        {
+        "variation" : "hs_gen",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16a/CENTRAL_410465_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16d/CENTRAL_410465_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16e/CENTRAL_410465_mc16e.root"
+        ]
+        },
+        {
+        "variation" : "frag_had",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16a/CENTRAL_410558_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16d/CENTRAL_410558_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/ttbar_wt_sys/mc16e/CENTRAL_410558_mc16e.root"
+        ]
+        }
+    ]
+}
