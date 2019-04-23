@@ -20,6 +20,8 @@ def efficiency_error(p, f, p_wt2, f_wt2) :
 
 def error_hatches(x, y, xerr, yerr, bin_width) :
 
+    print "error_hatches bin_width : %s" % bin_width
+
     """
     Build symmetric error band "hatches" about a histogram with bin width 'bin_width'.
 
@@ -34,16 +36,37 @@ def error_hatches(x, y, xerr, yerr, bin_width) :
         raise ValueError('error_hatches : Length of input x-values (=%d) does not equal length of input y-values (=%d)' % ( len(x), len(y) ) )
     
     error_boxes = []
-    for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
-        h = yc + ye - (yc - ye) # height of error band, from bottom edge to top edge (==2ye)
-        if yc == 0 :
-            continue
-        rect = Rectangle( (xc, yc-ye), bin_width, h, label = 'Uncertainty',
-                    edgecolor = 'none',
-                    fill = False,
-                    color = None,
-                    zorder = 1e6)
-        error_boxes.append(rect)
+    is_list = False
+    try:
+        some_object_iterator = iter(bin_width)
+        is_list = True
+    except TypeError as te:
+        is_list = False
+
+    if not is_list :
+        for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
+            h = yc + ye - (yc - ye) # height of error band, from bottom edge to top edge (==2ye)
+            if yc == 0 :
+                continue
+            rect = Rectangle( (xc, yc-ye), bin_width, h, label = 'Uncertainty',
+                        edgecolor = 'none',
+                        fill = False,
+                        color = None,
+                        zorder = 1e6)
+            error_boxes.append(rect)
+    else :
+        bin_no = 0
+        for xc, yc, xe, ye in zip(x, y, xerr, yerr) :
+            h = yc + ye - (yc - ye) # height of error band, from bottom edge to top edge (==2ye)
+            if yc == 0 :
+                continue
+            rect = Rectangle( (xc, yc-ye), bin_width[bin_no], h, label = 'Uncertainty',
+                        edgecolor = 'none',
+                        fill = False,
+                        color = None,
+                        zorder = 1e6)
+            error_boxes.append(rect)
+            bin_no += 1
 
     pc = PatchCollection( error_boxes, label = 'Uncertainty',
                     edgecolor = 'none',

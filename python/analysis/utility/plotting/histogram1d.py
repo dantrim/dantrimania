@@ -42,7 +42,7 @@ class histogram1d(object) :
             self._x_low = binning[0]
             self._x_high = binning[-1]
             self._bins = binning
-            raise ValueError('%s : variable width binning not yet supported!' % ( type(self).__name__) )
+            #raise ValueError('%s : variable width binning not yet supported!' % ( type(self).__name__) )
 
     @property
     def name(self) :
@@ -72,7 +72,14 @@ class histogram1d(object) :
         return self._bins
 
     def bin_centers(self) :
-        return [ edge + 0.5 * self.bin_width for edge in self.bins[:-1] ]
+        if not self.variable_width :
+            return [ edge + 0.5 * self.bin_width for edge in self.bins[:-1] ]
+        else :
+            bin_widths = 1.0 * np.array(self.binning)[1:] - 1.0 * np.array(self.binning)[0:-1]
+            centers = []
+            for iedge, edge in enumerate(self.binning[:-1]) :
+                centers.append(edge + 0.5 * bin_widths[iedge])
+            return centers
 
     def nbins(self) :
         return len(self._bins) - 1
@@ -97,8 +104,9 @@ class histogram1d(object) :
         if not self._variable_width :
             self._data = np.clip(self._data, self._x_low, self._x_high) 
         else :
-            raise ValueError('%s : adding overflow for variable width binning not yet supported!'
-                    % ( type(self).__name__) )
+            self._data = np.clip(self._data, self._x_low, self._x_high) 
+            #raise ValueError('%s : adding overflow for variable width binning not yet supported!'
+            #        % ( type(self).__name__) )
 
     def fill(self, input_data = None, input_weights = np.array([])) :
         self._empty = False
@@ -253,13 +261,23 @@ class histogram1d(object) :
         x = []
         y = []
 
-        for iedge, edge in enumerate(self.bins[:-1]) :
-            x.append(edge)
-            x.append(edge + self.bin_width)
-            y.append(h[iedge])
-            y.append(h[iedge])
-        x.append(x[-1])
-        y.append(np.min(h))
+        if not self.variable_width :
+            for iedge, edge in enumerate(self.bins[:-1]) :
+                x.append(edge)
+                x.append(edge + self.bin_width)
+                y.append(h[iedge])
+                y.append(h[iedge])
+            x.append(x[-1])
+            y.append(np.min(h))
+        else :
+            bin_widths = 1.0 * np.array(self.binning)[1:] - 1.0 * np.array(self.binning)[0:-1]
+            for iedge, edge in enumerate(self.binning[:-1]) :
+                x.append(edge)
+                x.append(edge + bin_widths[iedge])
+                y.append(h[iedge])
+                y.append(h[iedge])
+            x.append(x[-1])
+            y.append(np.min(h))
 
         return x, y
 
