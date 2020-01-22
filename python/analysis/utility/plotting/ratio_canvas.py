@@ -7,14 +7,14 @@ import numpy as np
 
 class ratio_canvas(object) :
 
-    def __init__(self, name = "", figsize = (7,8), logy = False) :
+    def __init__(self, name = "", figsize = (7,7), logy = False) :
         self._name = name
         self._figsize = figsize
         self._logy = logy
 
         self._fig = None
         self._labels = []
-        self._rlabel = "Data / Pred"
+        self._rlabel = "Data / Pred."
         self._upper_pad = None
         self._lower_pad = None
 
@@ -142,11 +142,15 @@ class ratio_canvas(object) :
 
         for ax in [upper_pad, lower_pad] :
             ax.tick_params(axis = 'both', which = 'both', labelsize = 16, direction = "in",
-                        labelleft=True, bottom = True, top = True, right = True, left = True)
+                        labelleft=True, bottom = True, top = True, right = True, left = True,
+                        pad = 7,
+            )
+            ax.tick_params(which = "major", length = 8)
+            ax.tick_params(which = "minor", length = 4)
             which_grid = 'both'
             if self.logy :
                 which_grid = 'major'
-            ax.grid(color = 'k', which = which_grid, linestyle = '--', lw = 1, alpha = 0.1)
+            #ax.grid(color = 'k', which = which_grid, linestyle = '--', lw = 1, alpha = 0.1)
 
         ax_x = upper_pad.get_position().x0
 

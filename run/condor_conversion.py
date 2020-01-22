@@ -7,7 +7,7 @@ import subprocess
 import argparse
 
 xrd_scope = 'root://${ATLAS_XROOTD_CACHE}/'
-analysis_release = 'AnalysisBase,21.2.55'
+analysis_release = 'AnalysisBase,21.2.60'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/data/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/a_oct28/mc/h5/'
 out_dir = '/data/uclhc/uci/user/dantrim/ntuples/n0304/b_nov11/data/h5/'
@@ -24,6 +24,12 @@ out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/c_dec20/data/h5/"
 out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/c_dec20/data_retry/h5/"
 out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/data/h5/"
 out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/mc/mc16e/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/data/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16e/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/b_feb18/mc/mc16e_retry/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/d_feb21/data/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/f_mar13_mll12/mc/mc16e/h5/"
+out_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0307/f_mar13_mll12/data/h5/"
 
 def get_outfilename(filename) :
 
@@ -77,6 +83,7 @@ def build_condor_file(condor_filename, exec_name, xrd_files) :
         f.write('+site_local = false\n')
         f.write('+sdsc = false\n')
         f.write('+uc = false\n')
+        f.write('Requirements = (GLIDEIN_Site == "UCI")\n') # && (HAS_CVMFS_atlas_cern_ch =?= True)\n')
         f.write('executable = %s\n' % exec_name)
         f.write('should_transfer_files = YES\n')
         f.write('when_to_transfer_output = ON_EXIT\n')

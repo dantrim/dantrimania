@@ -19,6 +19,7 @@ from dantrimania.python.analysis.utility.plotting.ratio_canvas import ratio_canv
 
 plt = plib.import_pyplot()
 import numpy as np
+import json
 
 def get_variables_from_tcut(tcut) :
 
@@ -69,16 +70,22 @@ def get_required_variables(plots, region) :
     variables.append("pupw_period")
     variables.append("mt2_bb")
     variables.append("NN_d_hh")
+    variables.append("NN_d_top")
+    variables.append("NN_d_zsf")
+    variables.append("NN_d_ztt")
     variables.append("isEE")
     variables.append("isMM")
     variables.append("isSF")
     variables.append("isDF")
     variables.append("year")
+    #variables.append("mcType")
     variables.append("trig_tight_2015")
     variables.append("trig_tight_2016")
     variables.append("trig_tight_2017rand")
     variables.append("trig_tight_2018")
     variables.append('NN_d_hh_R20')
+    variables.append('mll')
+    variables.append('mbb')
 
     # TODO when loading systematics we need to store the weight leafs
 
@@ -167,7 +174,8 @@ def add_labels(pad, region_name = "") :
     #lumi = '80'
     #lumi = '76.6'
     lumi = '137.30'
-    lumi = '140'
+    lumi = '140.5'
+    lumi = "139"
     #lumi = '36.2'
     pad.text(0.047, 0.9, '$\\sqrt{s} = 13$ TeV, %s fb$^{-1}$' % lumi, size = 0.75 * size, **opts)
 
@@ -232,10 +240,15 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 
             dhh = sc['NN_d_hh']
             mll = sc['mll']
+            mbb = sc['mbb']
 
-            idx_dhh = dhh > 5.5
+            idx_dhh = dhh > 5.45
             idx_mll = mll < 60
-            idx_pass = idx_mll & idx_dhh
+            idx_mbb = (mbb>110) | (mbb<140)
+
+            
+            #idx_pass = idx_mll & idx_dhh
+            idx_pass = idx_mbb
             #idx_pass = idx_dhh & idx_mll & idx_mt2bb
             sc = sc[idx_pass]
 
@@ -250,6 +263,7 @@ def draw_signal_histos(pad = None, signals = [], var = "", binning = None, bins 
 #            weights = lumis * sc['eventweightBtagJvt_multi']
             if 'Full' in signal.name :
                 weight_str = 'eventweightBtagJvt_multi'
+            weight_str = 'eventweightNoPRW_multi'
 
             ev_weight = sc[weight_str]
             if ('_multi' not in weight_str and 'NoPRW' not in weight_str) : #  or 'drellyan' in bkg.name.lower() : # or 'diboson' in bkg.name.lower() :
@@ -321,6 +335,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
     colors_bkg = {}
 
     print "LEN SIGNALS %d" % len(signals)
+    do_syst = True
 
     n_plots = len(plots)
 
@@ -341,20 +356,24 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         chain = bkg.chain()
         #weight_str = 'eventweightbtagNoPRW'
         #weight_str = 'eventweightbtag'
-        weight_str = 'eventweightBtagJvt'
+        #weight_str = 'eventweightbtagNoPRW'
 
         #weight_str = 'eventweightbtagNoPRW'
-        if 'Full' in bkg.name :
-            print "Using Multi for %s" % bkg.name
-            weight_str = 'eventweightBtagJvt_multi'
-            #weight_str = 'eventweightBtagJvtNoPRW_multi'
-            #weight_str = 'eventweightNoPRW_multi'
-            #weight_str = 'eventweightNoPRW_multi'
-            #weight_str = 'eventweightNoPRW_multi'
-            #weight_str = 'eventweight_multi'
-            if "ttbar" in bkg.name :
-                print " ***** WARNING Not including PRW in multi-period weighting for process %s **** " % bkg.name
-                weight_str = 'eventweightNoPRW_multi'
+        weight_str = "eventweight_multi"
+        #if 'Full' in bkg.name :
+        #    print "Using Multi for %s" % bkg.name
+        #    #weight_str = 'eventweightBtagJvt_multi'
+        #    #weight_str = "eventweight_multi"
+        #    weight_str = "eventweightNoPRW_multi"
+        #    #weight_str = 'eventweightNoPRW'#_multi'
+        #    #weight_str = 'eventweightBtagJvtNoPRW_multi'
+        #    #weight_str = 'eventweightNoPRW_multi'
+        #    #weight_str = 'eventweightNoPRW_multi'
+        #    #weight_str = 'eventweightNoPRW_multi'
+        #    #weight_str = 'eventweight_multi'
+        #    #if "ttbar" in bkg.name :
+        #    #    print " ***** WARNING Not including PRW in multi-period weighting for process %s **** " % bkg.name
+        #    #    weight_str = 'eventweightNoPRW'#_multi'
 
         for ic, c in enumerate(chain) :
 
@@ -384,49 +403,22 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 nb = c['nBJets']
                 mbb = c['mbb']
                 mbb_lo = mbb > 100
-                mbb_hi = mbb < 160
+                mbb_hi = mbb < 140
                 pass_mbb = mbb_lo & mbb_hi
                 pass_dhh = dhh > 0
-                ##pass_lo = mll > 75
-                ##pass_hi = mll < 110
-                #pass_lo = mll > 85
-                #pass_hi = mll < 110
-                ##pass_lo = mll > 65
-                ##pass_hi = mll < 85
-
-                # sideband method
                 pass_lo = mll > 81.2
                 pass_hi = mll < 101.2
                 pass_mll = pass_lo & pass_hi
 
-                pass_nb = nb == 2
-
-                #pass_lolo = mll > 71.2
-                #pass_lohi = mll < 81.2
-                #pass_hilo = mll > 101.2
-                #pass_hihi = mll < 115
-                #pass_mll = (pass_lolo & pass_lohi) | (pass_hilo & pass_hihi)
-
-                #mbb = c['mbb']
-                #mbb_lo = mbb < 100
-                #mbb_hi = mbb  > 140
-                #pass_mbb = mbb > 140 # mbb_lo | mbb_hi
-
-                is_mm = c['isEE']
-                pass_flav = is_mm == 1
-
-                mt2 = c['mt2_bb']
-                pass_mt2 = mt2 > 20
-
-                #mtbb = c['mt2_bb']
-                #pass_mtbb = mtbb > 30
-                idx = pass_dhh & pass_mll & pass_mbb  # & pass_mbb & pass_mt2
+                idx = pass_mll & pass_mbb
+                #idx = pass_dhh & pass_mll & pass_mbb
                 c = c[idx]
 
             if region.name == "vrztest" :
                 dhh = c['NN_d_hh']
                 mll = c['mll']
                 mbb = c['mbb']
+                is_sf = c['isSF']
                 pass_dhh = dhh > 0
                 pass_lolo = mll > 71.2
                 pass_lohi = mll < 81.2
@@ -434,9 +426,19 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 pass_hihi = mll < 115
                 pass_mll = (pass_lolo & pass_lohi) | (pass_hilo & pass_hihi)
                 mbb_lo = mbb > 100
-                mbb_hi = mbb < 160
+                mbb_hi = mbb < 140
                 pass_mbb = mbb_lo & mbb_hi
-                idx = pass_dhh & pass_mll & pass_mbb # & pass_mbb & pass_mt2
+                pass_flav = is_sf == 1
+                idx = pass_mll & pass_mbb & pass_flav
+                #idx = pass_dhh & pass_mll & pass_mbb & pass_flav
+                c = c[idx]
+
+            if region.name == "preselNoMBB" :
+                nb = c['nBJets']
+                mll = c['mll']
+                pass_nb = nb == 2
+                pass_mll = mll < 60
+                idx = pass_nb & pass_mll
                 c = c[idx]
 
 
@@ -444,62 +446,63 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 dhh = c['NN_d_hh']
                 mll = c['mll']
                 mbb = c['mbb']
+                is_em = c['isDF']
 
-                #pass_dhh_lo = dhh > -1
-                #pass_dhh_hi = dhh < 0
-                #pass_dhh = pass_dhh_lo & pass_dhh_hi
-
-                #mbb_lo = mbb > 100
-                #mbb_hi = mbb < 140
-                #pass_mbb = (mbb_lo & mbb_hi)
-                #pass_mll = mll < 60
-
-                pass_mbb = mbb > 150
-                #pass_dhh_lo = dhh > 2
-                #pass_dhh_hi = dhh < 3
-                pass_dhh = (dhh > 3.7) & (dhh < 5.2)
-
+                pass_mbb = (mbb>140) | (mbb<100)
+                pass_dhh = (dhh > 4.5)
+                pass_flav = (is_em == 1)
                 pass_mll = mll < 60
 
-                idx = pass_dhh & pass_mbb & pass_mll
-                #idx = pass_mbb & pass_mll
+                idx = pass_mbb & pass_mll & pass_flav
+                #idx = pass_dhh & pass_mbb & pass_mll & pass_flav
                 c = c[idx]
 
             if region.name == "vrtoptest" :
                 dhh = c['NN_d_hh']
-                mbb = c['mbb']
                 mll = c['mll']
+                mbb = c['mbb']
+                is_sf = c['isSF']
 
-                #pass_mbb = mbb > 150
-                #pass_dhh = dhh > 3
-                #pass_mll = mll < 60
-                #idx = pass_dhh & pass_mll & pass_mbb
-                #c = c[idx]
-
-                pass_mbb = mbb > 150
+                pass_mbb = (mbb>140)
+                pass_dhh = (dhh > 4.5)
                 pass_mll = mll < 60
-                pass_dhh = dhh > 5.2
-                idx = pass_dhh & pass_mbb & pass_mll
+                pass_flav = (is_sf == 1)
+                idx = pass_mbb & pass_mll & pass_flav
+                #idx = pass_dhh & pass_mbb & pass_mll & pass_flav
                 c = c[idx]
 
             if region.name == "mllpre" :
                 dhh = c['NN_d_hh']
-                mt2bb = c['mt2_bb']
                 mll = c['mll']
+                is_df = c['isDF']
 
-                idx_dhh = dhh > 5.5
-                #idx_dhh = dhh > 5.45
+                idx_dhh = dhh > 5.45
                 idx_mll = mll < 60
-                #idx_pass = idx_mll & idx_mt2bb
-                idx_pass = idx_mll & idx_dhh #& idx_mt2bb
+                idx_flav = is_df != 1
+                idx_pass = idx_mll & idx_dhh & idx_flav
                 c = c[idx_pass]
 
             if region.name == "mllOutMbb" :
                 mll = c['mll']
                 dhh = c['NN_d_hh']
+                mbb = c['mbb']
                 idx_mll = mll < 60
-                idx_dhh = dhh > 5
+                #idx_mll = mll > 0
+                idx_dhh = dhh > 4
+                #idx_mbb = (mbb>100) & (mbb<140)
                 idx_pass = idx_mll & idx_dhh
+                c = c[idx_pass]
+
+            if region.name == "srpre" :
+                mbb = c['mbb']
+                dhh = c['NN_d_hh']
+                is_sf = c['isSF']
+                is_df = c['isDF']
+                idx_flav = (is_sf==0) & (is_df==1)
+                idx_mbb = (mbb > 110) & (mbb < 140)
+                idx_dhh = (dhh > 4)
+                #idx_pass = idx_mbb & idx_dhh
+                idx_pass = idx_mbb & idx_dhh & idx_flav
                 c = c[idx_pass]
 
             ev_weight = c[weight_str]
@@ -534,14 +537,73 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 #    plot_data = plot_data * charge_data
 
                 lumis = bkg.scalefactor * np.ones(len(plot_data))
+
+               # if "ttbar" in bkg.name :
+               #     scales = np.ones(len(plot_data))
+               #     dhh = c['NN_d_hh']
+               #     sr_cut_idx = dhh > 5.45
+               #     scales[sr_cut_idx] *= 0.82
+               #     print "SCALING TTBAR IN SR ONLY"
+               #     print "SCALING TTBAR IN SR ONLY"
+               #     print "SCALING TTBAR IN SR ONLY"
+               # if "zjets" in bkg.name.lower() :
+               #     scales = np.ones(len(plot_data))
+               #     dhh = c['NN_d_hh']
+               #     sr_cut_idx = dhh > 5.45
+               #     scales[sr_cut_idx] *= 1.35
+               #     print "SCALING ZJETS IN SR ONLY"
+               #     print "SCALING ZJETS IN SR ONLY"
+               #     print "SCALING ZJETS IN SR ONLY"
+               #     print "SCALING ZJETS IN SR ONLY"
+                if "ttbar" in bkg.name and ('_multi' in weight_str and 'NoPRW' not in weight_str) :
+                    print "******** WARNING APPLYING PRW SUMW CORRECTION FACTORS TO SAMPLES %s ********" % bkg.name
+                    idx_a = (c['year'] == 2015) | (c['year'] == 2016)
+                    idx_d = (c['year'] == 2017)
+                    idx_e = (c['year'] == 2018)
+                    lumis[idx_a] *= 0.93
+                    lumis[idx_d] *= 0.61
+                    lumis[idx_e] *= 1.23
+
+                if do_syst :
+                    top_sf = 0.85
+                    z_sf = 1.35
+                    print "***** APPLY TOP AND Z SF DIRECTLY IN THE CR/VR/SR *****"
+                    if ("ttbar" in bkg.name.lower() or "wt" in bkg.name.lower()) and ("crtop" in region.name or "vrtop" in region.name) :
+                        cr_top_idx = c["NN_d_hh"] > 4.5
+                        lumis[cr_top_idx] *= top_sf
+                    if ("ttbar" in bkg.name.lower() or "wt" in bkg.name.lower()) and ("crz" in region.name or "vrz" in region.name) :
+                        cr_z_idx = c["NN_d_hh"] > 0
+                        lumis[cr_z_idx] *= top_sf
+                    if ("ttbar" in bkg.name.lower() or "wt" in bkg.name.lower()) and "sr" in region.name :
+                        sr_idx = c["NN_d_hh"] > 5.45
+                        lumis[sr_idx] *= top_sf
+                    if "zjetsdy" in bkg.name.lower() and ("crtop" in region.name or "vrtop" in region.name) :
+                        cr_top_idx = c["NN_d_hh"] > 4.5
+                        lumis[cr_top_idx] *= z_sf
+                    if "zjetsdy" in bkg.name.lower() and ("crz" in region.name or "vrz" in region.name) :
+                        cr_z_idx = c["NN_d_hh"] > 0
+                        lumis[cr_z_idx] *= z_sf
+                    if "zjetsdy" in bkg.name.lower() and "sr" in region.name :
+                        sr_idx = c["NN_d_hh"] > 5.45
+                        lumis[sr_idx] *= z_sf
+
+
+                    
+    #idx_15 = (arr['year'] == 2015) & (arr['trig_tight_2015'] == 1)
+        #    #if "ttbar" in bkg.name :
+        #    #    print " ***** WARNING Not including PRW in multi-period weighting for process %s **** " % bkg.name
+        #    #    weight_str = 'eventweightNoPRW'#_multi'
+                
                 weights = lumis * ev_weight #c['eventweightNoPRW']#_multi'] #NoPRW']
 
                 histograms_bkg[varname][bkg.name].fill(plot_data, weights)
 
     # add overflow
-    for plot in plots :
-        for bkg in backgrounds :
-            histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
+    add_overflow = False
+    if add_overflow :
+        for plot in plots :
+            for bkg in backgrounds :
+                histograms_bkg[plot.vartoplot][bkg.name].add_overflow()
 
 
     histogram_stacks = {}
@@ -590,15 +652,19 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
 
                 #if 'nn' in region.name and "cr" not in region.name and 'NN_d_h' in plot.vartoplot or 'NN_p_h' in plot.vartoplot :
                 #if (region.name == 'sr_test' or 'pre' in region.name) and 'NN_' in plot.vartoplot and '_hh' in plot.vartoplot  :
-                if (region.name == 'mllpre') :
+                if (region.name == 'mllpre') or ("presel" in region.name and plot.vartoplot == "NN_d_hh") :
                     print 'WARNING Blinding data in d_hh>0 region!'
                     idx = dc['NN_d_hh'] < 0
                     dc = dc[idx]
 
-                if 'nm1' in region.name and 'NN_d_h' in plot.vartoplot or 'NN_p_h' in plot.vartoplot :
-                    print 'BLINDING DATA'
-                    idx = dc['NN_d_hh'] < 0
-                    dc = dc[idx]
+                #if ('nm1' in region.name and 'NN_d_h' in plot.vartoplot) or ('NN_p_h' in plot.vartoplot) or ("sr" in region.name and 'NN_d_hh' in plot.vartoplot) :
+                #    print ' ****** BLINDING DATA ******* '
+                #    print ' ****** BLINDING DATA ******* '
+                #    print ' ****** BLINDING DATA ******* '
+                #    print ' ****** BLINDING DATA ******* '
+                #    print ' ****** BLINDING DATA ******* '
+                #    idx = dc['NN_d_hh'] < 4
+                #    dc = dc[idx]
 
                 if region.name == "crztest" :
                     dhh = dc['NN_d_hh']
@@ -606,48 +672,21 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     pass_dhh = dhh > 0
                     mbb = dc['mbb']
                     mbb_lo = mbb > 100
-                    mbb_hi = mbb < 160
+                    mbb_hi = mbb < 140
                     pass_mbb = mbb_lo & mbb_hi
-                    ##pass_lo = mll > 75
-                    ##pass_hi = mll < 110
-                    #pass_lo = mll > 85
-                    #pass_hi = mll < 110
-                    ##pass_lo = mll > 65
-                    ##pass_hi = mll < 85
-
-                    # sideband method
                     pass_lo = mll > 81.2
                     pass_hi = mll < 101.2
                     pass_mll = pass_lo & pass_hi
 
-                    #pass_lolo = mll > 71.2
-                    #pass_lohi = mll < 81.2
-                    #pass_hilo = mll > 101.2
-                    #pass_hihi = mll < 115
-                    #pass_mll = (pass_lolo & pass_lohi) | (pass_hilo & pass_hihi)
-        
-
-                    is_mm = dc['isEE']
-                    pass_flav = is_mm == 1
-
-                    mt2 = dc['mt2_bb']
-                    pass_mt2 = mt2 > 20
-
-                    #mbb = dc['mbb']
-                    #mbb_lo = mbb < 100
-                    #mbb_hi = mbb > 140
-                    #pass_mbb = mbb > 140 #mbb_lo | mbb_hi
-
-                
-                    #mtbb = dc['mt2_bb']
-                    #pass_mtbb = mtbb > 30
-                    idx = pass_dhh & pass_mll & pass_mbb# & pass_mbb & pass_mt2
+                    idx = pass_mll & pass_mbb
+                    #idx = pass_dhh & pass_mll & pass_mbb
                     dc = dc[idx]
 
                 if region.name == "vrztest" :
                     dhh = dc['NN_d_hh']
                     mll = dc['mll']
                     mbb = dc['mbb']
+                    is_sf = dc['isSF']
                     pass_dhh = dhh > 0
                     pass_lolo = mll > 71.2
                     pass_lohi = mll < 81.2
@@ -655,15 +694,26 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     pass_hihi = mll < 115
                     pass_mll = (pass_lolo & pass_lohi) | (pass_hilo & pass_hihi)
                     mbb_lo = mbb > 100
-                    mbb_hi = mbb < 160
+                    mbb_hi = mbb < 140
                     pass_mbb = mbb_lo & mbb_hi
-                    idx = pass_dhh & pass_mll & pass_mbb # & pass_mbb & pass_mt2
+                    pass_flav = is_sf == 1
+                    idx = pass_mll & pass_mbb & pass_flav
+                    #idx = pass_dhh & pass_mll & pass_mbb & pass_flav
+                    dc = dc[idx]
+
+                if region.name == "preselNoMBB" :
+                    nb = dc['nBJets']
+                    mll = dc['mll']
+                    pass_nb = nb == 2
+                    pass_mll = mll < 60
+                    idx = pass_nb & pass_mll
                     dc = dc[idx]
 
                 if region.name == "crtoptest" :
                     dhh = dc['NN_d_hh']
                     mll = dc['mll']
                     mbb = dc['mbb']
+                    is_em = dc['isDF']
 
                     #pass_dhh_lo = dhh > -1
                     #pass_dhh_hi = dhh < 0
@@ -674,70 +724,74 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     #pass_mbb = (mbb_lo & mbb_hi)
                     #pass_mll = mll < 60
 
-                    pass_mbb = mbb > 150
+                    #pass_mbb = ((mbb > 150) & (mbb < 300)) | (mbb<80)
+                    #pass_mbb = (mbb>150)
+                    #pass_mbb = (mbb>140)# | (mbb<100)
+                    pass_mbb = (mbb>140) | (mbb<100)
                     #pass_dhh_lo = dhh > 2
                     #pass_dhh_hi = dhh < 3
-                    pass_dhh = (dhh > 3.7) & (dhh < 5.2)
-                    #pass_dhh = dhh > 5
+                    #pass_dhh = (dhh > 3.7) & (dhh < 5.2)
+                    #pass_dhh = (dhh > 4.7)# & (dhh < 5.5)
+                    #pass_dhh = (dhh > 5)# & (dhh<4.7)# & (dhh < 5.5)
+                    #pass_dhh = (dhh < 5) & (dhh>4.5) # & (dhh<4.7)# & (dhh < 5.5)
+                    #pass_dhh = (dhh > 5.2) #& (dhh>4.5) # & (dhh<4.7)# & (dhh < 5.5)
+
+                    #pass_dhh = (dhh >4.7) & (dhh < 5.4)#& (dhh>4.5) # & (dhh<4.7)# & (dhh < 5.5)
+                    pass_dhh = (dhh > 4.5)
+                    pass_flav = (is_em == 1)
 
                     pass_mll = mll < 60
-
-                    #idx = pass_mbb & pass_mll
-                    idx = pass_dhh & pass_mbb & pass_mll
+                    idx = pass_mbb & pass_mll & pass_flav
+                    #idx = pass_dhh & pass_mbb & pass_mll & pass_flav
                     dc = dc[idx]
 
                 if region.name == "vrtoptest" :
                     dhh = dc['NN_d_hh']
                     mll = dc['mll']
                     mbb = dc['mbb']
+                    is_sf = dc['isSF']
 
-                    #pass_mbb = mbb > 150
-                    ##pass_dhh_lo = dhh > 1
-                    ##pass_dhh_hi = dhh > 3
-                    ##pass_dhh = pass_dhh_lo & pass_dhh_hi
-                    #pass_dhh = dhh > 3
-                    #pass_mll = mll < 60
-
-                    #idx = pass_dhh & pass_mll & pass_mbb
-                    #dc = dc[idx]
-
-                    pass_mbb = mbb > 150
+                    pass_mbb = (mbb>140)
+                    pass_dhh = (dhh > 4.5)
                     pass_mll = mll < 60
-                    pass_dhh = dhh > 5.2
-                    idx = pass_dhh & pass_mbb & pass_mll
+                    pass_flav = (is_sf == 1)
+                    idx = pass_mbb & pass_mll & pass_flav
+                    #idx = pass_dhh & pass_mbb & pass_mll & pass_flav
                     dc = dc[idx]
 
-                if region.name == "mllpre" :
-                    #dhh = dc['NN_d_hh']
-                    #mbb = dc['mbb']
-                    #mt2bb = dc['mt2_bb']
-                    #mll = dc['mll']
-                    #idx_mt2bb = mt2bb > 65
-                    #idx_dhh = dhh > 6.2
-                    ##idx_mll = (mll < 71.2) | (mll > 111.2)
-                    #idx_mll = mll < 60
-                    #idx_mbb = mbb > 110
-                    ##idx_pass = idx_dhh & idx_mt2bb & idx_mbb & idx_mll
-                    #idx_pass = idx_dhh  & idx_mll & idx_mbb  & idx_mt2bb
-                    #dc = dc[idx_pass]
 
+                if region.name == "mllpre" :
                     dhh = dc['NN_d_hh']
                     mll = dc['mll']
+                    nb = dc['nBJets']
+                    is_df = dc['isDF']
 
-                    idx_dhh = dhh > 5.5
+                    idx_dhh = dhh > 5.45
                     idx_mll = mll < 60
-                    #idx_pass = idx_mll & idx_mt2bb
-                    idx_pass = idx_mll & idx_dhh #& idx_mt2bb
+                    idx_flav = is_df != 1
+                    idx_pass = idx_mll & idx_dhh & idx_flav
                     dc = dc[idx_pass]
 
                 if region.name == "mllOutMbb" :
                     mll = dc['mll']
                     dhh = dc['NN_d_hh']
                     idx_mll = mll < 60
-                    idx_dhh = dhh > 5
+                    #idx_mll = mll > 0
+                    idx_dhh = dhh > 4
                     idx_pass = idx_mll & idx_dhh
                     dc = dc[idx_pass]
 
+                if region.name == "srpre" :
+                    mbb = dc['mbb']
+                    dhh = dc['NN_d_hh']
+                    is_sf = dc['isSF']
+                    is_df = dc['isDF']
+                    idx_flav = (is_sf==0) & (is_df==1)
+                    idx_mbb = (mbb > 110) & (mbb < 140)
+                    idx_dhh = (dhh > 4)
+                    #idx_pass = idx_mbb & idx_dhh
+                    idx_pass = idx_mbb & idx_dhh & idx_flav
+                    dc = dc[idx_pass]
 
                 trigger_idx = get_trigger_idx(dc)
                 dc = dc[trigger_idx]
@@ -765,7 +819,8 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                     plot_data = dc[plot.vartoplot]
                 hdata.fill(plot_data)#, weights)
             # overflow
-            hdata.add_overflow()
+            if add_overflow :
+                hdata.add_overflow()
             histograms_data[plot.vartoplot] = hdata
 
 
@@ -816,7 +871,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         if plot.logy :
             miny = 1e-2
 
-        multiplier = 1.65
+        multiplier = 1.75
         if len(signals) :
             multiplier = 1.8
         if plot.logy :
@@ -916,6 +971,7 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
         pred_y = histo_total.histogram
         ratio_y = hdata.divide(histo_total)
         ratio_y[ ratio_y == 0. ] = -1
+        print "data_vals2 = {}".format(ratio_y)
         ratio_x = np.array(hdata.bin_centers())
 
         ratio_data_err_low = -1 * np.ones(len(ratio_y))
@@ -944,6 +1000,110 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
             sm_ratio_error.append(relative_error)
         sm_x_error_ratio = [plot.bin_width for a in ratio_x]
 
+        # SYST
+        if do_syst :
+            # add the systematics band  
+            syst_config_dir = "/data/uclhc/uci/user/dantrim/n0307val/dantrimania/python/analysis/wwbb/error_band/"
+            syst_files = {}
+            if plot.vartoplot == "NN_d_hh" :
+                #syst_files = { "crtoptest" : "%s/process_uncerts_NN_d_hh_top_cr_71.json" % syst_config_dir,
+                #                "vrtoptest" : "%s/process_uncerts_NN_d_hh_top_vr_71.json" % syst_config_dir,
+                #                "crztest" : "%s/process_uncerts_NN_d_hh_z_cr_71.json" % syst_config_dir,
+                #                "vrztest" : "%s/process_uncerts_NN_d_hh_z_vr_71.json" % syst_config_dir,
+                #                "srpre" : "%s/process_uncerts_NN_d_hh_sr_71.json" % syst_config_dir }
+                syst_files = { "crtoptest" : "%s/process_uncerts_NN_d_hh_top_cr.json" % syst_config_dir,
+                                "vrtoptest" : "%s/process_uncerts_NN_d_hh_top_vr.json" % syst_config_dir,
+                                "crztest" : "%s/process_uncerts_NN_d_hh_z_cr.json" % syst_config_dir,
+                                "vrztest" : "%s/process_uncerts_NN_d_hh_z_vr.json" % syst_config_dir,
+                                "srpre" : "%s/process_uncerts_NN_d_hh_sr_unblind_srDF.json" % syst_config_dir }
+                                #"srpre" : "%s/process_uncerts_NN_d_hh_sr_unblind.json" % syst_config_dir }
+                                #"srpre" : "%s/process_uncerts_NN_d_hh_sr.json" % syst_config_dir }
+            elif plot.vartoplot == "NN_d_top" :
+                syst_files = { "srpre" : "%s/process_uncerts_NN_d_top_sr.json" % syst_config_dir }
+            elif plot.vartoplot == "NN_d_zsf" :
+                syst_files = { "srpre" : "%s/process_uncerts_NN_d_zsf_sr.json" % syst_config_dir }
+            elif plot.vartoplot == "NN_d_ztt" :
+                syst_files = { "srpre" : "%s/process_uncerts_NN_d_ztt_sr.json" % syst_config_dir }
+            syst_proc_names = { "ttbarFull" : "ttbar", "WtDRFull" : "wt", "ZjetsDYFull" : "z" }
+            process_fractions = {} # [var][bkg][list of bin fracions]
+            bkg_histos = histograms_bkg[plot.vartoplot]
+            for process in syst_proc_names :
+                process_fractions[process] = np.array(bkg_histos[process].histogram / histo_total.histogram)
+                neg_frac = process_fractions[process] < 0
+                process_fractions[process][neg_frac] = 0
+                print "Process fraction %s %s: %s" % (process, plot.vartoplot, process_fractions[process])
+
+            current_var = plot.vartoplot
+            if region.name in syst_files :
+                json_file = syst_files[region.name]
+                with open(json_file, "r") as input_file :
+                    syst_data = json.load(input_file)
+                
+                process_errors = {}
+                if syst_data["variable"] == current_var :
+                    processes = syst_data["processes"]
+                    for process in syst_proc_names :
+                        for process_err_group in processes :
+                            if process_err_group["name"] == syst_proc_names[process] :
+                                err = process_err_group["errors"]
+
+                                # add ttbar and Wt xsec-uncert
+                                if process_err_group["name"] == "ttbar" or process_err_group["name"] == "wt" :
+                                    #xsec_uncert = 0.0582 * np.ones(len(err))
+                                    #err = np.sqrt( np.power(err,2) + np.power(xsec_uncert,2) )
+                                    mu_top_uncert = 0.098 * np.ones(len(err))
+                                    err = np.sqrt( np.power(err,2) + np.power(mu_top_uncert,2) )
+                                #elif process_err_group["name"] == "wt" :
+                                #    xsec_uncert = 0.0532 * np.ones(len(err))
+                                #    err = np.sqrt( np.power(err,2) + np.power(xsec_uncert,2) )
+                                elif process_err_group["name"] == "z" :
+                                    #xsec_uncert = 0.05 * np.ones(len(err))
+                                    ##xsec_uncert = 0.032 * np.ones(len(err))
+                                    #err = np.sqrt( np.power(err,2) + np.power(xsec_uncert,2) )
+                                    mu_z_uncert = 0.066 * np.ones(len(err))
+                                    err = np.sqrt( np.power(err,2) + np.power(mu_z_uncert,2) )
+                                err_times_frac = err * process_fractions[process]
+                                process_errors[process] = err_times_frac
+                                print "Process %s err: " % process, err_times_frac
+                    #for process in syst_proc_names :
+                    #    err = processes[syst_proc_names[process]]
+                    #    err_times_frac = err * process_fractions[process]
+                    #    process_errors[process] = err_times_frac
+                total_err = np.zeros(len(histo_total.histogram))
+                for proc_name, proc_err in process_errors.iteritems() :
+                    total_err += np.power(proc_err, 2)
+                total_err = np.sqrt(total_err)
+
+
+                # add to ratio error band error
+                if do_syst :
+                    sm_ratio_error = np.power(sm_ratio_error, 2) + np.power(total_err, 2)
+                    sm_ratio_error = np.sqrt(sm_ratio_error)
+
+        # SIGNIFICANCE
+        data_vals = ratio_y
+        sm_vals = np.ones(len(ratio_y))
+        data_vals_err = []
+        print "ratio_data_err_low = {}".format(ratio_data_err_low)
+        print "ratio_data_err_hi  = {}".format(ratio_data_err_high)
+        for i in range(len(ratio_data_err_low)) :
+            low_val = abs(ratio_data_err_low[i])
+            hi_val = abs(ratio_data_err_high[i])
+            err_val = 0.5 * (low_val + hi_val)
+            data_vals_err.append(err_val)
+        data_vals_err = np.array(data_vals_err)
+
+        print "data_vals_err = {}".format(data_vals_err)
+            
+        uncert_vals = np.sqrt( np.power(sm_ratio_error,2) + np.power(data_vals_err,2) )
+        sig_vals = (ratio_y - sm_vals) / uncert_vals
+        print "data_vals = {}".format(ratio_y)
+        print "sm_vals   = {}".format(sm_vals)
+        print "uncert_vals {}".format(uncert_vals)
+        print "Significance vals: %s" % sig_vals
+                
+                
+
         ratio_stat_error_band = errorbars.error_hatches(
                 [xv - 0.5 * plot.bin_width for xv in ratio_x],
                 np.ones(len(ratio_y)),
@@ -951,6 +1111,10 @@ def make_stack_plots(plots, region, backgrounds, signals, data = None, output_di
                 sm_ratio_error,
                 plot.bin_width)
         lower_pad.add_collection(ratio_stat_error_band)
+
+        #lower_pad.set_yticks([0.8, 0.9, 1.0, 1.1, 1.2])
+        lower_pad.set_yticks([0.5, 0.75, 1.0, 1.25, 1.5])
+        lower_pad.set_ylim([0.5, 1.5])
 
 
 
@@ -1216,6 +1380,7 @@ def make_stack_plot(plot, region, backgrounds, signals, data, output_dir, suffix
                 relatve_error = 0
             sm_ratio_error.append(relative_error)
         sm_x_error_ratio = [plot.bin_width for a in ratio_x]
+
 
         # for the data graph we move the x-center to the center of the bin
         # so subtract off half the bin-width for the error hatches

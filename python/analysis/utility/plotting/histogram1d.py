@@ -6,6 +6,8 @@ from bisect import bisect_left
 class histogram1d(object) :
     def __init__(self, name = '', binning = []) :
 
+        #print "HISTOGRAM FUCK binning = %s" % binning
+
         self._name = name
         self._binning = binning
         self._variable_width = False
@@ -36,7 +38,10 @@ class histogram1d(object) :
             self._bin_width = binning[0]
             self._x_low = binning[1]
             self._x_high = binning[2]
+            #print "HISTOGRAM FUCK binning[0] = %.2f   binning[1] = %.2f  binning[2] = %.2f" % (binning[0], binning[1], binning[2])
             self._bins = np.arange(binning[1], binning[2] + binning[0], binning[0])
+            self._bins = self._bins[ ~ (self._bins > (binning[2] + 1e-5)) ]
+            #print "HISTOGRAM FUCK _bins = %s" % self._bins
         else :
             self._variable_width = True
             self._x_low = binning[0]

@@ -1,0 +1,46 @@
+{
+    "name" : "wt",
+    "samples" : [
+        {
+        "variation" : "nominal",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16a/output/CENTRAL_410648_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16a/output/CENTRAL_410649_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16d/output/CENTRAL_410648_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16d/output/CENTRAL_410649_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16e/output/CENTRAL_410648_mc16e.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16e/output/CENTRAL_410649_mc16e.root"
+        ]},
+        {
+        "variation" : "ds",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16a/output/CENTRAL_410656_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16a/output/CENTRAL_410657_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16d/output/CENTRAL_410656_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16d/output/CENTRAL_410657_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16e/output/CENTRAL_410656_mc16e.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/mc16e/output/CENTRAL_410657_mc16e.root"
+        ]},
+        {
+        "variation" : "hardscatter_matching",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16a/output/CENTRAL_412003_mc16a.root", 
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16d/output/CENTRAL_412003_mc16d.root", 
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16e/output/CENTRAL_412003_mc16e.root"
+        ]},
+        {
+        "variation" : "frag_had",
+        "treename" : "superNt",
+        "files" : [
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16a/output/CENTRAL_411038_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16a/output/CENTRAL_411039_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16d/output/CENTRAL_411038_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16d/output/CENTRAL_411039_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16e/output/CENTRAL_411038_mc16e.root",
+            "/data/uclhc/uci/user/dantrim/ntuples/n0307/e_mar13_wt_sys/mc/mc16e/output/CENTRAL_411039_mc16e.root"
+        ]}
+    ]
+}

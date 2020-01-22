@@ -49,27 +49,27 @@ import dantrimania.python.analysis.utility.samples.region as region
 ##h5_dir_mc_top = "/data/uclhc/uci/user/dantrim/ntuples/n0306/d_jan15/mc/h5/"
 
 
-filelist_dir = "/data/uclhc/uci/user/dantrim/n0306val/susynt-read/filelists/"
-filelist_dir_data = "/data/uclhc/uci/user/dantrim/n0306val/susynt-read/filelists/"
-h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/mc/mc16a/h5/"
-h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/submission_dir/data/h5/"
+filelist_dir = "/data/uclhc/uci/user/dantrim/n0307val/susynt-read/filelists/"
+filelist_dir_data = "/data/uclhc/uci/user/dantrim/n0307val/susynt-read/filelists/"
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/mc/h5/"
+#h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0307/b_feb18/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0307/a_feb10/data/h5/"
+
+h5_dir_mc = "/data/uclhc/uci/user/dantrim/ntuples/n0307/d_feb21/mc/h5/"
+h5_dir_data = "/data/uclhc/uci/user/dantrim/ntuples/n0307/d_feb21/data/h5/"
 
 #loaded_samples = []
 #loaded_signals = []
 
 lumi_factor = 36.24
 lumi_factor = 136
-lumi_factor = 139.89 # joakim
+lumi_factor = 140.48 # joakim
 #lumi_factor = 36.24
 #lumi_factor = 80.0
 #lumi_factor = 78.5
 #lumi_factor = 43.6
 
-#tags = ["mc16a"]#, "mc16d"] #, "mc16d"]
-#tags = ['mc16a', 'mc16d', 'mc16e']
-tags = ['mc16a']
-#tags = ["mc16a"]
-#tags = ["mc16a", "mc16d"]
+tags = ["mc16a", "mc16d", "mc16e"]
 
 which_data = '1516'
 sf_vals_tt = { '1516' : 1.00, '151617' : 1.00 }
@@ -90,26 +90,17 @@ sf_vals_wt = { '1516' : 1.00, '151617' : 1.00 }
 #top.load(filelist_dir + "topDS_mc16a", h5_dir_mc, tags = tags)
 #loaded_samples.append(top)
 
-top_sf =  0.9 #1.0 #0.94 #0.97 #0.97# 1.#0.64 #0.87 #0.88#0.905#0.93 #0.91 #0.97 #0.98 #0.98
-z_sf = 1.0#1.31#1.30#27#2 #1.3
-z_sf = 1.31
+top_sf =  0.85 #0.87  #0.9 #1.0 #0.94 #0.97 #0.97# 1.#0.64 #0.87 #0.88#0.905#0.93 #0.91 #0.97 #0.98 #0.98
+z_sf = 1.35 #1.31#1.30#27#2 #1.3
 
-print ""
-print " ***** WARNING: USING DIFFERENT FILEDIR FOR TTBAR ***** "
-print " ***** WARNING: USING DIFFERENT FILEDIR FOR TTBAR ***** "
-print " ***** WARNING: USING DIFFERENT FILEDIR FOR TTBAR ***** "
-print " ***** WARNING: USING DIFFERENT FILEDIR FOR TTBAR ***** "
-print ""
-ttbar_file_directory = "/data/uclhc/uci/user/dantrim/ntuples/n0306/h_joakim_complete/submission_dir_jan22/mc/h5/"
-
-ttbar = sample.Sample("ttbarHighStatsFull", "$t\\bar{t} \\times %s$" % top_sf)
+ttbar = sample.Sample("ttbarFull", "$t\\bar{t} \\times %s$" % top_sf)
 #ttbar = sample.Sample("ttbar", "$t\\bar{t} \\times$" % str(sf_vals_tt[which_data]))
 ttbar.scalefactor = lumi_factor * top_sf #* 0.646#* 0.5533 #* 0.93 #* sf_vals_tt[which_data]
 ttbar.fillstyle = 0
 ttbar.linestyle = '-'
 ttbar.color = "#057390"
 #ttbar.color = "#0057FF"
-ttbar.load(filelist_dir + "ttbar_mc16a", ttbar_file_directory, tags = ["mc16a","mc16d", "mc16e"])#, "mc16d", "mc16e"])
+ttbar.load(filelist_dir + "ttbar_mc16a", h5_dir_mc, tags = tags)#["mc16a"],"mc16d", "mc16e"])#, "mc16d", "mc16e"])
 #ttbar.load(filelist_dir + "ttbar_mc16a", h5_dir_mc, tags = ["mc16a" ,"mc16d", "mc16e"])#, "mc16d", "mc16e"])
 loaded_samples.append(ttbar)
 
@@ -134,7 +125,7 @@ if not useDS :
     wt.color = "#78b166"
     #wt.color = "#008AFF"
     #wt.load(filelist_dir + "WtPP8_mc16a", h5_dir_mc, tags = ['mc16a', 'mc16d', 'mc16e'])
-    wt.load(filelist_dir + "WtPP8_mc16a", h5_dir_mc, tags = ['mc16a', 'mc16d', 'mc16e'])
+    wt.load(filelist_dir + "WtPP8_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
     loaded_samples.append(wt)
 
     #wt = sample.Sample("WtDR", "$Wt$ (DR) $\\times %s$" % str(top_sf))
@@ -149,16 +140,22 @@ if not useDS :
     #loaded_samples.append(wt)
 
 else :
-    wt_file_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/e_jan20/mc/h5/"
-    #wt = sample.Sample("WtDS", "$Wt$ (DS)")# \\times 0.45$")
-    wt = sample.Sample("WtDSFull5", "$Wt$ (DS)")# \\times 0.45$")
-    wt.scalefactor = lumi_factor * top_sf 
+    wt = sample.Sample("WtDSFull", "$Wt$ (DS) $\\times %s$" % top_sf)
+    wt.scalefactor = lumi_factor * top_sf
     wt.fillstyle = 0
     wt.linestyle = '-'
-    wt.color = "#e94f37"
-    #wt.load(filelist_dir + "WtDS_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])#, tags = tags)
-    wt.load(filelist_dir + "WtDS_mc16a", h5_dir_mc, tags = ['mc16a', 'mc16d', 'mc16e'])#, tags = tags)
+    wt.color = "#78b166"
+    wt.load(filelist_dir + "WtDS_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
     loaded_samples.append(wt)
+
+#stop = sample.Sample("STFull", "Single Top")
+#stop.scalefactor = lumi_factor
+#stop.fillstyle = 0
+#stop.linestyle = '-'
+#stop.color = 'b'
+#stop.load(filelist_dir + "single_top_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
+#loaded_samples.append(stop)
+
 #zjets = sample.Sample("Zjets", "$Z$+jets $\\times %s$" % z_sf)
 #zjets.scalefactor = lumi_factor * z_sf
 #zjets.fillstyle = 0
@@ -174,7 +171,7 @@ zjets.fillstyle = 0
 zjets.linestyle = '-'
 zjets.color = "#fc8f1e"
 #zjets.color = "#FF0000"
-zjets.load(filelist_dir + "zjets_sherpa_mc16a", h5_dir_mc, tags = ['mc16a', 'mc16d', 'mc16e'])
+zjets.load(filelist_dir + "zjets_sherpa_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
 loaded_samples.append(zjets)
 
 #zee = sample.Sample("Zee", "$Z\\rightarrow ee$")
@@ -221,15 +218,22 @@ loaded_samples.append(zjets)
 #higgs.load(filelist_dir + "single_higgs_mc16a", h5_dir_mc, tags = tags)
 #loaded_samples.append(higgs)
 
-higgs = sample.Sample("higgsFull", "Single-higgs")
+higgs = sample.Sample("higgsCorr2Full", "Single-higgs")
 higgs.scalefactor = lumi_factor
 higgs.fillstyle = 0
 higgs.linestyle = '-'
 higgs.color = '#d93b3b'
 #higgs.color = '#7F557D'
-higgs.load(filelist_dir + "single_higgs_mc16a", h5_dir_mc, tags = ['mc16a', 'mc16d', 'mc16e'])
+#higgs.load(filelist_dir + "single_higgs_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
 #loaded_samples.append(higgs)
 
+tth = sample.Sample("ttHFull", "$t\\bar{t} +H$")
+tth.scalefactor = lumi_factor
+tth.fillstyle = 0
+tth.linestyle = '-'
+tth.color = '#d93b3b'
+#tth.load(filelist_dir + "ttH_dilep_mc16a", h5_dir_mc, tags = tags) #['mc16a', 'mc16d', 'mc16e'])
+#loaded_samples.append(tth)
 
 ##zee = sample.Sample("zee", "$Z\\rightarrow ee$")
 ##zee.scalefactor = lumi_factor
@@ -261,7 +265,7 @@ dib.scalefactor = lumi_factor
 dib.fillstyle = 0
 dib.linestyle = '-'
 dib.color = "#f6f7eb"
-dib.load(filelist_dir + "diboson_sherpa_mc16a", h5_dir_mc, tags = ["mc16a", "mc16d", "mc16e"])
+dib.load(filelist_dir + "diboson_sherpa_mc16a", h5_dir_mc, tags = tags) #["mc16a", "mc16d", "mc16e"])
 loaded_samples.append(dib)
 #dib = sample.Sample("Diboson", "$VV$")
 #dib.scalefactor = lumi_factor
@@ -271,11 +275,11 @@ loaded_samples.append(dib)
 #dib.load(filelist_dir + "diboson_sherpa_mc16a", h5_dir_mc, tags = tags)
 #loaded_samples.append(dib)
 
-#wjets = sample.Sample("Wjets", "$W + jets$")
-#wjets.scalefactor = lumi_factor
-#wjets.fillstyle = 0
-#wjets.linestyle = '-'
-#wjets.color = "#726e97"
+wjets = sample.Sample("WjetsFull", "$W + jets$")
+wjets.scalefactor = lumi_factor
+wjets.fillstyle = 0
+wjets.linestyle = '-'
+wjets.color = "#726e97"
 #wjets.load(filelist_dir + "wjets_sherpa_mc16a", h5_dir_mc, tags = tags)
 #loaded_samples.append(wjets)
 
@@ -284,7 +288,7 @@ ttv.scalefactor = lumi_factor
 ttv.fillstyle = 0
 ttv.linestyle = '-'
 ttv.color = "#353531"
-ttv.load(filelist_dir + "ttV_mc16a", h5_dir_mc, tags = ["mc16a", "mc16d", "mc16e"])
+ttv.load(filelist_dir + "ttV_mc16a", h5_dir_mc, tags = tags) #["mc16a", "mc16d", "mc16e"])
 loaded_samples.append(ttv)
 
 #ttv = sample.Sample("ttV", "$t\\bar{t} + V$")
@@ -300,7 +304,7 @@ dy.fillstyle = 0
 dy.linestyle = '-'
 dy.color = "#f7b94c"
 #dy.color = "#FF5959"
-dy.load(filelist_dir + "drellyan_sherpa_mc16a", h5_dir_mc, tags = ["mc16a", "mc16d", "mc16e"])
+dy.load(filelist_dir + "drellyan_sherpa_mc16a", h5_dir_mc, tags = tags) #["mc16a", "mc16d", "mc16e"])
 loaded_samples.append(dy)
 
 #dy = sample.Sample("DY", "Drell-Yan")
@@ -337,25 +341,16 @@ loaded_samples.append(dy)
 ##loaded_samples.append(dytt)
 #
 ##signals
-##hh0 = sample.Sample("hhSM", "$hh$ SM ($\\times 20$)")
-##hh0.is_signal = True
-##hh0.scalefactor = lumi_factor * 20 # 0.06# * 100
-##hh0.fillstyle = 0
-##hh0.linestyle = '--'
-##hh0.color = '#fa0f00'
-##hh0.load(filelist_dir + "custom_wwbb", h5_dir_sig, dsid_select = '123456')
-##loaded_samples.append(hh0)
-#
-hh = sample.Sample("hhSMFull", "SM $hh$ (arbitrary $\\sigma$)")
-hh.is_signal = True
-hh.scalefactor = lumi_factor * 5000#* 350
-hh.fillstyle = 0
-hh.linestyle = '--'
-hh.color = 'r'
-#hh.load(filelist_dir + "wwbb_mc16a", h5_dir_mc, tags = tags)
-sig_file_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/wwbb_signal/"
-hh.load('/data/uclhc/uci/user/dantrim/n0306val/susynt-read/filelists_mwt2/wwbb_mc16a', sig_file_dir, tags = ["mc16a", "mc16d", "mc16e"])
-#loaded_samples.append(hh)
+#hh = sample.Sample("hhSMFull", "SM $hh$ (arbitrary $\\sigma$)")
+#hh.is_signal = True
+#hh.scalefactor = lumi_factor * 5000#* 350
+#hh.fillstyle = 0
+#hh.linestyle = '--'
+#hh.color = 'r'
+##hh.load(filelist_dir + "wwbb_mc16a", h5_dir_mc, tags = tags)
+#sig_file_dir = "/data/uclhc/uci/user/dantrim/ntuples/n0306/f_jan21/wwbb_signal/"
+#hh.load('/data/uclhc/uci/user/dantrim/n0306val/susynt-read/filelists_mwt2/wwbb_mc16a', sig_file_dir, tags = ["mc16a", "mc16d", "mc16e"])
+##loaded_samples.append(hh)
 
 ## data
 data = sample.Sample("data15161718REAL", "Data ('15+'16+'17)")
@@ -366,13 +361,13 @@ data.scalefactor = 1.0
 data.fillstyle = 0
 data.linestyle = '-'
 data.color = 'k'
-#data.load(filelist_dir + "ttV_mc16a", h5_dir_mc, tags = tags)
 #data.load(filelist_dir_data + "n0306_data1516", h5_dir_data)
-data.load(filelist_dir_data + "n0306_data15161718", h5_dir_data)
+data.load(filelist_dir_data + "n0307_data15161718", h5_dir_data)
 #print 'LOADING DATA AS Wt SAMPLE'
 #print 'LOADING DATA AS Wt SAMPLE'
 #print 'LOADING DATA AS Wt SAMPLE'
 #print 'LOADING DATA AS Wt SAMPLE'
+#data.load(filelist_dir + "ttV_mc16a", h5_dir_mc, tags = tags)
 #data.load(filelist_dir + "wwbb_mc16a", h5_dir_mc, tags = tags)
 #data.load(filelist_dir + "WtPP8_mc16a", h5_dir_mc, tags = tags)
 loaded_samples.append(data)
@@ -544,7 +539,7 @@ variables = {}
 
 # definitions as of Jan 21
 variables["met"]                    = { "presel": [60, 0, 600], "crtoptest" : [50, 0, 500]    ,    "vrtoptest" : [100, 0, 800]    ,    "crztest" :  [40, 0, 340],    "vrztest" :  [40, 0, 440]}
-variables["mbb"]                    = { "presel": [5,100, 140], "crtoptest" : [100, 100, 1300],       "vrtoptest" : [400, 0, 1800],       "crztest" :  [5, 100, 160],  "vrztest" :  [5, 100, 160]}
+variables["mbb"]                    = { "presel": [5,100, 140], "crtoptest" : [20, 0, 600],       "vrtoptest" : [400, 0, 1800],       "crztest" :  [5, 100, 160],  "vrztest" :  [5, 100, 160]}
 variables["abs(metPhi)"]            = { "presel": [0.16, 0, 3.2], "crtoptest" : [0.32, 0, 3.2] ,   "vrtoptest" : [0.32, 0, 3.2] ,   "crztest" : [0.32, 0, 3.2],   "vrztest" : [0.32, 0, 3.2]}
 variables["mll"]                    = { "presel": [60, 0, 1200], "crtoptest" : [5, 20, 60]    ,     "vrtoptest" : [5, 20, 60]    ,     "crztest" : [1, 80, 102],     "vrztest" : [5, 70, 115]}
 variables["dRll"]                   = { "presel": [0.3, 0, 6], "crtoptest" : [0.25, 0, 3.25]      ,  "vrtoptest" : [0.3, 0, 3]      ,  "crztest" : [0.25, 0, 3],      "vrztest" : [0.4, 0, 4]}
@@ -577,18 +572,18 @@ variables["dRbb"]                   = { "presel": [0.25, 0, 5], "crtoptest" : [0
 variables["abs(deta_ll)"]           = { "presel": [0.2, 0, 4], "crtoptest" : [0.2, 0, 2.2],        "vrtoptest" : [0.2, 0, 2],        "crztest" : [0.2, 0, 2],      "vrztest" : [0.2, 0, 2.4]}   
 variables["abs(dphi_WW_bb)"]        = { "presel": [0.32, 0, 3.2], "crtoptest" : [0.32, 0, 3.2],       "vrtoptest" : [0.4, 0, 3.2],       "crztest" : [0.32, 0, 3.2],   "vrztest" : [0.32, 0, 3.2]}
 
-tmp = {}
-#tmp["NN_d_hh"] = { "sr_test" : [2, -30, 20] }
-#tmp["NN_d_hh"] = { "mllpre" : [1, -12, 12] }
-tmp["mll"] = { "mllOutMbb" : [4, 20, 60] }
-tmp["l1_pt"] = { "mllOutMbb" : [20, 0, 160] }
-tmp["l0_pt"] = { "mllOutMbb" : [50, 0, 500] }
-tmp["abs(l0_eta)"] = { "mllOutMbb" : [0.4, 0, 2.4] }
-tmp["abs(l1_eta)"] = { "mllOutMbb" : [0.4, 0, 2.4] }
-#tmp["NN_d_hh"] = { "sr_nm1" : [2, -20, 12] }
-#tmp["HT2Ratio"] = { "sr_nm1" : [0.05, 0, 1] }
-#tmp["mt2_bb"] = { "sr_nm1" : [10, 0, 200] }
-variables = tmp
+#tmp = {}
+##tmp["NN_d_hh"] = { "mllpre" : [1, -12, 12] }
+#tmp["mll"] = { "mllOutMbb" : [4, 20, 60] }
+#tmp["l1_pt"] = { "mllOutMbb" : [20, 0, 160] }
+#tmp["l0_pt"] = { "mllOutMbb" : [50, 0, 500] }
+#tmp["NN_d_hh"] = { "mllOutMbb" : [2, -10, 10] }
+##tmp["abs(l0_eta)"] = { "mllOutMbb" : [0.4, 0, 2.4] }
+##tmp["abs(l1_eta)"] = { "mllOutMbb" : [0.4, 0, 2.4] }
+##tmp["NN_d_hh"] = { "sr_nm1" : [2, -20, 12] }
+##tmp["HT2Ratio"] = { "sr_nm1" : [0.05, 0, 1] }
+##tmp["mt2_bb"] = { "sr_nm1" : [10, 0, 200] }
+#variables = tmp
 
 #tmp = {}
 ##tmp['NN_d_hh'] = { "nn_crz" : [1,-50,50] }

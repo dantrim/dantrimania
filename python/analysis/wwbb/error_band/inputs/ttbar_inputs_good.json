@@ -5,9 +5,9 @@
         "variation" : "nominal",
         "treename" : "TTbar_CENTRAL",
         "files" : [
-            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/ttbar_mar30_2_2019_03_30/HFT_TTbar_CENTRAL_mc16a.root",
-            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/ttbar_mar30_2_2019_03_30/HFT_TTbar_CENTRAL_mc16d.root",
-            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/ttbar_mar30_2_2019_03_30/HFT_TTbar_CENTRAL_mc16e.root"
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/hft_outputs_apr2_2019_04_02/HFT_TTbar_CENTRAL_mc16a.root",
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/hft_outputs_apr2_2019_04_02/HFT_TTbar_CENTRAL_mc16d.root",
+            "/data/uclhc/uci/user/dantrim/wwbb_limits/r21_2019/histfitter_setup/hft_outputs_apr2_2019_04_02/HFT_TTbar_CENTRAL_mc16e.root"
         ]
         },
         {
